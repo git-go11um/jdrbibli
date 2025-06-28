@@ -1,4 +1,4 @@
-package com.jdrbibli.user_service;
+package com.jdrbibli.userservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

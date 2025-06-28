@@ -1,0 +1,39 @@
+### Get all users (should return empty list at first)
+GET http://localhost:8082/api/users
+Content-Type: application/json
+
+###
+
+### Create new user
+POST http://localhost:8082/api/users
+Content-Type: application/json
+
+{
+  "pseudo": "Alice",
+  "email": "alice@example.com",
+  "avatarUrl": "https://example.com/avatar/alice.png"
+}
+
+###
+
+### Create another user
+POST http://localhost:8082/api/users
+Content-Type: application/json
+
+{
+  "pseudo": "Bob",
+  "email": "bob@example.com",
+  "avatarUrl": "https://example.com/avatar/bob.png"
+}
+
+###
+
+### Get user by ID (ex: 1)
+GET http://localhost:8082/api/users/1
+Content-Type: application/json
+
+###
+
+### Delete user by ID (ex: 2)
+DELETE http://localhost:8082/api/users/1
+Content-Type: application/json

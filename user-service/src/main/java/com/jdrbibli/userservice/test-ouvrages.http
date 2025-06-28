@@ -1,0 +1,41 @@
+### Get all ouvrages (devrait être vide au début)
+GET http://localhost:8082/api/ouvrages
+Content-Type: application/json
+
+###
+
+### Create a new ouvrage
+POST http://localhost:8082/api/ouvrages
+Content-Type: application/json
+
+{
+  "title": "Bestiaire monstrueux",
+  "description": "Un bestiaire pour D&D5",
+  "imageUrl": "https://example.com/dd5_bestiaire.png",
+  "gamme": { "id": 1 }
+}
+
+###
+
+### Create another ouvrage
+POST http://localhost:8082/api/ouvrages
+Content-Type: application/json
+
+{
+  "title": "Les années folles",
+  "description": "Extensions décrivant la France des années 1920",
+  "imageUrl": "https://example.com/cthulhu_annees_folles.png",
+  "gamme": { "id": 1 }
+}
+
+###
+
+### Get a ouvrage by ID (par exemple ID=1)
+GET http://localhost:8082/api/ouvrages/1
+Content-Type: application/json
+
+###
+
+### Delete a ouvrage by ID (par exemple ID=2)
+DELETE http://localhost:8082/api/ouvrages/2
+Content-Type: application/json
