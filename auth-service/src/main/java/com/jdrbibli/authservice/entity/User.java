@@ -7,12 +7,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "utilisateurs")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Utilisateur {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,8 +28,8 @@ public class Utilisateur {
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "utilisateurs_roles",
-        joinColumns = @JoinColumn(name = "utilisateur_id"),
+    @JoinTable(name = "users_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 }

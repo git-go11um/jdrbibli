@@ -1,9 +1,9 @@
 package com.jdrbibli.authservice.service;
 
 import com.jdrbibli.authservice.entity.Role;
-import com.jdrbibli.authservice.entity.Utilisateur;
+import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.repository.RoleRepository;
-import com.jdrbibli.authservice.repository.UtilisateurRepository;
+import com.jdrbibli.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,19 +12,19 @@ import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
-public class UtilisateurService implements IUtilisateurService {
+public class UserService implements IUserService {
 
-    private final UtilisateurRepository utilisateurRepository;
+    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public Utilisateur inscrireNouvelUtilisateur(String pseudo, String email, String motDePasse) {
+    public User inscrireNewUser(String pseudo, String email, String motDePasse) {
         // Vérifier si l'email ou le pseudo existent déjà
-        if (utilisateurRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("Email déjà utilisé");
         }
-        if (utilisateurRepository.existsByPseudo(pseudo)) {
+        if (userRepository.existsByPseudo(pseudo)) {
             throw new RuntimeException("Pseudo déjà utilisé");
         }
 
@@ -35,14 +35,14 @@ public class UtilisateurService implements IUtilisateurService {
         Role roleUser = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Rôle ROLE_USER introuvable dans la base de données"));
 
-        // Créer et sauvegarder l'utilisateur
-        Utilisateur utilisateur = Utilisateur.builder()
+        // Créer et sauvegarder le user
+        User user = User.builder()
                 .pseudo(pseudo)
                 .email(email)
                 .motDePasse(motDePasseHache)
                 .roles(Collections.singleton(roleUser))
                 .build();
 
-        return utilisateurRepository.save(utilisateur);
+        return userRepository.save(user);
     }
 }

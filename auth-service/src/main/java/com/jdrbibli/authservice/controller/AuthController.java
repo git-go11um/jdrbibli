@@ -1,8 +1,8 @@
 package com.jdrbibli.authservice.controller;
 
 import com.jdrbibli.authservice.dto.InscriptionRequest;
-import com.jdrbibli.authservice.entity.Utilisateur;
-import com.jdrbibli.authservice.service.IUtilisateurService;
+import com.jdrbibli.authservice.entity.User;
+import com.jdrbibli.authservice.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final IUtilisateurService utilisateurService;
+    private final IUserService userService;
 
     @PostMapping("/inscription")
-    public ResponseEntity<Utilisateur> inscrireUtilisateur(@Valid @RequestBody InscriptionRequest request) {
-        Utilisateur nouvelUtilisateur = utilisateurService.inscrireNouvelUtilisateur(
+    public ResponseEntity<User> inscrireUser(@Valid @RequestBody InscriptionRequest request) {
+        User nouvelUser = userService.inscrireNewUser(
                 request.getPseudo(),
                 request.getEmail(),
                 request.getMotDePasse()
         );
-        return ResponseEntity.ok(nouvelUtilisateur);
+        return ResponseEntity.ok(nouvelUser);
     }
 }
