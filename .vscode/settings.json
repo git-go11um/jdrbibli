@@ -1,4 +1,23 @@
 {
     "java.compile.nullAnalysis.mode": "disabled",
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.errors.incompleteClasspath.severity": "ignore",
+  "java.configuration.checkProjectSettingsExclusions": false,
+  "java.project.referencedLibraries": [    "lib/**/*.jar"  ],
+  "java.compile.enableAnnotationProcessing": true,
+
+
+  "treeMaker.files.selectedOutputFormat": "txt", // markdown, json, yaml, xml, csv, txt
+  "treeMaker.files.outputFolder": "tree-maker", // Output folder for the tree file
+  "treeMaker.files.outputFileName": "structure", // Output file name
+  "treeMaker.files.outputFilePrefix": "", // Output file prefix
+  "treeMaker.files.outputFileSuffix": "", // Output file suffix
+  "treeMaker.files.outputFileSeparator": "_", // Output file separator
+  "treeMaker.search.ignoreFilePathPatternOnExport": ["**/dist/**", "**/tree-maker/**"], // Ignore file path patterns
+  "treeMaker.search.shouldListOnlyFiles": false, // List only files
+  "treeMaker.search.maxSearchRecursionDepth": 0, // Maximum search recursion depth. 0 for unlimited
+  "treeMaker.search.supportsHiddenFiles": true, // Supports hidden files
+  "treeMaker.search.keepGitignorePreferences": false, // Keep .gitignore preferences
 }

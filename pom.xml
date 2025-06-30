@@ -13,13 +13,13 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.3</version>
+    <version>3.2.6</version> <!-- Mise à jour vers une version compatible -->
     <relativePath/>
   </parent>
 
   <properties>
     <java.version>21</java.version>
-    <spring-cloud.version>2025.0.0</spring-cloud.version>
+    <spring-cloud.version>2023.0.2</spring-cloud.version>
   </properties>
 
   <modules>
@@ -38,6 +38,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      
     </dependencies>
   </dependencyManagement>
 

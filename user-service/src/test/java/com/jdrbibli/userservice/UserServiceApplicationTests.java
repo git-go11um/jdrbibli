@@ -1,9 +1,10 @@
-package com.jdrbibli.user_service;
+package com.jdrbibli.userservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+
+@SpringBootTest(classes = UserServiceApplication.class)
 class UserServiceApplicationTests {
 
 	@Test

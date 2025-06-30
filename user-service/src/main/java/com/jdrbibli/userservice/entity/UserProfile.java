@@ -1,11 +1,13 @@
 package com.jdrbibli.userservice.entity;
 
+import com.jdrbibli.userservice.dto.OuvrageDTO;
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "user_profiles")
 public class UserProfile {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -14,15 +16,23 @@ public class UserProfile {
     private String email;
     private String avatarUrl;
 
-    // Pour plus tard : relations avec amis et ludothèque
-    // @OneToMany(mappedBy = "sender") private List<FriendRequest> sentRequests;
-    // @OneToMany(mappedBy = "receiver") private List<FriendRequest>
-    // receivedRequests;
-    // @OneToMany private List<GameItem> ludotheque;
+    /**
+     * Liste d'IDs des ouvrages liés à cet utilisateur (persistée en base).
+     */
+    @ElementCollection
+    @CollectionTable(name = "user_ludotheque", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "ouvrage_id")
+    private List<Long> ouvrageIds;
 
-    @OneToMany
-    @JoinTable(name = "user_ludotheque", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "ouvrage_id"))
-    private List<Ouvrage> ludotheque;
+    /**
+     * Liste des ouvrages complets récupérés depuis ouvrage-service (non persistée).
+     */
+    @Transient
+    private List<OuvrageDTO> ludotheque;
+
+    // Pour plus tard : relations avec amis
+    // @OneToMany(mappedBy = "sender") private List<FriendRequest> sentRequests;
+    // @OneToMany(mappedBy = "receiver") private List<FriendRequest> receivedRequests;
 
     // Getters et setters
     public Long getId() {
@@ -55,5 +65,21 @@ public class UserProfile {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public List<Long> getOuvrageIds() {
+        return ouvrageIds;
+    }
+
+    public void setOuvrageIds(List<Long> ouvrageIds) {
+        this.ouvrageIds = ouvrageIds;
+    }
+
+    public List<OuvrageDTO> getLudotheque() {
+        return ludotheque;
+    }
+
+    public void setLudotheque(List<OuvrageDTO> ludotheque) {
+        this.ludotheque = ludotheque;
     }
 }

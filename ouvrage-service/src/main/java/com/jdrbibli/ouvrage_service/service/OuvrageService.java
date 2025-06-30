@@ -1,7 +1,7 @@
-package com.jdrbibli.userservice.service;
+package com.jdrbibli.ouvrage_service.service;
 
-import com.jdrbibli.userservice.entity.Ouvrage;
-import com.jdrbibli.userservice.repository.OuvrageRepository;
+import com.jdrbibli.ouvrage_service.entity.Ouvrage;
+import com.jdrbibli.ouvrage_service.repository.OuvrageRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,19 +15,19 @@ public class OuvrageService {
         this.ouvrageRepository = ouvrageRepository;
     }
 
-    public List<Ouvrage> getAllOuvrages() {
+    public List<Ouvrage> findAll() {
         return ouvrageRepository.findAll();
     }
 
-    public Optional<Ouvrage> getOuvrageById(Long id) {
+    public Optional<Ouvrage> findById(Long id) {
         return ouvrageRepository.findById(id);
     }
 
-    public Ouvrage createOuvrage(Ouvrage ouvrage) {
+    public Ouvrage save(Ouvrage ouvrage) {
         return ouvrageRepository.save(ouvrage);
     }
 
-    public void deleteOuvrage(Long id) {
+    public void deleteById(Long id) {
         ouvrageRepository.deleteById(id);
     }
 }
