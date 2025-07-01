@@ -12,4 +12,7 @@ public interface IUserService {
 
     UserResponseDTO toDTO(User user);
 
+    User getUserByPseudo(String pseudo);
+
+
 }

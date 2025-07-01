@@ -23,3 +23,8 @@ spring:
 logging:
   level:
     org.hibernate.SQL: DEBUG
+
+jwt:
+  secret: maCleSecreteUltraSecuriseePourJwt1234567890
+  expiration: 3600000
+

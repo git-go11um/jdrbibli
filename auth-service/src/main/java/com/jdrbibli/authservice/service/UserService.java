@@ -58,4 +58,10 @@ public class UserService implements IUserService {
         return new UserResponseDTO(user.getId(), user.getPseudo(), user.getEmail(), roleNames);
     }
 
+    @Override
+    public User getUserByPseudo(String pseudo) {
+        return userRepository.findByPseudo(pseudo)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec le pseudo : " + pseudo));
+    }
+
 }
