@@ -9,7 +9,7 @@
   "java.compile.enableAnnotationProcessing": true,
 
 
-  "treeMaker.files.selectedOutputFormat": "txt", // markdown, json, yaml, xml, csv, txt
+  "treeMaker.files.selectedOutputFormat": "markdown", // markdown, json, yaml, xml, csv, txt
   "treeMaker.files.outputFolder": "tree-maker", // Output folder for the tree file
   "treeMaker.files.outputFileName": "structure", // Output file name
   "treeMaker.files.outputFilePrefix": "", // Output file prefix
