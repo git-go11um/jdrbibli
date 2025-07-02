@@ -1,12 +1,30 @@
 package com.jdrbibli.authservice.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
 public class AuthenticationResponse {
     private String token;
-    private String pseudo;
-    private String email;
+    private UserResponseDTO user;
+
+    public AuthenticationResponse() {
+    }
+
+    public AuthenticationResponse(String token, UserResponseDTO user) {
+        this.token = token;
+        this.user = user;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public UserResponseDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserResponseDTO user) {
+        this.user = user;
+    }
 }

@@ -1,0 +1,3 @@
+  jwt:
+    secret: MaCléSuperSecrèteQuiFaitAuMoins32Caractères123456
+    expiration: 3600000

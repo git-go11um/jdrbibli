@@ -19,57 +19,76 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long jwtExpirationMs;
 
-    private Key getSignInKey() {
+    // 🔑 Générer la clé à partir du secret
+    private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    // Générer un token simple avec claims custom optionnels
+    /**
+     * Générer un token avec claims custom optionnels
+     * @param extraClaims : map de claims supplémentaires
+     * @param pseudo : pseudo de l'utilisateur (subject)
+     */
     public String generateToken(Map<String, Object> extraClaims, String pseudo) {
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(pseudo) // on met le pseudo comme subject
+                .setSubject(pseudo)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // Générer un token sans claims custom
-    public String generateToken(String username) {
-        return generateToken(Map.of(), username);
+    /**
+     * Générer un token simple sans claims custom
+     */
+    public String generateToken(String pseudo) {
+        return generateToken(Map.of(), pseudo);
     }
 
-    // Extraire un claim générique
+    /**
+     * Extraire un claim particulier du token
+     */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    // Extraire le pseudo (subject)
+    /**
+     * Extraire le pseudo (subject)
+     */
     public String extractPseudo(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Vérifier si le token est valide (subject correspond et pas expiré)
+    /**
+     * Vérifier si le token est encore valide
+     */
     public boolean isTokenValid(String token, String pseudo) {
         final String extractedPseudo = extractPseudo(token);
         return (extractedPseudo.equals(pseudo)) && !isTokenExpired(token);
     }
 
-    // Vérifier expiration
+    /**
+     * Vérifier si le token est expiré
+     */
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    // Extraire la date d’expiration
+    /**
+     * Extraire la date d'expiration
+     */
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    // Parser le token et obtenir tous les claims
+    /**
+     * Extraire tous les claims
+     */
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

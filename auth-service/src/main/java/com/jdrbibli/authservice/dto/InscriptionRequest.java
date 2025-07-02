@@ -2,9 +2,7 @@ package com.jdrbibli.authservice.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
 
-@Data
 public class InscriptionRequest {
     @NotBlank(message = "Le pseudo est obligatoire")
     private String pseudo;
@@ -15,8 +13,8 @@ public class InscriptionRequest {
 
     @NotBlank(message = "Le mot de passe est obligatoire")
     private String motDePasse;
-    
-// Getters et Setters
+
+    // Getters et Setters
     public String getPseudo() {
         return pseudo;
     }

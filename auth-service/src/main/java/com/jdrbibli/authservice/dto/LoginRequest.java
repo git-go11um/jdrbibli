@@ -1,13 +1,18 @@
 package com.jdrbibli.authservice.dto;
 
-import lombok.Data;
-
-@Data
 public class LoginRequest {
     private String pseudo;
     private String motDePasse;
 
     public LoginRequest() {
+    }
+
+    public String getPseudo() {
+        return pseudo;
+    }
+
+    public void setPseudo(String pseudo) {
+        this.pseudo = pseudo;
     }
 
     public String getMotDePasse() {

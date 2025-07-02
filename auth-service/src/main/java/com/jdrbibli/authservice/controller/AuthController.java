@@ -8,56 +8,87 @@ import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.security.JwtService;
 import com.jdrbibli.authservice.service.IUserService;
 
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor
 public class AuthController {
 
+    private final IUserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final IUserService userService;
 
-    @PostMapping("/inscription")
-    public ResponseEntity<User> inscrireUser(@Valid @RequestBody InscriptionRequest request) {
-        User nouvelUser = userService.inscrireNewUser(
-                request.getPseudo(),
-                request.getEmail(),
-                request.getMotDePasse());
-        return ResponseEntity.ok(nouvelUser);
+    public AuthController(IUserService userService,
+            AuthenticationManager authenticationManager,
+            JwtService jwtService) {
+        this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
+    // Inscription
+    @PostMapping("/inscription")
+    public ResponseEntity<AuthenticationResponse> inscrire(@RequestBody InscriptionRequest request) {
+        User newUser = userService.inscrireNewUser(request.getPseudo(), request.getEmail(), request.getMotDePasse());
+        String token = jwtService.generateToken(newUser.getPseudo());
+        return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(newUser)));
+    }
+
+    // Login
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest request) {
-        // Créer un token d’authentification Spring à partir du pseudo et mot de passe
-        // reçus
-        var authToken = new UsernamePasswordAuthenticationToken(request.getPseudo(), request.getMotDePasse());
+        // Authentifier l'utilisateur
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getPseudo(), request.getMotDePasse()));
 
-        // Tenter l’authentification (va lancer une exception si ça échoue)
-        authenticationManager.authenticate(authToken);
-
-        // Récupérer l’utilisateur complet (avec email, rôles, etc.)
         User user = userService.getUserByPseudo(request.getPseudo());
+        String token = jwtService.generateToken(user.getPseudo());
 
-        // Générer le JWT avec le pseudo comme subject
-        String jwt = jwtService.generateToken(user.getPseudo());
-
-        // Construire la réponse avec le token et infos utilisateur
-        AuthenticationResponse response = new AuthenticationResponse(jwt, user.getPseudo(), user.getEmail());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(user)));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> supprimerUser(@PathVariable Long id) {
-        userService.supprimerUser(id);
-        return ResponseEntity.noContent().build(); // 204 No Content
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+        // Le token arrive en header "Authorization: Bearer <token>"
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token manquant ou mal formé");
+        }
+
+        String token = authorizationHeader.substring(7); // on enlève "Bearer "
+
+        try {
+            // Extraire le pseudo du token (même s’il est expiré, il faut catch
+            // ExpiredJwtException)
+            String pseudo = jwtService.extractPseudo(token);
+
+            // Ici on pourrait vérifier si le token n’est pas complètement invalide
+            // (blacklist, etc.)
+            // mais pour l’instant on se base sur la signature valide
+
+            // Générer un nouveau token
+            String newToken = jwtService.generateToken(pseudo);
+
+            // Récupérer user + créer réponse
+            User user = userService.getUserByPseudo(pseudo);
+            AuthenticationResponse response = new AuthenticationResponse(newToken, userService.toDTO(user));
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide ou expiré");
+        }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication authentication) {
+        String pseudo = authentication.getName();
+        User user = userService.getUserByPseudo(pseudo);
+        return ResponseEntity.ok(userService.toDTO(user));
     }
 }

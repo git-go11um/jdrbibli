@@ -5,6 +5,7 @@ import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.repository.UserRepository;
 import com.jdrbibli.authservice.exception.UserNotFoundException;
 import com.jdrbibli.authservice.exception.BadCredentialsException;
+import com.jdrbibli.authservice.entity.Role;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,7 @@ public class UserService implements IUserService {
 
     public UserResponseDTO toDTO(User user) {
         Set<String> roleNames = user.getRoles().stream()
-                .map(role -> role.getName())
+                .map(Role::getRoleName)
                 .collect(Collectors.toSet());
         return new UserResponseDTO(user.getId(), user.getPseudo(), user.getEmail(), roleNames);
     }

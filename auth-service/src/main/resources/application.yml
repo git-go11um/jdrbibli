@@ -20,11 +20,23 @@ spring:
     enabled: false
     locations: classpath:db/migration
 
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.springframework : DEBUG
 
 jwt:
-  secret: maCleSecreteUltraSecuriseePourJwt1234567890
+  secret: MaSuperClefSecreteTrèsLonguePourHmacSha256DontTuDoisPrendreSoin1234567890
   expiration: 3600000
 
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: v.haumont@gmail.com
+  password: votremotdepasseoumdpapplication
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
