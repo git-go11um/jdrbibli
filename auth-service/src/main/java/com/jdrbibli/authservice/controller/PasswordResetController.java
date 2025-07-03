@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth/reset-password")
+@RequestMapping("/auth/reset-password")  // important : correspond à ce que le gateway forwardera
 public class PasswordResetController {
 
     @Autowired
@@ -16,8 +16,8 @@ public class PasswordResetController {
 
     @PostMapping("/request")
     public ResponseEntity<String> requestReset(@RequestBody PasswordResetRequest request) {
-        resetService.createPasswordResetToken(request.getEmail());
-        return ResponseEntity.ok("Email de réinitialisation envoyé si l'email existe.");
+        resetService.createPasswordResetToken(request.getPseudo());
+        return ResponseEntity.ok("Email de réinitialisation envoyé si le pseudo existe.");
     }
 
     @PostMapping("/confirm")

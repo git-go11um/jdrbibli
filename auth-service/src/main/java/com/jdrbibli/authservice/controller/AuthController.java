@@ -1,6 +1,7 @@
 package com.jdrbibli.authservice.controller;
 
 import com.jdrbibli.authservice.dto.AuthenticationResponse;
+import com.jdrbibli.authservice.dto.ChangePasswordRequest;
 import com.jdrbibli.authservice.dto.InscriptionRequest;
 import com.jdrbibli.authservice.dto.LoginRequest;
 import com.jdrbibli.authservice.dto.UserResponseDTO;
@@ -13,6 +14,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.Map;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
@@ -91,4 +96,11 @@ public class AuthController {
         User user = userService.getUserByPseudo(pseudo);
         return ResponseEntity.ok(userService.toDTO(user));
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request, Principal connectedUser) {
+        userService.changePassword(connectedUser.getName(), request);
+        return ResponseEntity.ok().body(Map.of("message", "Mot de passe changé avec succès"));
+    }
+
 }

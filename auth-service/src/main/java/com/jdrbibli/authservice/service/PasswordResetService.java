@@ -28,15 +28,18 @@ public class PasswordResetService {
     private EmailService emailService;
 
     /**
-     * Crée un token de réinitialisation de mot de passe pour l'utilisateur et l'envoie par email.
+     * Crée un token de réinitialisation de mot de passe pour l'utilisateur et
+     * l'envoie par email.
+     * 
      * @param email L'email de l'utilisateur ayant demandé la réinitialisation
      */
-    public void createPasswordResetToken(String email) {
-        // Chercher l'utilisateur correspondant à l'email
-        Optional<User> userOpt = userRepository.findByEmail(email);
+    public void createPasswordResetToken(String pseudo) {
+        // Chercher l'utilisateur correspondant au pseudo
+        Optional<User> userOpt = userRepository.findByPseudo(pseudo);
         if (userOpt.isEmpty()) {
-            // Pour des raisons de sécurité, tu pourrais ne rien dire et faire semblant de l'envoyer
-            throw new RuntimeException("Utilisateur non trouvé avec cet email.");
+            // Pour des raisons de sécurité, tu pourrais ne rien dire et faire semblant de
+            // l'envoyer
+            throw new RuntimeException("Utilisateur non trouvé avec ce pseudo.");
         }
 
         User user = userOpt.get();
@@ -49,13 +52,15 @@ public class PasswordResetService {
         PasswordResetToken resetToken = new PasswordResetToken(token, expiryDate, user);
         tokenRepository.save(resetToken);
 
-        // Envoyer l'email de réinitialisation
-        emailService.sendPasswordResetEmail(email, token);
+        // Envoyer l'email de réinitialisation à l'email réel de l'utilisateur
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
     }
 
     /**
-     * Réinitialise le mot de passe de l'utilisateur si le token est valide et non expiré.
-     * @param token Le token fourni par l'utilisateur
+     * Réinitialise le mot de passe de l'utilisateur si le token est valide et non
+     * expiré.
+     * 
+     * @param token       Le token fourni par l'utilisateur
      * @param newPassword Le nouveau mot de passe en clair
      */
     public void resetPassword(String token, String newPassword) {
@@ -72,10 +77,11 @@ public class PasswordResetService {
         User user = resetToken.getUser();
 
         // Encoder le nouveau mot de passe et le sauvegarder
-        user.setMotDePasse(passwordEncoder.encode(newPassword));
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
         // Supprimer le token après usage pour éviter toute réutilisation
         tokenRepository.delete(resetToken);
     }
+
 }

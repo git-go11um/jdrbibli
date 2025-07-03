@@ -1,8 +1,10 @@
 package com.jdrbibli.authservice.service;
 
+import com.jdrbibli.authservice.dto.ChangePasswordRequest;
 import com.jdrbibli.authservice.dto.UserResponseDTO;
 import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.repository.UserRepository;
+import com.jdrbibli.authservice.util.PasswordValidator;
 import com.jdrbibli.authservice.exception.UserNotFoundException;
 import com.jdrbibli.authservice.exception.BadCredentialsException;
 import com.jdrbibli.authservice.entity.Role;
@@ -27,6 +29,9 @@ public class UserService implements IUserService {
 
     @Override
     public User inscrireNewUser(String pseudo, String email, String motDePasse) {
+        // Vérifier la complexité du mot de passe avant de hasher
+        PasswordValidator.validate(motDePasse);
+
         String hashedPassword = passwordEncoder.encode(motDePasse);
         User newUser = new User(null, pseudo, email, hashedPassword, new HashSet<>());
         return userRepository.save(newUser);
@@ -37,7 +42,7 @@ public class UserService implements IUserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
 
-        if (!passwordEncoder.matches(motDePasse, user.getMotDePasse())) {
+        if (!passwordEncoder.matches(motDePasse, user.getPassword())) {
             throw new BadCredentialsException("Mot de passe incorrect");
         }
 
@@ -65,4 +70,19 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec le pseudo : " + pseudo));
     }
 
+    @Override
+    public void changePassword(String userPseudo, ChangePasswordRequest request) {
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new IllegalArgumentException("Les deux mots de passe ne correspondent pas");
+        }
+
+        // Vérifier la complexité du nouveau mot de passe
+        PasswordValidator.validate(request.getNewPassword());
+
+        User user = userRepository.findByPseudo(userPseudo)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
 }

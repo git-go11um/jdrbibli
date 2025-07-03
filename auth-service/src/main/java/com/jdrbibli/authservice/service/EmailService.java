@@ -11,18 +11,20 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendPasswordResetEmail(String to, String token) {
-        String subject = "Réinitialisation de votre mot de passe";
-        String resetUrl = "http://localhost:4200/reset-password?token=" + token;
-        String text = "Bonjour,\n\n" +
-                "Vous avez demandé à réinitialiser votre mot de passe.\n" +
-                "Veuillez cliquer sur le lien suivant pour le faire :\n" + resetUrl + "\n\n" +
-                "Ce lien est valide pendant 24 heures.\n\n" +
-                "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.";
-
+    public void sendPasswordResetEmail(String toEmail, String token) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(subject);
+        message.setTo(toEmail);
+        message.setSubject("Réinitialisation de votre mot de passe");
+        
+        String text = "Bonjour,\n\n"
+                + "Vous avez demandé à réinitialiser votre mot de passe.\n"
+                + "Voici votre code de réinitialisation à copier/coller :\n\n"
+                + token + "\n\n"
+                + "Ce code est valable pendant 24 heures.\n\n"
+                + "Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer ce message.\n\n"
+                + "Cordialement,\n"
+                + "L'équipe JdrBibli";
+        
         message.setText(text);
 
         mailSender.send(message);

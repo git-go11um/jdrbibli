@@ -1,12 +1,19 @@
 package com.jdrbibli.authservice.dto;
 
 public class PasswordResetRequest {
-    private String email;
+    private String pseudo;
 
     public PasswordResetRequest() {}
 
-    public PasswordResetRequest(String email) { this.email = email; }
+    public PasswordResetRequest(String pseudo) {
+        this.pseudo = pseudo;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getPseudo() {
+        return pseudo;
+    }
+
+    public void setPseudo(String pseudo) {
+        this.pseudo = pseudo;
+    }
 }

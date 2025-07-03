@@ -1,0 +1,7 @@
+### Demande de réinitialisation mot de passe via pseudo
+POST http://localhost:8081/api/auth/reset-password/request
+Content-Type: application/json
+
+{
+  "pseudo": "testuser84"
+}

@@ -13,17 +13,18 @@ public class MailConfig {
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.yopmail.com");
-        mailSender.setPort(587);
 
-        mailSender.setUsername("alt.gu-elnpqy5@yopmail.com"); // adapte selon ton config
-        mailSender.setPassword(""); // adapte selon ton config
+        mailSender.setHost("sandbox.smtp.mailtrap.io");
+        mailSender.setPort(2525);
+
+        mailSender.setUsername("v.haumont@gmail.com"); // ton username Mailtrap
+        mailSender.setPassword("0ul@l@5&cur1T&");   // ton password Mailtrap
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true"); // utile pour debug mail
+        props.put("mail.smtp.starttls.enable", "true"); // TLS activé
+        props.put("mail.debug", "true"); // utile pour debug
 
         return mailSender;
     }

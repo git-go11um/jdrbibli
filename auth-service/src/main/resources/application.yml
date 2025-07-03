@@ -25,18 +25,21 @@ spring:
       org.hibernate.SQL: DEBUG
       org.springframework : DEBUG
 
+  mail:
+    host: localhost
+    port: 2525
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls.enable: false
+
 jwt:
   secret: MaSuperClefSecreteTrèsLonguePourHmacSha256DontTuDoisPrendreSoin1234567890
   expiration: 3600000
 
-mail:
-  host: smtp.gmail.com
-  port: 587
-  username: v.haumont@gmail.com
-  password: votremotdepasseoumdpapplication
-  properties:
-    mail:
-      smtp:
-        auth: true
-        starttls:
-          enable: true
+app:
+  frontend:
+    reset-password-url: "http://localhost:4200/reset-password?token="
