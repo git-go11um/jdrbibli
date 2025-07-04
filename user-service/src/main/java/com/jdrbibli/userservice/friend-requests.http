@@ -1,0 +1,57 @@
+### Envoyer une demande d'ami
+POST http://localhost:8084/friends/request?senderId=1&receiverId=2
+Content-Type: application/json
+
+###
+
+### Accepter une demande d'ami
+POST http://localhost:8082/friends/2/accept
+Content-Type: application/json
+
+###
+
+### Refuser une demande d'ami
+POST http://localhost:8082/friends/1/reject
+Content-Type: application/json
+
+###
+
+### Supprimer un ami
+DELETE http://localhost:8082/friends/2?userId=1
+
+###
+
+### Lister les amis de l'utilisateur 1
+GET http://localhost:8082/friends?userId=1
+Accept: application/json
+
+------------------gateway--------------------
+
+### Envoyer une demande d'ami via gateway
+POST http://localhost:8084/user/friends/request?senderId=1&receiverId=2
+Content-Type: application/json
+
+###
+
+### Accepter une demande d'ami via gateway (id de la demande = 1)
+POST http://localhost:8084/user/friends/5/accept
+Content-Type: application/json
+
+###
+
+### Refuser une demande d'ami via gateway (id de la demande = 2)
+POST http://localhost:8084/user/friends/2/reject
+Content-Type: application/json
+
+###
+
+### Supprimer un ami via gateway (friendId=2, userId=1)
+DELETE http://localhost:8084/user/friends/2?userId=1
+
+###
+
+### Lister les amis via gateway (userId=1)
+GET http://localhost:8084/user/friends?userId=1
+Accept: application/json
+
+

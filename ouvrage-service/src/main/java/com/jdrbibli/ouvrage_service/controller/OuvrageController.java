@@ -59,10 +59,31 @@ public class OuvrageController {
     
 
     @PutMapping("/{id}")
-    public Ouvrage update(@PathVariable Long id, @RequestBody Ouvrage ouvrage) {
-        ouvrage.setId(id);
-        return ouvrageService.save(ouvrage);
-    }
+public Ouvrage update(@PathVariable Long id, @RequestBody OuvrageDTO dto) {
+    Gamme gamme = gammeRepository.findById(dto.getGammeId())
+            .orElseThrow(() -> new RuntimeException("Gamme non trouvée"));
+
+    // construire un Ouvrage partiel à partir du DTO
+    Ouvrage updatedOuvrage = new Ouvrage();
+    updatedOuvrage.setGamme(gamme);
+    updatedOuvrage.setVersion(dto.getVersion());
+    updatedOuvrage.setTypeOuvrage(dto.getTypeOuvrage());
+    updatedOuvrage.setDatePublication(dto.getDatePublication());
+    updatedOuvrage.setLangue(dto.getLangue());
+    updatedOuvrage.setEditeur(dto.getEditeur());
+    updatedOuvrage.setEtat(dto.getEtat());
+    updatedOuvrage.setIsbn(dto.getIsbn());
+    updatedOuvrage.setOuvrageLie(dto.getOuvrageLie());
+    updatedOuvrage.setScenarioLie(dto.getScenarioLie());
+    updatedOuvrage.setPret(dto.getPret());
+    updatedOuvrage.setErrata(dto.getErrata());
+    updatedOuvrage.setNotes(dto.getNotes());
+    updatedOuvrage.setScenariosContenus(dto.getScenariosContenus());
+    updatedOuvrage.setAutresOuvragesGamme(dto.getAutresOuvragesGamme());
+
+    return ouvrageService.updateOuvrage(id, updatedOuvrage);
+}
+
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {

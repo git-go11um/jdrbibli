@@ -11,7 +11,9 @@ public class Ouvrage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relation vers Gamme (facultative si tu veux juste stocker le nom)
+    private String titre;     
+    private String description; 
+
     @ManyToOne
     @JoinColumn(name = "gamme_id")
     private Gamme gamme;
@@ -39,6 +41,12 @@ public class Ouvrage {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public String getTitre() { return titre; }                  
+    public void setTitre(String titre) { this.titre = titre; }  
+
+    public String getDescription() { return description; }  
+    public void setDescription(String description) { this.description = description; }
 
     public Gamme getGamme() { return gamme; }
     public void setGamme(Gamme gamme) { this.gamme = gamme; }

@@ -30,4 +30,31 @@ public class OuvrageService {
     public void deleteById(Long id) {
         ouvrageRepository.deleteById(id);
     }
+
+    public Ouvrage updateOuvrage(Long id, Ouvrage updatedOuvrage) {
+    return ouvrageRepository.findById(id)
+            .map(existing -> {
+                existing.setTitre(updatedOuvrage.getTitre());
+                existing.setDescription(updatedOuvrage.getDescription());
+                existing.setDatePublication(updatedOuvrage.getDatePublication());
+                existing.setVersion(updatedOuvrage.getVersion());
+                existing.setTypeOuvrage(updatedOuvrage.getTypeOuvrage());
+                existing.setLangue(updatedOuvrage.getLangue());
+                existing.setEditeur(updatedOuvrage.getEditeur());
+                existing.setEtat(updatedOuvrage.getEtat());
+                existing.setIsbn(updatedOuvrage.getIsbn());
+                existing.setOuvrageLie(updatedOuvrage.getOuvrageLie());
+                existing.setScenarioLie(updatedOuvrage.getScenarioLie());
+                existing.setPret(updatedOuvrage.getPret());
+                existing.setErrata(updatedOuvrage.getErrata());
+                existing.setNotes(updatedOuvrage.getNotes());
+                existing.setScenariosContenus(updatedOuvrage.getScenariosContenus());
+                existing.setAutresOuvragesGamme(updatedOuvrage.getAutresOuvragesGamme());
+                existing.setGamme(updatedOuvrage.getGamme());
+                return ouvrageRepository.save(existing);
+            })
+            .orElseThrow(() -> new RuntimeException("Ouvrage not found with id " + id));
+}
+
+
 }
