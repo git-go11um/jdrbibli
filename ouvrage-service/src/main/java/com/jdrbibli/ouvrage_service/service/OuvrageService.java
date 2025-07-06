@@ -10,7 +10,7 @@ import java.util.Optional;
 @Service
 public class OuvrageService {
     private final OuvrageRepository ouvrageRepository;
-
+    
     public OuvrageService(OuvrageRepository ouvrageRepository) {
         this.ouvrageRepository = ouvrageRepository;
     }
@@ -55,6 +55,7 @@ public class OuvrageService {
             })
             .orElseThrow(() -> new RuntimeException("Ouvrage not found with id " + id));
 }
+
 
 
 }

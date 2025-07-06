@@ -1,0 +1,31 @@
+### Liste toutes les gammes
+GET http://localhost:8083/api/gammes
+Accept: application/json
+
+### Création d'une gamme
+POST http://localhost:8083/api/gammes
+Content-Type: application/json
+
+{
+  "nom": "Donjons & Dragonsxxxxx",
+  "description": "La gamme de base de Donjons & Dragons"
+}
+
+### Récupérer une gamme par ID (remplacer 1 par l'id réel)
+GET http://localhost:8083/api/gammes/6
+Accept: application/json
+
+### Mettre à jour une gamme (remplacer 1 par l'id réel)
+PUT http://localhost:8083/api/gammes/6
+Content-Type: application/json
+
+{
+  "nom": "Donjons & Dragons (édition mise à jour)",
+  "description": "Description mise à jour de la gamme D&D"
+}
+
+### Supprimer une gamme sans force (devrait échouer si gamme non vide)
+DELETE http://localhost:8083/api/gammes/10
+
+### Supprimer une gamme avec force (supprime aussi les ouvrages liés)
+DELETE http://localhost:8083/api/gammes/11?force=true

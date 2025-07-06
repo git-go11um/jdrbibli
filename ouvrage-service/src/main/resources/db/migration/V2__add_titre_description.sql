@@ -1,3 +1,0 @@
-ALTER TABLE ouvrages
-ADD COLUMN titre VARCHAR(255),
-ADD COLUMN description TEXT;

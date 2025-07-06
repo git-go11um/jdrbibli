@@ -3,87 +3,62 @@ package com.jdrbibli.ouvrage_service.controller;
 import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
 import com.jdrbibli.ouvrage_service.entity.Ouvrage;
+import com.jdrbibli.ouvrage_service.mapper.OuvrageMapper;
 import com.jdrbibli.ouvrage_service.repository.GammeRepository;
 import com.jdrbibli.ouvrage_service.service.OuvrageService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/ouvrages")
 public class OuvrageController {
+
     private final OuvrageService ouvrageService;
-
     private final GammeRepository gammeRepository;
+    private final OuvrageMapper ouvrageMapper;
 
-    public OuvrageController(OuvrageService ouvrageService, GammeRepository gammeRepository) {
+    public OuvrageController(OuvrageService ouvrageService, GammeRepository gammeRepository, OuvrageMapper ouvrageMapper) {
         this.ouvrageService = ouvrageService;
         this.gammeRepository = gammeRepository;
+        this.ouvrageMapper = ouvrageMapper;
     }
 
     @GetMapping
-    public List<Ouvrage> getAll() {
-        return ouvrageService.findAll();
+    public List<OuvrageDTO> getAll() {
+        return ouvrageService.findAll()
+                .stream()
+                .map(ouvrageMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public Ouvrage getById(@PathVariable Long id) {
-        return ouvrageService.findById(id).orElse(null);
+    public OuvrageDTO getById(@PathVariable Long id) {
+        return ouvrageService.findById(id)
+                .map(ouvrageMapper::toDTO)
+                .orElse(null);
     }
 
     @PostMapping
-    public Ouvrage create(@RequestBody OuvrageDTO dto) {
+    public OuvrageDTO create(@RequestBody OuvrageDTO dto) {
         Gamme gamme = gammeRepository.findById(dto.getGammeId())
                 .orElseThrow(() -> new RuntimeException("Gamme non trouvée"));
 
-        Ouvrage ouvrage = new Ouvrage();
-        ouvrage.setGamme(gamme);
-        ouvrage.setVersion(dto.getVersion());
-        ouvrage.setTypeOuvrage(dto.getTypeOuvrage());
-        ouvrage.setDatePublication(dto.getDatePublication());
-        ouvrage.setLangue(dto.getLangue());
-        ouvrage.setEditeur(dto.getEditeur());
-        ouvrage.setEtat(dto.getEtat());
-        ouvrage.setIsbn(dto.getIsbn());
-        ouvrage.setOuvrageLie(dto.getOuvrageLie());
-        ouvrage.setScenarioLie(dto.getScenarioLie());
-        ouvrage.setPret(dto.getPret());
-        ouvrage.setErrata(dto.getErrata());
-        ouvrage.setNotes(dto.getNotes());
-        ouvrage.setScenariosContenus(dto.getScenariosContenus());
-        ouvrage.setAutresOuvragesGamme(dto.getAutresOuvragesGamme());
-
-        return ouvrageService.save(ouvrage);
+        Ouvrage ouvrage = ouvrageMapper.toEntity(dto, gamme);
+        Ouvrage saved = ouvrageService.save(ouvrage);
+        return ouvrageMapper.toDTO(saved);
     }
 
-    
-
     @PutMapping("/{id}")
-public Ouvrage update(@PathVariable Long id, @RequestBody OuvrageDTO dto) {
-    Gamme gamme = gammeRepository.findById(dto.getGammeId())
-            .orElseThrow(() -> new RuntimeException("Gamme non trouvée"));
+    public OuvrageDTO update(@PathVariable Long id, @RequestBody OuvrageDTO dto) {
+        Gamme gamme = gammeRepository.findById(dto.getGammeId())
+                .orElseThrow(() -> new RuntimeException("Gamme non trouvée"));
 
-    // construire un Ouvrage partiel à partir du DTO
-    Ouvrage updatedOuvrage = new Ouvrage();
-    updatedOuvrage.setGamme(gamme);
-    updatedOuvrage.setVersion(dto.getVersion());
-    updatedOuvrage.setTypeOuvrage(dto.getTypeOuvrage());
-    updatedOuvrage.setDatePublication(dto.getDatePublication());
-    updatedOuvrage.setLangue(dto.getLangue());
-    updatedOuvrage.setEditeur(dto.getEditeur());
-    updatedOuvrage.setEtat(dto.getEtat());
-    updatedOuvrage.setIsbn(dto.getIsbn());
-    updatedOuvrage.setOuvrageLie(dto.getOuvrageLie());
-    updatedOuvrage.setScenarioLie(dto.getScenarioLie());
-    updatedOuvrage.setPret(dto.getPret());
-    updatedOuvrage.setErrata(dto.getErrata());
-    updatedOuvrage.setNotes(dto.getNotes());
-    updatedOuvrage.setScenariosContenus(dto.getScenariosContenus());
-    updatedOuvrage.setAutresOuvragesGamme(dto.getAutresOuvragesGamme());
-
-    return ouvrageService.updateOuvrage(id, updatedOuvrage);
-}
-
+        Ouvrage updatedOuvrage = ouvrageMapper.toEntity(dto, gamme);
+        Ouvrage updated = ouvrageService.updateOuvrage(id, updatedOuvrage);
+        return ouvrageMapper.toDTO(updated);
+    }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {

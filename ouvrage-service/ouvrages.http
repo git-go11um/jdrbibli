@@ -1,0 +1,52 @@
+### Create (POST)
+POST http://localhost:8083/api/ouvrages
+Content-Type: application/json
+
+{
+  "titre": "Nouveau Livre de JDR",
+  "description": "Un super ouvrage",
+  "version": "1.0",
+  "typeOuvrage": "Livre de base",
+  "datePublication": "2025-01-01",
+  "langue": "Français",
+  "editeur": "Éditeur Test",
+  "etat": "Neuf",
+  "isbn": "1234567890123",
+  "ouvrageLie": "Autre ouvrage",
+  "scenarioLie": "Un scénario",
+  "pret": false,
+  "errata": "Aucun",
+  "notes": "RAS",
+  "gammeId": 1
+}
+
+### Get all (GET)
+GET http://localhost:8083/api/ouvrages
+
+### Get by ID (GET)
+GET http://localhost:8083/api/ouvrages/2
+
+### Update (PUT)
+PUT http://localhost:8083/api/ouvrages/1
+Content-Type: application/json
+
+{
+  "titre": "Livre de JDR modifié",
+  "description": "Description modifiée",
+  "version": "1.1",
+  "typeOuvrage": "Supplément",
+  "datePublication": "2025-02-01",
+  "langue": "Français",
+  "editeur": "Éditeur modifié",
+  "etat": "Occasion",
+  "isbn": "1234567890123",
+  "ouvrageLie": "Autre ouvrage modifié",
+  "scenarioLie": "Scénario modifié",
+  "pret": true,
+  "errata": "Petite erreur",
+  "notes": "Notes modifiées",
+  "gammeId": 1
+}
+
+### Delete (DELETE)
+DELETE http://localhost:8083/api/ouvrages/2
