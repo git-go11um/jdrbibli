@@ -4,8 +4,9 @@ import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
 import com.jdrbibli.ouvrage_service.entity.Ouvrage;
 import com.jdrbibli.ouvrage_service.mapper.OuvrageMapper;
-import com.jdrbibli.ouvrage_service.repository.GammeRepository;
 import com.jdrbibli.ouvrage_service.service.OuvrageService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,15 +17,14 @@ import java.util.stream.Collectors;
 public class OuvrageController {
 
     private final OuvrageService ouvrageService;
-    private final GammeRepository gammeRepository;
     private final OuvrageMapper ouvrageMapper;
 
-    public OuvrageController(OuvrageService ouvrageService, GammeRepository gammeRepository, OuvrageMapper ouvrageMapper) {
+    public OuvrageController(OuvrageService ouvrageService, OuvrageMapper ouvrageMapper) {
         this.ouvrageService = ouvrageService;
-        this.gammeRepository = gammeRepository;
         this.ouvrageMapper = ouvrageMapper;
     }
 
+    // GET /api/ouvrages
     @GetMapping
     public List<OuvrageDTO> getAll() {
         return ouvrageService.findAll()
@@ -33,35 +33,45 @@ public class OuvrageController {
                 .collect(Collectors.toList());
     }
 
+    // GET /api/ouvrages/{id}
     @GetMapping("/{id}")
-    public OuvrageDTO getById(@PathVariable Long id) {
+    public ResponseEntity<OuvrageDTO> getById(@PathVariable Long id) {
         return ouvrageService.findById(id)
                 .map(ouvrageMapper::toDTO)
-                .orElse(null);
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
+    // POST /api/ouvrages
     @PostMapping
-    public OuvrageDTO create(@RequestBody OuvrageDTO dto) {
-        Gamme gamme = gammeRepository.findById(dto.getGammeId())
-                .orElseThrow(() -> new RuntimeException("Gamme non trouvée"));
-
-        Ouvrage ouvrage = ouvrageMapper.toEntity(dto, gamme);
-        Ouvrage saved = ouvrageService.save(ouvrage);
-        return ouvrageMapper.toDTO(saved);
+    public ResponseEntity<OuvrageDTO> create(@RequestBody OuvrageDTO dto) {
+        try {
+            Ouvrage created = ouvrageService.createFromDTO(dto);
+            return new ResponseEntity<>(ouvrageMapper.toDTO(created), HttpStatus.CREATED);
+        } catch (RuntimeException ex) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 
+    // PUT /api/ouvrages/{id}
     @PutMapping("/{id}")
-    public OuvrageDTO update(@PathVariable Long id, @RequestBody OuvrageDTO dto) {
-        Gamme gamme = gammeRepository.findById(dto.getGammeId())
-                .orElseThrow(() -> new RuntimeException("Gamme non trouvée"));
-
-        Ouvrage updatedOuvrage = ouvrageMapper.toEntity(dto, gamme);
-        Ouvrage updated = ouvrageService.updateOuvrage(id, updatedOuvrage);
-        return ouvrageMapper.toDTO(updated);
+    public ResponseEntity<OuvrageDTO> update(@PathVariable Long id, @RequestBody OuvrageDTO dto) {
+        try {
+            Ouvrage updated = ouvrageService.updateFromDTO(id, dto);
+            return ResponseEntity.ok(ouvrageMapper.toDTO(updated));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    // DELETE /api/ouvrages/{id}
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        ouvrageService.deleteById(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (ouvrageService.findById(id).isPresent()) {
+            ouvrageService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

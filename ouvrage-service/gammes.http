@@ -25,7 +25,7 @@ Content-Type: application/json
 }
 
 ### Supprimer une gamme sans force (devrait échouer si gamme non vide)
-DELETE http://localhost:8083/api/gammes/10
+DELETE http://localhost:8083/api/gammes/6
 
 ### Supprimer une gamme avec force (supprime aussi les ouvrages liés)
 DELETE http://localhost:8083/api/gammes/11?force=true

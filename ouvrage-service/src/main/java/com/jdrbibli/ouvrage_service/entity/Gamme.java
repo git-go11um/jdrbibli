@@ -4,6 +4,7 @@ import java.util.List;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "gammes")  // <- indique explicitement la table à utiliser
 public class Gamme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

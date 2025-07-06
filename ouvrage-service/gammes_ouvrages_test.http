@@ -1,0 +1,42 @@
+### Créer une nouvelle gamme
+POST http://localhost:8083/api/gammes
+Content-Type: application/json
+
+{
+  "nom": "Test Gamme Suppression",
+  "description": "Gamme pour test suppression forcée"
+}
+
+### Lister toutes les gammes pour trouver l'ID (note: prends l'id créé)
+GET http://localhost:8083/api/gammes
+
+### Créer un ouvrage lié à la gamme créée (remplace GAMME_ID par l'id réel, ex: 12)
+POST http://localhost:8083/api/ouvrages
+Content-Type: application/json
+
+{
+  "titre": "Livre lié à gamme test",
+  "description": "Ouvrage pour tester suppression gamme",
+  "version": "1.0",
+  "typeOuvrage": "Livre de base",
+  "datePublication": "2025-01-01",
+  "langue": "Français",
+  "editeur": "Éditeur Test",
+  "etat": "Neuf",
+  "isbn": "1234567890123",
+  "ouvrageLie": "Autre ouvrage",
+  "scenarioLie": "Un scénario",
+  "pret": false,
+  "errata": "Aucun",
+  "notes": "RAS",
+  "gammeId": 3
+}
+
+### Vérifier que l'ouvrage a été créé
+GET http://localhost:8083/api/ouvrages
+
+### Tenter de supprimer la gamme sans force (doit échouer si ouvrage lié)
+DELETE http://localhost:8083/api/gammes/3
+
+### Supprimer la gamme avec force=true (doit réussir)
+DELETE http://localhost:8083/api/gammes/3?force=true

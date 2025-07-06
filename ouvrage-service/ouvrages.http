@@ -17,7 +17,7 @@ Content-Type: application/json
   "pret": false,
   "errata": "Aucun",
   "notes": "RAS",
-  "gammeId": 1
+  "gammeId": 12
 }
 
 ### Get all (GET)
