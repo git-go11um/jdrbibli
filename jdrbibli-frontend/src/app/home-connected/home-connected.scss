@@ -2,3 +2,16 @@
   text-align: center;
   margin-top: 50px;
 }
+
+.logout-btn {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #c9302c;
+}
