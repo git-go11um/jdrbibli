@@ -1,0 +1,51 @@
+.login-page {
+    width: 300px;
+    margin: 50px auto;
+
+    h2 {
+        text-align: center;
+    }
+
+    label {
+        display: block;
+        margin-top: 15px;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+    }
+
+    button {
+        margin-top: 20px;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .secondary-links {
+        text-align: center;
+        margin-top: 15px;
+
+        a {
+            display: inline-block;
+            margin: 0 5px;
+            color: #007acc;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    @media (max-width: 480px) {
+        width: 90%;
+    }
+
+    .error {
+        color: red;
+        margin-top: 10px;
+    }
+
+}

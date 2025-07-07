@@ -1,0 +1,18 @@
+.home-public {
+  text-align: center;
+  margin-top: 50px;
+
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #007acc;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+
+    &:hover {
+      background: #005a99;
+    }
+  }
+}
