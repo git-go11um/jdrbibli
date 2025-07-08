@@ -24,8 +24,11 @@ public class GlobalExceptionHandler {
     // Ajout pour les erreurs de validation (mot de passe trop faible, etc.)
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
+        // Passer le code d'état HTTP 400 (Bad Request) en plus du message
         ErrorResponseDTO error = new ErrorResponseDTO(ex.getMessage(), HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST) // 400
+                .body(error);
     }
 
     @ExceptionHandler(Exception.class)

@@ -22,7 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final IUserService userService;
@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     // Inscription
-    @PostMapping("/inscription")
+    @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> inscrire(@RequestBody InscriptionRequest request) {
         User newUser = userService.inscrireNewUser(request.getPseudo(), request.getEmail(), request.getMotDePasse());
         String token = jwtService.generateToken(newUser.getPseudo());

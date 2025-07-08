@@ -20,6 +20,9 @@ public class PasswordValidator {
         if (password.contains(" ")) {
             throw new IllegalArgumentException("Le mot de passe ne doit pas contenir d'espaces.");
         }
-        // optionnel : if (!password.matches(".*[!@#$%^&*].*")) {...}
+        if (!password.matches(".*[!@#$%^&*].*")) {
+            throw new IllegalArgumentException(
+                    "Le mot de passe doit contenir au moins un caractère spécial (par ex. !@#$%^&*).");
+        }
     }
 }
