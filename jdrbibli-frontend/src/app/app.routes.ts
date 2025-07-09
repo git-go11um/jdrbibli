@@ -17,9 +17,15 @@ export const routes: Routes = [
   { path: 'success-login', component: SuccessLoginPage },
   { path: 'register', component: RegisterPage },
   { path: 'password-reset', component: ResetPasswordRequestComponent },
-  { path: 'reset-password-code', component: ResetPasswordCodePage },
-  { path: 'reset-password-newpass', component: ResetPasswordNewpassPage },
+  {
+    path: 'reset-password-code',
+    loadComponent: () => import('./pages/auth/reset-password-code-page/reset-password-code-page').then(m => m.ResetPasswordCodePage)
+  },
+  {
+    path: 'reset-password-newpass',
+    loadComponent: () => import('./pages/auth/reset-password-newpass-page/reset-password-newpass-page').then(m => m.ResetPasswordNewpassPage)
+  },
   { path: 'home', component: HomeConnected, canActivate: [authGuard] },
-  
+
 
 ];

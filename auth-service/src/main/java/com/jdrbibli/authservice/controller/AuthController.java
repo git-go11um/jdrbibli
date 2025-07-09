@@ -4,6 +4,7 @@ import com.jdrbibli.authservice.dto.AuthenticationResponse;
 import com.jdrbibli.authservice.dto.ChangePasswordRequest;
 import com.jdrbibli.authservice.dto.InscriptionRequest;
 import com.jdrbibli.authservice.dto.LoginRequest;
+import com.jdrbibli.authservice.dto.PasswordResetRequest;
 import com.jdrbibli.authservice.dto.UserResponseDTO;
 import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.security.JwtService;
@@ -101,6 +102,35 @@ public class AuthController {
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request, Principal connectedUser) {
         userService.changePassword(connectedUser.getName(), request);
         return ResponseEntity.ok().body(Map.of("message", "Mot de passe changé avec succès"));
+    }
+
+    @PostMapping("/validate-reset-code")
+    public ResponseEntity<?> validateResetCode(@RequestBody PasswordResetRequest request) {
+        try {
+            boolean isValid = userService.validateResetCode(request.getPseudo(), request.getCode());
+            if (isValid) {
+                return ResponseEntity.ok(Map.of("message", "Code valide"));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Code invalide"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
+        }
+    }
+
+    // Réinitialiser le mot de passe
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest request) {
+        try {
+            // Appel du service pour réinitialiser le mot de passe
+            userService.resetPassword(request.getPseudo(), request.getCode(), request.getNewPassword());
+            return ResponseEntity.ok(Map.of("message", "Mot de passe réinitialisé avec succès"));
+        } catch (Exception e) {
+            // Si une erreur se produit, retourner une erreur serveur
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
+        }
     }
 
 }

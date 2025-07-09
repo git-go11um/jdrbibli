@@ -74,4 +74,15 @@ export class AuthService {
     }
     return throwError(() => new Error(msg));
   }
+
+  validateResetCode(pseudo: string, code: string) {
+    return this.http.post('/api/auth/validate-reset-code', { pseudo, code });
+  }
+
+  resetPassword(pseudo: string, code: string, newPassword: string) {
+    return this.http.post('/api/auth/reset-password', { pseudo, code, newPassword });
+  }
+
+
+
 }
