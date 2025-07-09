@@ -14,17 +14,17 @@ public class MailConfig {
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-        mailSender.setHost("sandbox.smtp.mailtrap.io");
-        mailSender.setPort(2525);
+        mailSender.setHost("localhost"); // Fake SMTP
+        mailSender.setPort(25);          // port où Fake SMTP écoute
 
-        mailSender.setUsername("v.haumont@gmail.com"); // ton username Mailtrap
-        mailSender.setPassword("0ul@l@5&cur1T&");   // ton password Mailtrap
+        mailSender.setUsername("");      // inutile
+        mailSender.setPassword("");      // inutile
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true"); // TLS activé
-        props.put("mail.debug", "true"); // utile pour debug
+        props.put("mail.smtp.auth", "false"); // pas d'auth
+        props.put("mail.smtp.starttls.enable", "false"); // pas de TLS
+        props.put("mail.debug", "true"); // logs utiles
 
         return mailSender;
     }

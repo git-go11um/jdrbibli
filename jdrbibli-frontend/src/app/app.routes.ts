@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
 import { HomePublic } from './pages/home-public/home-public';
-import { LoginPage } from './pages/login-page/login-page';
+import { LoginPage } from './pages/auth/login-page/login-page';
 import { HomeConnected } from './pages/home-connected/home-connected';
-import { RegisterPage } from './pages/register-page/register-page.component';
-import { ResetPasswordPage } from './pages/reset-password-page/reset-password-page';
+import { RegisterPage } from './pages/auth/register-page/register-page.component';
+import { ResetPasswordRequestComponent } from './pages/auth/reset-password-request/reset-password-request.component';
+import { ResetPasswordCodePage } from './pages/auth/reset-password-code-page/reset-password-code-page';
+import { ResetPasswordNewpassPage } from './pages/auth/reset-password-newpass-page/reset-password-newpass-page';
 import { SuccessLoginPage } from './pages/success-login-page/success-login-page';
 import { authGuard } from './guards/auth.guard'; // importe le guard
 
@@ -14,6 +16,10 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'success-login', component: SuccessLoginPage },
   { path: 'register', component: RegisterPage },
-  { path: 'reset-password', component: ResetPasswordPage },
-  { path: 'home', component: HomeConnected, canActivate: [authGuard]},
+  { path: 'password-reset', component: ResetPasswordRequestComponent },
+  { path: 'reset-password-code', component: ResetPasswordCodePage },
+  { path: 'reset-password-newpass', component: ResetPasswordNewpassPage },
+  { path: 'home', component: HomeConnected, canActivate: [authGuard] },
+  
+
 ];

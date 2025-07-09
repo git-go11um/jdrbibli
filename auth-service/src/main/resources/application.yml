@@ -29,7 +29,7 @@ logging:
 
   mail:
     host: localhost
-    port: 2525
+    port: 25
     username: ""
     password: ""
     properties:
