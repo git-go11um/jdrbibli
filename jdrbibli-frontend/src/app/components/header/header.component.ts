@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { filter, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
@@ -21,7 +21,7 @@ export class HeaderComponent implements OnDestroy {
     // 🔍 Étape 1 : initialiser selon la valeur actuelle
     this.isLoggedIn = this.authService.isLoggedIn();
     this.updateNavbarVisibility();
-    
+
 
     // Étape 2 : s'abonner pour réagir aux changements
     this.subscriptions.add(
@@ -55,5 +55,9 @@ export class HeaderComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
+  }
+
+  goToProfile() {
+    this.router.navigate(['/profile']);
   }
 }

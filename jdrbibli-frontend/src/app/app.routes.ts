@@ -31,6 +31,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/home-connected/home-connected.component').then(m => m.HomeConnected),  // <-- standalone import
     canActivate: [authGuard]
   },
-  { path: 'profile', component: ProfilePageComponent },
+  { path: 'profile', component: ProfilePageComponent, canActivate: [authGuard] },
   { path: 'ludotheque', component: LudothequePageComponent },
 ];

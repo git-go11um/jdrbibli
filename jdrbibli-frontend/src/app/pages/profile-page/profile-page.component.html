@@ -1,18 +1,25 @@
 <h1>Profil utilisateur</h1>
-<button (click)="editProfile()">Modifier le compte</button>
 
-<div>
-    <p>Pseudo : {{ profile?.pseudo }}</p>
-    <p>Email : {{ profile?.email }}</p>
-    <p>Mot de passe : ******</p>
-    <p>Image de profil : <!-- à faire plus tard --></p>
-</div>
+<div class="profile-container">
+  <div class="profile-avatar">
+    <!-- Affichage de l'avatar actuel -->
+    <img [src]="userProfile?.avatarUrl || 'assets/default-avatar.png'" alt="Avatar utilisateur">
+    
+    <!-- Formulaire pour l'upload de l'avatar -->
+    <form (submit)="onAvatarSubmit($event)" enctype="multipart/form-data">
+      <input type="file" (change)="onFileSelected($event)" name="image" />
+      <button type="submit">Mettre à jour l'avatar</button>
+    </form>
+  </div>
 
-<button (click)="askDelete()" style="background-color: red; color: white;">Supprimer le compte</button>
+  <div class="profile-info">
+    <p><strong>Pseudo :</strong> {{ userProfile?.pseudo }}</p>
+    <p><strong>Email :</strong> {{ userProfile?.email }}</p>
+    <p><strong>Mot de passe :</strong> ********</p>
+  </div>
 
-<!-- Popup de confirmation -->
-<div *ngIf="showDeleteConfirm" class="popup">
-    <p style="color: red;">Êtes-vous sûr ?</p>
-    <button (click)="confirmDelete()" style="background-color: red; color: white;">Confirmer</button>
-    <button (click)="cancelDelete()" style="background-color: lightyellow;">Annuler</button>
+  <div class="profile-actions">
+    <button (click)="onEdit()">Modifier le compte</button>
+    <button (click)="onDelete()">Supprimer le compte</button>
+  </div>
 </div>
