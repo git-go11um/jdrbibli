@@ -1,0 +1,18 @@
+<h1>Profil utilisateur</h1>
+<button (click)="editProfile()">Modifier le compte</button>
+
+<div>
+    <p>Pseudo : {{ profile?.pseudo }}</p>
+    <p>Email : {{ profile?.email }}</p>
+    <p>Mot de passe : ******</p>
+    <p>Image de profil : <!-- à faire plus tard --></p>
+</div>
+
+<button (click)="askDelete()" style="background-color: red; color: white;">Supprimer le compte</button>
+
+<!-- Popup de confirmation -->
+<div *ngIf="showDeleteConfirm" class="popup">
+    <p style="color: red;">Êtes-vous sûr ?</p>
+    <button (click)="confirmDelete()" style="background-color: red; color: white;">Confirmer</button>
+    <button (click)="cancelDelete()" style="background-color: lightyellow;">Annuler</button>
+</div>

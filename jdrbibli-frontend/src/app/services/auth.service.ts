@@ -1,12 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, throwError, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = 'http://localhost:8084/api/auth';
 
+  // État observable de la connexion (initialisé selon la présence du token)
+  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
+  public isLoggedIn$: Observable<boolean> = this.loggedIn.asObservable();
+
   constructor(private http: HttpClient) { }
+
+  private hasToken(): boolean {
+    return !!localStorage.getItem('token');
+  }
 
   login(pseudo: string, password: string) {
     return this.http.post<{ token: string }>(
@@ -17,12 +25,20 @@ export class AuthService {
     );
   }
 
+  // À appeler **après** un login réussi pour stocker le token et notifier l'état connecté
+  setLogin(token: string) {
+    localStorage.setItem('token', token);
+    this.loggedIn.next(true);
+  }
+
+  // Vérification synchrone (utile dans certains cas)
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    return this.loggedIn.value;
   }
 
   logout() {
     localStorage.removeItem('token');
+    this.loggedIn.next(false);
   }
 
   register(pseudo: string, email: string, password: string) {
@@ -63,6 +79,14 @@ export class AuthService {
     );
   }
 
+  validateResetCode(pseudo: string, code: string) {
+    return this.http.post(`${this.apiUrl}/validate-reset-code`, { pseudo, code });
+  }
+
+  resetPassword(pseudo: string, code: string, newPassword: string) {
+    return this.http.post(`${this.apiUrl}/reset-password`, { pseudo, code, newPassword });
+  }
+
   private handleError(error: HttpErrorResponse) {
     let msg = 'Erreur inconnue';
     if (error.error instanceof ErrorEvent) {
@@ -74,16 +98,4 @@ export class AuthService {
     }
     return throwError(() => new Error(msg));
   }
-
-  validateResetCode(pseudo: string, code: string) {
-    return this.http.post(`${this.apiUrl}/validate-reset-code`, { pseudo, code });
-  }
-
-  resetPassword(pseudo: string, code: string, newPassword: string) {
-    return this.http.post(`${this.apiUrl}/reset-password`, { pseudo, code, newPassword });
-  }
-
-
-
-
 }

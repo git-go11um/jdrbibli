@@ -145,4 +145,17 @@ public class AuthController {
         }
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteCurrentUser(Principal connectedUser) {
+        try {
+            String pseudo = connectedUser.getName();
+            User user = userService.getUserByPseudo(pseudo);
+            userService.supprimerUser(user.getId());
+            return ResponseEntity.ok(Map.of("message", "Compte supprimé avec succès"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
+        }
+    }
+
 }

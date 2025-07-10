@@ -5,8 +5,8 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-home-connected',
   standalone: true,
-  templateUrl: './home-connected.html',
-  styleUrl: './home-connected.scss'
+  templateUrl: './home-connected.component.html',
+  styleUrl: './home-connected.component.scss'
 })
 export class HomeConnected {
   constructor(private authService: AuthService, private router: Router) {}

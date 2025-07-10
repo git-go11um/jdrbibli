@@ -1,0 +1,6 @@
+<nav *ngIf="showNavbar" class="navbar">
+    <button routerLink="/home" class="nav-button">Accueil</button>
+    <button routerLink="/profile" class="nav-button">Profil utilisateur</button>
+    <button routerLink="/ludotheque" class="nav-button">Ludothèque personnelle</button>
+    <button (click)="logout()" class="nav-button logout-button">Déconnexion</button>
+</nav>
