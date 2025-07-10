@@ -27,33 +27,30 @@ public class User implements UserDetails {
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    // --- Attributs ajoutés pour la réinitialisation du mot de passe ---
+    // --- Attributs pour la réinitialisation du mot de passe ---
+    @Column(name = "reset_code")
+    private String resetCode;
 
     @Column(name = "reset_password_code")
     private String resetPasswordCode;
 
     @Column(name = "reset_password_code_expiration")
-    private Long resetPasswordCodeExpiration; // Timestamp pour expiration (ou Date)
+    private Long resetPasswordCodeExpiration; // timestamp
 
     // --- Constructeurs ---
     public User() {
     }
 
-    // Constructeur sans les nouveaux champs
     public User(Long id, String pseudo, String email, String password, Set<Role> roles) {
         this.id = id;
         this.pseudo = pseudo;
         this.email = email;
         this.password = password;
         this.roles = roles != null ? roles : new HashSet<>();
-        // Les nouveaux champs sont initialisés à null par défaut
-        this.resetPasswordCode = null;
-        this.resetPasswordCodeExpiration = null;
     }
 
-    // Constructeur avec les nouveaux champs (pour compléter la classe)
-    public User(Long id, String pseudo, String email, String password, Set<Role> roles, String resetPasswordCode,
-            Long resetPasswordCodeExpiration) {
+    public User(Long id, String pseudo, String email, String password, Set<Role> roles,
+            String resetPasswordCode, Long resetPasswordCodeExpiration) {
         this.id = id;
         this.pseudo = pseudo;
         this.email = email;
@@ -64,7 +61,6 @@ public class User implements UserDetails {
     }
 
     // --- Getters et setters ---
-
     public Long getId() {
         return id;
     }
@@ -105,8 +101,6 @@ public class User implements UserDetails {
         this.roles = roles != null ? roles : new HashSet<>();
     }
 
-    // --- Getters et setters pour la réinitialisation du mot de passe ---
-
     public String getResetPasswordCode() {
         return resetPasswordCode;
     }
@@ -123,8 +117,15 @@ public class User implements UserDetails {
         this.resetPasswordCodeExpiration = resetPasswordCodeExpiration;
     }
 
-    // --- Implémentation UserDetails ---
+    public String getResetCode() {
+        return resetCode;
+    }
 
+    public void setResetCode(String resetCode) {
+        this.resetCode = resetCode;
+    }
+
+    // --- Implémentation UserDetails ---
     @Override
     public Collection<Role> getAuthorities() {
         return roles;
@@ -132,8 +133,8 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return pseudo; // ou email si tu préfères
-    }
+        return pseudo;
+    } // ou email si tu préfères
 
     @Override
     public boolean isAccountNonExpired() {
@@ -155,8 +156,7 @@ public class User implements UserDetails {
         return true;
     }
 
-    // --- Builder (facultatif mais pratique) ---
-
+    // --- Builder pratique ---
     public static Builder builder() {
         return new Builder();
     }

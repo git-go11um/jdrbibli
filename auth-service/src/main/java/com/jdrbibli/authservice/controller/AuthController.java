@@ -23,7 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     private final IUserService userService;
@@ -128,6 +128,18 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("message", "Mot de passe réinitialisé avec succès"));
         } catch (Exception e) {
             // Si une erreur se produit, retourner une erreur serveur
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/password-reset/request")
+    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> body) {
+        try {
+            String pseudo = body.get("pseudo");
+            userService.requestPasswordReset(pseudo);
+            return ResponseEntity.ok(Map.of("message", "Code de réinitialisation envoyé"));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
         }

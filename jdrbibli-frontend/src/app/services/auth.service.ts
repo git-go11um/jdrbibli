@@ -4,7 +4,7 @@ import { catchError, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:8081/api/auth';
+  private apiUrl = 'http://localhost:8084/api/auth';
 
   constructor(private http: HttpClient) { }
 
@@ -76,12 +76,13 @@ export class AuthService {
   }
 
   validateResetCode(pseudo: string, code: string) {
-    return this.http.post('/api/auth/validate-reset-code', { pseudo, code });
+    return this.http.post(`${this.apiUrl}/validate-reset-code`, { pseudo, code });
   }
 
   resetPassword(pseudo: string, code: string, newPassword: string) {
-    return this.http.post('/api/auth/reset-password', { pseudo, code, newPassword });
+    return this.http.post(`${this.apiUrl}/reset-password`, { pseudo, code, newPassword });
   }
+
 
 
 
