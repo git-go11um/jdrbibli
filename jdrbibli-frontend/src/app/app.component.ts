@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common'; // <-- importer
+import { CommonModule } from '@angular/common'; // <-- Assure-toi que CommonModule est bien importé ici
 import { FooterComponent } from './components/footer/footer.component';
 import { Navbar } from './components/navbar/navbar';
 
@@ -20,5 +20,4 @@ export class AppComponent {
     console.log('Token is:', token);  // Vérifier ce que ça renvoie
     return !!token;
   }
-
 }

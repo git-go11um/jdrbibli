@@ -37,6 +37,10 @@ public class User implements UserDetails {
     @Column(name = "reset_password_code_expiration")
     private Long resetPasswordCodeExpiration; // timestamp
 
+    // --- Relation avec PasswordResetToken ---
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PasswordResetToken> resetTokens = new HashSet<>();
+
     // --- Constructeurs ---
     public User() {
     }
@@ -125,6 +129,14 @@ public class User implements UserDetails {
         this.resetCode = resetCode;
     }
 
+    public Set<PasswordResetToken> getResetTokens() {
+        return resetTokens;
+    }
+
+    public void setResetTokens(Set<PasswordResetToken> resetTokens) {
+        this.resetTokens = resetTokens;
+    }
+
     // --- Implémentation UserDetails ---
     @Override
     public Collection<Role> getAuthorities() {
@@ -169,6 +181,7 @@ public class User implements UserDetails {
         private Set<Role> roles = new HashSet<>();
         private String resetPasswordCode;
         private Long resetPasswordCodeExpiration;
+        private Set<PasswordResetToken> resetTokens = new HashSet<>();
 
         public Builder id(Long id) {
             this.id = id;
@@ -205,8 +218,15 @@ public class User implements UserDetails {
             return this;
         }
 
+        public Builder resetTokens(Set<PasswordResetToken> resetTokens) {
+            this.resetTokens = resetTokens != null ? resetTokens : new HashSet<>();
+            return this;
+        }
+
         public User build() {
-            return new User(id, pseudo, email, password, roles, resetPasswordCode, resetPasswordCodeExpiration);
+            User user = new User(id, pseudo, email, password, roles, resetPasswordCode, resetPasswordCodeExpiration);
+            user.setResetTokens(resetTokens);
+            return user;
         }
     }
 }

@@ -5,7 +5,10 @@ import com.jdrbibli.authservice.dto.ChangePasswordRequest;
 import com.jdrbibli.authservice.dto.InscriptionRequest;
 import com.jdrbibli.authservice.dto.LoginRequest;
 import com.jdrbibli.authservice.dto.PasswordResetRequest;
+import com.jdrbibli.authservice.dto.UpdateUserRequest;
 import com.jdrbibli.authservice.dto.UserResponseDTO;
+import com.jdrbibli.authservice.dto.ReponseProfileChange;
+
 import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.security.JwtService;
 import com.jdrbibli.authservice.service.IUserService;
@@ -14,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -142,6 +147,47 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
+        }
+    }
+
+    // Route de suppression du compte utilisateur
+    @DeleteMapping("/auth/{pseudo}")
+    public ResponseEntity<?> deleteUser(@PathVariable String pseudo, @RequestHeader("Authorization") String token) {
+        try {
+            // Extraire le pseudo (subject) du token
+            String tokenPseudo = jwtService.extractPseudo(token.substring(7)); // Enlève "Bearer " du token
+
+            if (!tokenPseudo.equals(pseudo)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Vous ne pouvez supprimer que votre propre compte.");
+            }
+
+            // Trouver l'utilisateur par son pseudo et le supprimer
+            User user = userService.getUserByPseudo(pseudo); // Récupérer l'utilisateur par son pseudo
+            if (user != null) {
+                userService.deleteUserById(user.getId()); // Supprimer l'utilisateur par son ID
+                return ResponseEntity.ok("Utilisateur supprimé avec succès.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Utilisateur non trouvé.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de la suppression du compte.");
+        }
+    }
+
+    // Route pour mettre à jour le profil (pseudo et email)
+    @PutMapping("/profile")
+    public ResponseEntity<ReponseProfileChange> updateUserProfile(@RequestBody UpdateUserRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = ((User) userDetails).getId();
+
+        try {
+            userService.updateUserProfile(userId, request.getPseudo(), request.getEmail());
+            return ResponseEntity.ok(new ReponseProfileChange("Profil mis à jour avec succès"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ReponseProfileChange(e.getMessage()));
         }
     }
 

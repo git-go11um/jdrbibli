@@ -1,5 +1,40 @@
 <div class="profil-utilisateur">
-    <h1>Profil de l'utilisateur</h1>
-    <p>Bienvenue, voici vos informations :</p>
-    <!-- Affichage des informations de l'utilisateur ici -->
+    <div class="left-column">
+        <h1>Profil utilisateur</h1>
+
+        <div class="user-info">
+            <div class="info-item">
+                <label for="pseudo">Pseudo:</label>
+                <span id="pseudo">{{ pseudo }}</span>
+            </div>
+            <div class="info-item">
+                <label for="email">Email:</label>
+                <span id="email">{{ email }}</span>
+            </div>
+            <div class="info-item">
+                <label for="motDePasse">Mot de passe:</label>
+                <span id="motDePasse">{{ motDePasse }}</span>
+            </div>
+            <div class="info-item">
+                <label for="avatar">Avatar:</label>
+                <div id="avatar">
+                    <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Avatar utilisateur" width="100">
+                    <p *ngIf="!avatarUrl">Aucun avatar uploadé</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-modifier" routerLink="/profile-edit">Modifier le compte</button>
+
+
+            <button class="btn-supprimer" (click)="deleteUser()">Supprimer le compte</button>
+            <!-- Bouton de suppression -->
+        </div>
+    </div>
+
+    <div class="right-column">
+        <h2>Amis</h2>
+        <p>Aucune information sur les amis pour l'instant.</p>
+    </div>
 </div>

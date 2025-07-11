@@ -13,8 +13,6 @@ public interface IUserService {
 
     User login(String email, String motDePasse);
 
-    void supprimerUser(Long userId);
-
     UserResponseDTO toDTO(User user);
 
     User getUserByPseudo(String pseudo);
@@ -26,5 +24,9 @@ public interface IUserService {
     void requestPasswordReset(String pseudo) throws MessagingException;
 
     void resetPassword(String pseudo, String resetCode, String newPassword);
+
+    void deleteUserById(Long userId);
+
+    void updateUserProfile(Long userId, String newPseudo, String newEmail);
 
 }

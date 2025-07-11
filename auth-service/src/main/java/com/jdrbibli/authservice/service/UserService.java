@@ -8,6 +8,8 @@ import com.jdrbibli.authservice.exception.BadCredentialsException;
 import com.jdrbibli.authservice.exception.UserNotFoundException;
 import com.jdrbibli.authservice.repository.UserRepository;
 import com.jdrbibli.authservice.util.PasswordValidator;
+import com.jdrbibli.authservice.repository.PasswordResetTokenRepository;
+
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -26,12 +28,14 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JavaMailSender mailSender) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailSender = mailSender;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     @Override
@@ -53,11 +57,21 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void supprimerUser(Long userId) {
+    public void deleteUserById(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("Utilisateur avec id " + userId + " non trouvé");
         }
+
+        // Supprimer les tokens de réinitialisation associés à l'utilisateur
+        deletePasswordResetTokens(userId);
+
+        // Supprimer l'utilisateur de la base de données
         userRepository.deleteById(userId);
+    }
+
+    public void deletePasswordResetTokens(Long userId) {
+        // Supprimer les tokens associés à l'utilisateur
+        passwordResetTokenRepository.deleteByUserId(userId);
     }
 
     @Override
@@ -108,7 +122,8 @@ public class UserService implements IUserService {
         String storedCode = user.getResetCode();
         Long expiration = user.getResetPasswordCodeExpiration();
 
-        return storedCode != null && storedCode.equals(code) && expiration != null && expiration > System.currentTimeMillis();
+        return storedCode != null && storedCode.equals(code) && expiration != null
+                && expiration > System.currentTimeMillis();
     }
 
     /**
@@ -165,5 +180,20 @@ public class UserService implements IUserService {
         }
     }
 
-    
+    @Override
+    public void updateUserProfile(Long userId, String newPseudo, String newEmail) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
+
+        if (newPseudo != null && !newPseudo.trim().isEmpty()) {
+            user.setPseudo(newPseudo);
+        }
+
+        if (newEmail != null && !newEmail.trim().isEmpty()) {
+            user.setEmail(newEmail);
+        }
+
+        userRepository.save(user);
+    }
+
 }

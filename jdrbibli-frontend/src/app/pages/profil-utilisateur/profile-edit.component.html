@@ -1,0 +1,13 @@
+<div>
+    <h2>Modifier mon profil</h2>
+    <form (ngSubmit)="updateProfile()">
+        <label>Pseudo :</label>
+        <input [(ngModel)]="pseudo" name="pseudo" required />
+
+        <label>Email :</label>
+        <input type="email" [(ngModel)]="email" name="email" required />
+
+        <button type="submit">Mettre à jour</button>
+    </form>
+    <p>{{ message }}</p>
+</div>

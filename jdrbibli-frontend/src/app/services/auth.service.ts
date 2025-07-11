@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, throwError } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { catchError, Observable, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
@@ -14,7 +14,7 @@ export class AuthService {
       `${this.apiUrl}/login`,
       { pseudo, motDePasse: password }
     ).pipe(
-      tap((response: { token: string }) => { // Spécifie ici le type de la réponse
+      tap((response: { token: string }) => {
         // Stocke le token dans localStorage
         localStorage.setItem('jwt', response.token);
         console.log('Login réussi, token:', response.token);
@@ -23,13 +23,22 @@ export class AuthService {
     );
   }
 
+  // Nouvelle méthode pour récupérer les informations de l'utilisateur connecté
+  getUserInfo() {
+    const token = localStorage.getItem('jwt'); // Récupère le token
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); // Ajoute le token dans les en-têtes
+
+    return this.http.get<any>(`${this.apiUrl}/me`, { headers }).pipe(
+      catchError(this.handleError)
+    );
+  }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    return !!localStorage.getItem('jwt');  // Vérifie la présence du token
   }
 
   logout() {
-    localStorage.removeItem('token');
+    localStorage.removeItem('jwt'); // Supprime le token lors de la déconnexion
   }
 
   register(pseudo: string, email: string, password: string) {
@@ -89,6 +98,51 @@ export class AuthService {
   resetPassword(pseudo: string, code: string, newPassword: string) {
     return this.http.post(`${this.apiUrl}/reset-password`, { pseudo, code, newPassword });
   }
+
+  deleteUser(pseudo: string): Observable<any> {
+    const token = localStorage.getItem('jwt'); // Récupère le token JWT
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); // Ajoute le token dans l'en-tête
+
+    return this.http.delete(`${this.apiUrl}/auth/${pseudo}`, { headers }).pipe(
+      catchError(this.handleError) // Gère les erreurs
+    );
+  }
+
+
+
+
+
+
+  // Cette méthode extrait l'ID de l'utilisateur depuis le token JWT
+  getUserIdFromToken(): number | null {
+    const token = localStorage.getItem('jwt');
+    if (!token) return null;
+
+    // Décoder le token pour en extraire l'ID utilisateur
+    const payload = this.decodeJwt(token);
+    return payload ? payload.id : null; // Récupérer l'ID de l'utilisateur dans le JWT
+  }
+
+  // Décoder le JWT sans librairie externe (ta méthode)
+  decodeJwt(token: string): any {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Token JWT invalide');
+    }
+    const decoded = atob(parts[1]);  // Décoder la partie centrale du JWT
+    return JSON.parse(decoded);  // Retourne le contenu JSON du token
+  }
+
+  updateProfile(pseudo: string, email: string) {
+    const token = localStorage.getItem('jwt');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    const url = this.apiUrl + '/profile';
+    return this.http.put(url, { pseudo, email }, { headers });
+  }
+
+
+
 
 
 

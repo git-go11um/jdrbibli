@@ -10,6 +10,7 @@ import { SuccessLoginPage } from './pages/success-login-page/success-login-page'
 import { authGuard } from './guards/auth.guard'; // importe le guard
 import { LudothequePage } from './pages/ludotheque-page/ludotheque-page';
 import { ProfilUtilisateur } from './pages/profil-utilisateur/profil-utilisateur';
+import { ProfileEditComponent } from './pages/profil-utilisateur/profile-edit.component';
 
 
 export const routes: Routes = [
@@ -29,6 +30,7 @@ export const routes: Routes = [
   },
   { path: 'home-connected', component: HomeConnected, canActivate: [authGuard] },
   { path: 'ludotheque', component: LudothequePage },
-  { path: 'profil-utilisateur', component: ProfilUtilisateur }
+  { path: 'profil-utilisateur', component: ProfilUtilisateur },
+  { path: 'profile-edit', component: ProfileEditComponent}
 
 ];
