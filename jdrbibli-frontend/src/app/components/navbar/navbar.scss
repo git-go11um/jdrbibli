@@ -1,0 +1,52 @@
+/* Style global pour la navbar */
+.navbar {
+    background-color: #b7e4c7;
+    /* Vert clair */
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+/* Style des liens et boutons */
+.navbar a,
+.navbar button {
+    padding: 10px 20px;
+    border-radius: 25px;
+    /* Arrondi */
+    font-size: 1rem;
+    text-decoration: none;
+    /* Enlever le souligné des liens */
+    color: #333;
+    background-color: #e0e0e0;
+    /* Gris clair */
+    margin-right: 10px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+/* Hover sur tous les liens et boutons */
+.navbar a:hover,
+.navbar button:hover {
+    background-color: #c1c1c1;
+    /* Gris un peu plus foncé */
+    transform: scale(1.05);
+    /* Effet d’agrandissement au survol */
+}
+
+/* Spécifique au bouton déconnexion */
+.navbar button {
+    background-color: #dc3545;
+    /* Rouge pour le bouton déconnexion */
+    color: white;
+    border: none;
+}
+
+/* Hover sur le bouton déconnexion */
+.navbar button:hover {
+    background-color: #c82333;
+    /* Rouge plus foncé */
+    transform: scale(1.05);
+    /* Agrandissement pour le bouton déconnexion */
+}

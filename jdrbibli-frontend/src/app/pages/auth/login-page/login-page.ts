@@ -25,7 +25,7 @@ export class LoginPage {
       next: (response) => {
         console.log('Login réussi, token:', response.token);
         localStorage.setItem('token', response.token);
-        this.router.navigate(['/success-login']);
+        this.router.navigate(['/home-connected']);
       },
       error: (err) => {
         console.error('Erreur de login', err);

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -13,9 +14,15 @@ export class AuthService {
       `${this.apiUrl}/login`,
       { pseudo, motDePasse: password }
     ).pipe(
+      tap((response: { token: string }) => { // Spécifie ici le type de la réponse
+        // Stocke le token dans localStorage
+        localStorage.setItem('jwt', response.token);
+        console.log('Login réussi, token:', response.token);
+      }),
       catchError(this.handleError)
     );
   }
+
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token');

@@ -1,16 +1,24 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from './components/header/header.component';
+import { CommonModule } from '@angular/common'; // <-- importer
 import { FooterComponent } from './components/footer/footer.component';
+import { Navbar } from './components/navbar/navbar';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterOutlet, Navbar, FooterComponent],
   template: `
-    <app-header></app-header>
+    <app-navbar *ngIf="isLoggedIn"></app-navbar>
     <router-outlet></router-outlet>
     <app-footer></app-footer>
   `,
 })
-export class AppComponent {}
+export class AppComponent {
+  get isLoggedIn(): boolean {
+    const token = localStorage.getItem('jwt');
+    console.log('Token is:', token);  // Vérifier ce que ça renvoie
+    return !!token;
+  }
+
+}
