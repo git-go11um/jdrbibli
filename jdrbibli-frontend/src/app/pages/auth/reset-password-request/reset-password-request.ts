@@ -5,13 +5,14 @@ import { AuthService } from '../../../services/auth.service';
 import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'app-register-page',
+  selector: 'app-reset-password-request',
   standalone: true,
   imports: [FormsModule, NgIf],
-  templateUrl: './register-page.component.html',
-  styleUrls: ['./register-page.component.scss']
+  templateUrl: './reset-password-request.html',
+  styleUrls: ['./reset-password-request.scss']
 })
-export class RegisterPage {
+export class ResetPasswordRequestComponent {
+  pseudo = '';
   errorMessage = '';
   successMessage = '';
   loading = false;
@@ -23,36 +24,27 @@ export class RegisterPage {
     this.successMessage = '';
 
     if (form.invalid) {
-      this.errorMessage = 'Veuillez remplir tous les champs correctement.';
-      return;
-    }
-
-    const { pseudo, email, password, confirmPassword } = form.value;
-
-    // Log des données avant envoi
-    console.log('Données envoyées :', { pseudo, email, password, confirmPassword });
-
-    if (password !== confirmPassword) {
-      this.errorMessage = 'Les mots de passe ne correspondent pas.';
+      this.errorMessage = 'Veuillez saisir votre pseudo.';
       return;
     }
 
     this.loading = true;
 
-    this.authService.register(pseudo, email, password).subscribe({
+    this.authService.requestPasswordReset(this.pseudo).subscribe({
       next: () => {
-        this.successMessage = 'Compte créé avec succès ! Redirection en cours...';
+        this.successMessage = 'Si un compte existe, un email a été envoyé.';
+        localStorage.setItem('resetPseudo', this.pseudo); // optionnel si besoin
+        this.router.navigate(['/reset-password-code']); // redirection après succès
         this.errorMessage = '';
-        setTimeout(() => this.router.navigate(['/login']), 2000);
       },
       error: (err: any) => {
-        console.error('Erreur inscription:', err);
+        console.error('Erreur demande réinitialisation :', err);
         if (err.status === 0) {
           this.errorMessage = "Serveur indisponible, réessayez plus tard.";
         } else if (err.error?.message) {
           this.errorMessage = err.error.message;
         } else {
-          this.errorMessage = 'Erreur lors de la création du compte.';
+          this.errorMessage = 'Erreur lors de la demande.';
         }
         this.successMessage = '';
       },
@@ -61,6 +53,4 @@ export class RegisterPage {
       }
     });
   }
-
-
 }
