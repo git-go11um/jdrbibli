@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 export interface UserProfile {
     pseudo: string;
     email: string;
-    imageUrl?: string;
+    avatarUrl?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -16,7 +16,7 @@ export class UserService {
 
     // Récupérer profil
     getUserProfile(): Observable<UserProfile> {
-        return this.http.get<UserProfile>(`${this.apiUrl}/me`);
+        return this.http.get<UserProfile>(`${this.apiUrl}/api/user/me`);
     }
 
     // Supprimer compte
@@ -24,9 +24,9 @@ export class UserService {
         return this.http.delete(`${this.apiUrl}/me`);
     }
 
-    // (Plus tard) Modifier profil
-    updateProfile(profileData: Partial<UserProfile>): Observable<UserProfile> {
-        return this.http.put<UserProfile>(`${this.apiUrl}/me`, profileData);
+    // Mettre à jour le profil de l'utilisateur
+    updateUserProfile(profile: UserProfile): Observable<UserProfile> {
+        return this.http.put<UserProfile>(`${this.apiUrl}/profile`, profile);
     }
 
     uploadAvatar(formData: FormData): Observable<any> {

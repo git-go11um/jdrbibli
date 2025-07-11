@@ -6,6 +6,8 @@ import com.jdrbibli.userservice.repository.UserProfileRepository;
 import reactor.core.publisher.Mono;
 
 import com.jdrbibli.userservice.dto.OuvrageDTO;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.UUID;
 @Service
 public class UserProfileService {
 
+    @Autowired
     private final UserProfileRepository userProfileRepository;
     private final WebClient.Builder webClientBuilder;
 
@@ -115,4 +118,55 @@ public class UserProfileService {
 
         return imageUrl;
     }
+
+    public UserProfile getUserProfile(Long userId) {
+        return userProfileRepository.findById(userId).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+    }
+
+    /**
+     * Méthode pour mettre à jour un profil utilisateur.
+     * 
+     * @param username    Le nom d'utilisateur de l'utilisateur connecté
+     * @param userProfile Les nouvelles données du profil
+     * @return Le profil mis à jour
+     * @throws Exception Si l'utilisateur n'est pas trouvé
+     */
+    public UserProfile updateUserProfile(String username, UserProfile userProfileData) throws Exception {
+        // Vérifier si l'utilisateur existe dans la base de données
+        UserProfile existingUserProfile = userProfileRepository.findByPseudo(username)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        // Mettre à jour les informations de l'utilisateur
+        existingUserProfile.setPseudo(userProfileData.getPseudo());
+        existingUserProfile.setEmail(userProfileData.getEmail());
+
+        // Si l'avatar est mis à jour, mettez à jour l'URL de l'avatar
+        if (userProfileData.getAvatarUrl() != null) {
+            existingUserProfile.setAvatarUrl(userProfileData.getAvatarUrl());
+        }
+
+        // Enregistrer le profil mis à jour dans la base de données
+        return userProfileRepository.save(existingUserProfile);
+    }
+
+    /**
+     * Récupérer l'URL de l'avatar d'un utilisateur.
+     * 
+     * @param username Le nom d'utilisateur de l'utilisateur connecté
+     * @return L'URL de l'avatar de l'utilisateur
+     * @throws Exception Si l'utilisateur n'est pas trouvé
+     */
+    public Optional<String> getUserAvatarUrl(String username) {
+        // Trouver l'utilisateur par son nom d'utilisateur
+        UserProfile userProfile = userProfileRepository.findByPseudo(username)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        // Récupérer l'URL de l'avatar de l'utilisateur
+        return Optional.ofNullable(userProfile.getAvatarUrl());
+    }
+
+    public Optional<UserProfile> getUserByPseudo(String pseudo) {
+        return userProfileRepository.findByPseudo(pseudo);
+    }
+
 }

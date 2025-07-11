@@ -1,25 +1,21 @@
-<h1>Profil utilisateur</h1>
-
-<div class="profile-container">
-  <div class="profile-avatar">
-    <!-- Affichage de l'avatar actuel -->
-    <img [src]="userProfile?.avatarUrl || 'assets/default-avatar.png'" alt="Avatar utilisateur">
-    
-    <!-- Formulaire pour l'upload de l'avatar -->
-    <form (submit)="onAvatarSubmit($event)" enctype="multipart/form-data">
-      <input type="file" (change)="onFileSelected($event)" name="image" />
-      <button type="submit">Mettre à jour l'avatar</button>
-    </form>
-  </div>
-
-  <div class="profile-info">
-    <p><strong>Pseudo :</strong> {{ userProfile?.pseudo }}</p>
-    <p><strong>Email :</strong> {{ userProfile?.email }}</p>
-    <p><strong>Mot de passe :</strong> ********</p>
-  </div>
-
-  <div class="profile-actions">
-    <button (click)="onEdit()">Modifier le compte</button>
-    <button (click)="onDelete()">Supprimer le compte</button>
+<div class="profile">
+  <div *ngIf="userProfile">
+    <h2>{{ userProfile.pseudo }}'s Profile</h2>
+    <div *ngIf="isEditing; else viewMode">
+      <input [(ngModel)]="editedUserProfile.pseudo" placeholder="Pseudo" />
+      <input [(ngModel)]="editedUserProfile.email" placeholder="Email" />
+      <input type="file" (change)="onFileSelected($event)" />
+      <button (click)="saveProfile()">Save</button>
+      <button (click)="toggleEdit()">Cancel</button>
+    </div>
+    <ng-template #viewMode>
+      <p>Email: {{ userProfile.email }}</p>
+      <!-- Afficher avatar avec une image par défaut si non disponible -->
+      <img *ngIf="userProfile.avatarUrl; else defaultAvatar" [src]="userProfile.avatarUrl" alt="Avatar" />
+      <ng-template #defaultAvatar>
+        <img [src]="defaultAvatarUrl" alt="Avatar par défaut" />
+      </ng-template>
+      <button (click)="toggleEdit()">Edit</button>
+    </ng-template>
   </div>
 </div>

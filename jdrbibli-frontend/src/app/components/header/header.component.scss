@@ -27,6 +27,20 @@
     background-color: #c7c7c7;
 }
 
+/* Style spécifique pour le bouton "Profil utilisateur" */
+.normal-button {
+    background-color: #d3d3d3;
+    /* gris clair spécifique */
+    color: #000000;
+    /* couleur du texte gris plus foncé */
+}
+
+.normal-button:hover {
+    background-color: #b0b0b0;
+    /* Gris un peu plus foncé au survol */
+}
+
+/* Style spécifique pour le bouton "Déconnexion" */
 .logout-button {
     background-color: #e63946;
     /* rouge */

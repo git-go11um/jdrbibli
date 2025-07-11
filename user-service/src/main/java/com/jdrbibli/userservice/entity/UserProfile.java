@@ -14,6 +14,8 @@ public class UserProfile {
 
     private String pseudo;
     private String email;
+
+    @Lob
     private String avatarUrl;
 
     /**

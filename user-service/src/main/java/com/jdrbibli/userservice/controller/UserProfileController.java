@@ -2,17 +2,17 @@ package com.jdrbibli.userservice.controller;
 
 import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.service.UserProfileService;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.security.Principal;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/user/api/users")
+@RequestMapping("/api/users")
 public class UserProfileController {
     private final UserProfileService userProfileService;
 
@@ -34,15 +34,23 @@ public class UserProfileController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Endpoint pour récupérer le profil de l'utilisateur connecté (principal)
+    @GetMapping("/me")
+    public ResponseEntity<UserProfile> getCurrentUserProfile(Principal principal) {
+        String username = principal.getName();
+        Optional<UserProfile> userProfile = userProfileService.getUserByPseudo(username);
+        return userProfile.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
     // Endpoint pour créer un nouvel utilisateur
     @PostMapping
     public ResponseEntity<UserProfile> createUser(@RequestBody UserProfile userProfile) {
-        // Ajouter des vérifications (par exemple, pseudo ou email déjà existants)
         try {
             UserProfile createdUser = userProfileService.createUser(userProfile);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
         } catch (Exception e) {
-            // En cas d'erreur, retour d'un code d'erreur approprié
+            // Gestion d'erreur si l'utilisateur existe déjà ou autre
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -78,6 +86,29 @@ public class UserProfileController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error uploading image: " + e.getMessage());
+        }
+    }
+
+    // Endpoint pour récupérer l'avatar d'un utilisateur
+    @GetMapping("/me/avatar")
+    public ResponseEntity<String> getAvatar(Principal principal) {
+        String username = principal.getName();
+        Optional<String> avatarUrl = userProfileService.getUserAvatarUrl(username);
+
+        return avatarUrl
+                .map(url -> ResponseEntity.ok(url))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avatar not found"));
+    }
+
+    // Endpoint pour mettre à jour les informations de profil (y compris avatar)
+    @PutMapping("/me")
+    public ResponseEntity<UserProfile> updateProfile(@RequestBody UserProfile userProfile, Principal principal) {
+        String username = principal.getName();
+        try {
+            UserProfile updatedProfile = userProfileService.updateUserProfile(username, userProfile);
+            return ResponseEntity.ok(updatedProfile);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 }

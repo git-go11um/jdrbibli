@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth/password-reset")
+@RequestMapping("/api/auth")
 public class PasswordResetController {
 
     @Autowired
