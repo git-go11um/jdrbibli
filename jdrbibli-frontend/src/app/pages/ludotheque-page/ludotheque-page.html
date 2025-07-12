@@ -1,7 +1,22 @@
-<h2>Ludothèque</h2>
+<div class="page-container">
+    <div class="col col-1">
+        <div class="actions">
+            <button (click)="ajouterGamme()">Ajouter une gamme</button>
+            <button (click)="supprimerGamme()">Supprimer la gamme sélectionnée</button>
 
-<div class="gamme-list">
-    <button *ngFor="let gamme of gammes" (click)="goToGamme(gamme.id)" class="gamme-button">
-        {{ gamme.nom }}
-    </button>
+
+        </div>
+
+        <h2>Gammes</h2>
+
+        <div class="gammes-list">
+            <button *ngFor="let gamme of gammes" (click)="goToGamme(gamme.id)" class="gamme-button"
+                [class.selected]="gamme.id === selectedGammeId">
+                {{ gamme.nom }}
+            </button>
+        </div>
+    </div>
+
+    <div class="col col-2"></div>
+    <div class="col col-3"></div>
 </div>

@@ -1,3 +1,110 @@
-<h2>{{ ouvrage?.titre }}</h2>
-<p>{{ ouvrage?.description }}</p>
-<button (click)="goBack()">Retour à la gamme</button>
+<div class="page-container">
+  <!-- Colonne gauche : informations de l'ouvrage -->
+  <div class="left-column">
+    <h2>{{ ouvrage.titre }}</h2>
+    <button (click)="goToGamme()" class="gamme-button">{{ gamme.nom }}</button>
+
+    <div class="field">
+      <label>Version :</label>
+      <input [(ngModel)]="ouvrage.version" type="text" />
+    </div>
+
+    <div class="field">
+      <label>Type d'ouvrage :</label>
+      <select [(ngModel)]="ouvrage.type">
+        <option *ngFor="let option of typeOptions" [value]="option">{{ option }}</option>
+      </select>
+      <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.type" />
+    </div>
+
+    <div class="field">
+      <label>Date de publication :</label>
+      <input type="month" [(ngModel)]="ouvrage.datePublication" />
+    </div>
+
+    <div class="field">
+      <label>Langue :</label>
+      <select [(ngModel)]="ouvrage.langue">
+        <option *ngFor="let option of langueOptions" [value]="option">{{ option }}</option>
+      </select>
+      <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.langue" />
+    </div>
+
+    <div class="field">
+      <label>Éditeur :</label>
+      <input type="text" [(ngModel)]="ouvrage.editeur" />
+    </div>
+
+    <div class="field">
+      <label>État de l'ouvrage :</label>
+      <select [(ngModel)]="ouvrage.etat">
+        <option *ngFor="let option of etatOptions" [value]="option">{{ option }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>EAN/ISBN :</label>
+      <input type="text" [(ngModel)]="ouvrage.eanIsbn" />
+    </div>
+
+    <div class="field">
+      <label>Lié à un autre ouvrage :</label>
+      <input type="text" [(ngModel)]="ouvrage.lieA" placeholder="Ensemble de la gamme" />
+    </div>
+
+    <div class="field">
+      <label>Scénario lié :</label>
+      <input type="text" [(ngModel)]="ouvrage.scenarioLie" placeholder="Non" />
+    </div>
+
+    <div class="field">
+      <label>Prêt :</label>
+      <input type="text" [(ngModel)]="ouvrage.pret" placeholder="Non" />
+    </div>
+
+    <div class="field">
+      <label>Errata :</label>
+      <input type="text" [(ngModel)]="ouvrage.errata" placeholder="Lien ou texte" />
+    </div>
+    <div class="field">
+      <label>Notes personnelles :</label>
+      <textarea [(ngModel)]="ouvrage.notes" placeholder="Prenez vos notes ici..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Scénarios :</label>
+      <textarea [(ngModel)]="ouvrage.scenarios"
+        placeholder="Listez ici les scénarios contenus dans cet ouvrage..."></textarea>
+    </div>
+  </div>
+
+  <!-- Colonne centrale -->
+  <div class="center-column">
+  <div class="card">
+    <h3>Couverture</h3>
+    <div class="cover-placeholder">
+      <!-- Placeholder pour l'image -->
+      <span>Image à venir</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Liens vers d'autres médias :</h3>
+    <div class="field" *ngFor="let lien of ouvrage.liens; let i = index">
+      <input type="url" [(ngModel)]="ouvrage.liens[i]" placeholder="https://..." />
+    </div>
+    <button (click)="ajouterLien()">Ajouter un lien</button>
+  </div>
+</div>
+
+
+  <!-- Colonne droite : autres ouvrages dans la gamme -->
+  <div class="right-column">
+    <h3>Autres ouvrages dans la gamme</h3>
+    <ul>
+      <li *ngFor="let autre of autresOuvrages">
+        <a (click)="goToOuvrage(autre.id)">{{ autre.titre }}</a>
+      </li>
+    </ul>
+  </div>
+</div>
