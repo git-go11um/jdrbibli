@@ -18,6 +18,9 @@ export class LudothequePage implements OnInit {
   selectedGammeId: number | null = null;
   newGammeName: string = '';
 
+  // Liste des gammes sélectionnées pour suppression
+  selectedGammes: Set<number> = new Set<number>(); // Utilisation de Set pour éviter les doublons
+
   constructor(
     private gammeService: GammeService,
     private router: Router
@@ -76,18 +79,35 @@ export class LudothequePage implements OnInit {
 
 
 
-  /** Supprime la gamme sélectionnée (backend) et recharge */
+  // Fonction pour sélectionner/désélectionner une gamme
+  toggleSelection(gammeId: number): void {
+    if (this.selectedGammes.has(gammeId)) {
+      this.selectedGammes.delete(gammeId);
+    } else {
+      this.selectedGammes.add(gammeId);
+    }
+  }
+
+  // Vérifie si une gamme est sélectionnée
+  isSelected(gammeId: number): boolean {
+    return this.selectedGammes.has(gammeId);
+  }
+
+  // Supprimer les gammes sélectionnées
   supprimerGamme(): void {
-    if (this.selectedGammeId !== null) {
-      this.gammeService.delete(this.selectedGammeId, true).subscribe({
-        next: () => {
-          this.selectedGammeId = null;
-          this.loadGammes();
-        },
-        error: (err) => {
-          console.error('Erreur lors de la suppression de la gamme:', err);
-          alert('Erreur lors de la suppression de la gamme.');
-        }
+    if (this.selectedGammes.size > 0) {
+      const selectedIds = Array.from(this.selectedGammes);
+      selectedIds.forEach(id => {
+        this.gammeService.delete(id, true).subscribe({
+          next: () => {
+            this.selectedGammes.delete(id);  // Retirer la gamme de la sélection
+            this.loadGammes();  // Recharger les gammes
+          },
+          error: (err) => {
+            console.error('Erreur lors de la suppression de la gamme:', err);
+            alert('Erreur lors de la suppression de la gamme.');
+          }
+        });
       });
     } else {
       alert('Sélectionnez d\'abord une gamme pour la supprimer.');

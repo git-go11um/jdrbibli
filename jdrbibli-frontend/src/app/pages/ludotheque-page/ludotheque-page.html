@@ -6,7 +6,7 @@
             <button class="add-button" (click)="ajouterGamme()">Ajouter une gamme</button>
         </div>
 
-        <button class="delete-button" (click)="supprimerGamme()">Supprimer la gamme sélectionnée</button>
+        <button class="delete-button" (click)="supprimerGamme()">Supprimer les gammes sélectionnées</button>
     </div>
 
     <hr class="separator" />
@@ -15,10 +15,16 @@
 
     <div class="columns">
         <div class="col" *ngFor="let column of columns">
-            <button *ngFor="let gamme of column" (click)="goToGamme(gamme.id!)" class="gamme-button"
-                [class.selected]="gamme.id === selectedGammeId">
-                {{ gamme.nom }}
-            </button>
+            <div *ngFor="let gamme of column" class="gamme-item">
+                <!-- Case à cocher pour chaque gamme -->
+                <input type="checkbox" [checked]="isSelected(gamme.id!)" (change)="toggleSelection(gamme.id!)" />
+
+                <!-- Bouton pour afficher la gamme -->
+                <button (click)="goToGamme(gamme.id!)" class="gamme-button"
+                    [class.selected]="gamme.id === selectedGammeId">
+                    {{ gamme.nom }}
+                </button>
+            </div>
         </div>
     </div>
 </div>
