@@ -3,6 +3,7 @@ package com.jdrbibli.ouvrage_service.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "ouvrages")
@@ -19,25 +20,45 @@ public class Ouvrage {
     private Gamme gamme;
 
     private String version;
+
+    @Column(name = "type_ouvrage")
     private String typeOuvrage;
+
+    @Column(name = "date_publication")
     private LocalDate datePublication;
+
     private String langue;
     private String editeur;
     private String etat;
     private String isbn;
+
+    @Column(name = "ouvrage_lie")
     private String ouvrageLie;
+
+    @Column(name = "scenario_lie")
     private String scenarioLie;
+
     private Boolean pret;
     private String errata;
     private String notes;
 
     @ElementCollection
-    private List<String> scenariosContenus;
+    @CollectionTable(name = "ouvrage_scenarios_contenus", joinColumns = @JoinColumn(name = "ouvrage_id"))
+    @Column(name = "scenario")
+    private List<String> scenariosContenus = new ArrayList<>();
 
     @ElementCollection
-    private List<String> autresOuvragesGamme;
+    @CollectionTable(name = "ouvrage_autres_ouvrages_gamme", joinColumns = @JoinColumn(name = "ouvrage_id"))
+    @Column(name = "ouvrage")
+    private List<String> autresOuvragesGamme = new ArrayList<>();
 
-    // Getters & setters
+    // Nouveau champ liensMedias (liens vers médias externes)
+    @ElementCollection
+    @CollectionTable(name = "ouvrage_liens_medias", joinColumns = @JoinColumn(name = "ouvrage_id"))
+    @Column(name = "lien")
+    private List<String> liensMedias = new ArrayList<>();
+
+    // Getters & setters (ajoute liensMedias)
 
     public Long getId() {
         return id;
@@ -181,5 +202,13 @@ public class Ouvrage {
 
     public void setAutresOuvragesGamme(List<String> autresOuvragesGamme) {
         this.autresOuvragesGamme = autresOuvragesGamme;
+    }
+
+    public List<String> getLiensMedias() {
+        return liensMedias;
+    }
+
+    public void setLiensMedias(List<String> liensMedias) {
+        this.liensMedias = liensMedias;
     }
 }

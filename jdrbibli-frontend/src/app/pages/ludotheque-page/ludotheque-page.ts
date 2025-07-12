@@ -1,55 +1,96 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { GammeService, GammeDTO } from '../../services/gamme.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
   selector: 'app-ludotheque-page',
   templateUrl: './ludotheque-page.html',
   styleUrl: './ludotheque-page.scss',
-  imports: [CommonModule]
+  imports: [CommonModule, FormsModule]
+
 })
-export class LudothequePage {
-  gammes = [
-    { id: 1, nom: 'Warhammer', description: '' },
-    { id: 2, nom: "L'appel de Cthulhu", description: '' }
-  ];
+export class LudothequePage implements OnInit {
+  gammes: GammeDTO[] = [];
+  columns: GammeDTO[][] = [];  // pour stocker les colonnes dynamiques
+  selectedGammeId: number | null = null;
+  newGammeName: string = '';
 
-  selectedGammeId: number | null = null;  // pour savoir quelle gamme est sélectionnée
+  constructor(
+    private gammeService: GammeService,
+    private router: Router
+  ) { }
 
-  constructor(private router: Router) { }
-
-
-  ngOnInit() {
-    this.trierGammes();
+  ngOnInit(): void {
+    this.loadGammes();
   }
 
-  goToGamme(id: number) {
-    this.selectedGammeId = id;  // on sélectionne en même temps
+  /** Charge les gammes depuis le backend et trie puis divise en colonnes */
+  loadGammes(): void {
+    this.gammeService.getAll().subscribe({
+      next: (data) => {
+        this.gammes = data.sort((a, b) => a.nom.localeCompare(b.nom));
+        this.splitGammesIntoColumns();
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des gammes:', err);
+      }
+    });
+  }
+
+  /** Divise la liste des gammes triées en 3 colonnes */
+  private splitGammesIntoColumns(): void {
+    const numberOfColumns = 3;
+    this.columns = Array.from({ length: numberOfColumns }, () => []);
+
+    this.gammes.forEach((gamme, index) => {
+      this.columns[index % numberOfColumns].push(gamme);
+    });
+  }
+
+  /** Navigue vers la page d'une gamme */
+  goToGamme(id: number): void {
+    this.selectedGammeId = id;
     this.router.navigate(['/gamme', id]);
   }
 
-  ajouterGamme() {
-    const newId = Math.max(...this.gammes.map(g => g.id)) + 1;
-    this.gammes.push({ id: newId, nom: 'Nouvelle gamme', description: '' });
-    this.trierGammes();
+  /** Ajoute une nouvelle gamme (backend) et recharge */
+  ajouterGamme(): void {
+    if (!this.newGammeName.trim()) {
+      alert('Veuillez saisir un nom pour la gamme.');
+      return;
+    }
+    const nouvelleGamme: GammeDTO = { nom: this.newGammeName.trim(), description: '' };
+    this.gammeService.create(nouvelleGamme).subscribe({
+      next: () => {
+        this.newGammeName = ''; // reset input
+        this.loadGammes();
+      },
+      error: (err) => {
+        console.error('Erreur lors de l\'ajout de la gamme:', err);
+      }
+    });
   }
 
 
-  supprimerGamme() {
+
+  /** Supprime la gamme sélectionnée (backend) et recharge */
+  supprimerGamme(): void {
     if (this.selectedGammeId !== null) {
-      this.gammes = this.gammes.filter(g => g.id !== this.selectedGammeId);
-      this.selectedGammeId = null;
-      this.trierGammes();
+      this.gammeService.delete(this.selectedGammeId, true).subscribe({
+        next: () => {
+          this.selectedGammeId = null;
+          this.loadGammes();
+        },
+        error: (err) => {
+          console.error('Erreur lors de la suppression de la gamme:', err);
+          alert('Erreur lors de la suppression de la gamme.');
+        }
+      });
     } else {
       alert('Sélectionnez d\'abord une gamme pour la supprimer.');
     }
   }
-
-
-  trierGammes() {
-    this.gammes.sort((a, b) => a.nom.localeCompare(b.nom));
-  }
-
-
 }

@@ -1,5 +1,6 @@
 package com.jdrbibli.ouvrage_service.service;
 
+import com.jdrbibli.ouvrage_service.dto.GammeDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
 import com.jdrbibli.ouvrage_service.repository.GammeRepository;
 import com.jdrbibli.ouvrage_service.repository.OuvrageRepository;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class GammeService {
@@ -73,4 +75,15 @@ public class GammeService {
         gammeRepository.deleteById(id);
     }
 
+    /** Convertit une Gamme en GammeDTO */
+    public GammeDTO toDTO(Gamme gamme) {
+        if (gamme == null)
+            return null;
+        return new GammeDTO(gamme.getId(), gamme.getNom(), gamme.getDescription());
+    }
+
+    /** Convertit une liste de Gamme en liste de GammeDTO */
+    public List<GammeDTO> toDTOList(List<Gamme> gammes) {
+        return gammes.stream().map(this::toDTO).collect(Collectors.toList());
+    }
 }

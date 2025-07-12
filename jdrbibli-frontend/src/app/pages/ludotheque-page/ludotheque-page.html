@@ -1,22 +1,24 @@
 <div class="page-container">
-    <div class="col col-1">
-        <div class="actions">
-            <button (click)="ajouterGamme()">Ajouter une gamme</button>
-            <button (click)="supprimerGamme()">Supprimer la gamme sélectionnée</button>
-
-
+    <div class="actions">
+        <div class="ajout-gamme-container">
+            <input type="text" placeholder="Nom de la nouvelle gamme" [(ngModel)]="newGammeName"
+                class="new-gamme-input" />
+            <button class="add-button" (click)="ajouterGamme()">Ajouter une gamme</button>
         </div>
 
-        <h2>Gammes</h2>
+        <button class="delete-button" (click)="supprimerGamme()">Supprimer la gamme sélectionnée</button>
+    </div>
 
-        <div class="gammes-list">
-            <button *ngFor="let gamme of gammes" (click)="goToGamme(gamme.id)" class="gamme-button"
+    <hr class="separator" />
+
+    <h2>Gammes</h2>
+
+    <div class="columns">
+        <div class="col" *ngFor="let column of columns">
+            <button *ngFor="let gamme of column" (click)="goToGamme(gamme.id!)" class="gamme-button"
                 [class.selected]="gamme.id === selectedGammeId">
                 {{ gamme.nom }}
             </button>
         </div>
     </div>
-
-    <div class="col col-2"></div>
-    <div class="col col-3"></div>
 </div>

@@ -8,13 +8,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class OuvrageMapper {
 
-    public OuvrageDTO toDTO(Ouvrage entity) {
-        if (entity == null) return null;
+    // Dans OuvrageMapper.java
 
+    public OuvrageDTO toDTO(Ouvrage entity) {
+        if (entity == null) {
+            return null;
+        }
         OuvrageDTO dto = new OuvrageDTO();
         dto.setId(entity.getId());
         dto.setTitre(entity.getTitre());
         dto.setDescription(entity.getDescription());
+        dto.setGammeId(entity.getGamme() != null ? entity.getGamme().getId() : null);
         dto.setVersion(entity.getVersion());
         dto.setTypeOuvrage(entity.getTypeOuvrage());
         dto.setDatePublication(entity.getDatePublication());
@@ -30,16 +34,16 @@ public class OuvrageMapper {
         dto.setScenariosContenus(entity.getScenariosContenus());
         dto.setAutresOuvragesGamme(entity.getAutresOuvragesGamme());
 
-        if (entity.getGamme() != null) {
-            dto.setGammeId(entity.getGamme().getId());
-        }
+        // Ajout des liens médias
+        dto.setLiensMedias(entity.getLiensMedias());
 
         return dto;
     }
 
-    public Ouvrage toEntity(OuvrageDTO dto, Gamme gamme) {
-        if (dto == null) return null;
-
+    public Ouvrage toEntity(OuvrageDTO dto) {
+        if (dto == null) {
+            return null;
+        }
         Ouvrage entity = new Ouvrage();
         entity.setId(dto.getId());
         entity.setTitre(dto.getTitre());
@@ -58,8 +62,11 @@ public class OuvrageMapper {
         entity.setNotes(dto.getNotes());
         entity.setScenariosContenus(dto.getScenariosContenus());
         entity.setAutresOuvragesGamme(dto.getAutresOuvragesGamme());
-        entity.setGamme(gamme);
+
+        // Ajout des liens médias
+        entity.setLiensMedias(dto.getLiensMedias());
 
         return entity;
     }
+
 }
