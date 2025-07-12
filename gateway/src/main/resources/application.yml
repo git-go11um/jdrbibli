@@ -26,10 +26,8 @@ spring:
           uri: http://localhost:8083
           predicates:
             - Path=/api/ouvrage/**
-
-
           filters:
-            - StripPrefix=2
+            - StripPrefix=0
 
 logging:
   level:

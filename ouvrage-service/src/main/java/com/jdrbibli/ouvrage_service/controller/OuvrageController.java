@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/ouvrages")
+@RequestMapping("/api/ouvrage/ouvrages")
 public class OuvrageController {
 
     private final OuvrageService ouvrageService;

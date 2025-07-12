@@ -1,29 +1,18 @@
-<div class="page-container">
-    <div class="actions">
-        <div class="ajout-gamme-container">
-            <input type="text" placeholder="Nom de la nouvelle gamme" [(ngModel)]="newGammeName"
-                class="new-gamme-input" />
-            <button class="add-button" (click)="ajouterGamme()">Ajouter une gamme</button>
-        </div>
+<div class="ludotheque-container">
+    <h1>Liste des Gammes</h1>
 
-        <button class="delete-button" (click)="supprimerGamme()">Supprimer les gammes sélectionnées</button>
+    <div class="ajout-gamme-container">
+        <input type="text" placeholder="Nom de la nouvelle gamme" [(ngModel)]="newGammeName" />
+        <button (click)="ajouterGamme()">Ajouter une gamme</button>
     </div>
 
-    <hr class="separator" />
-
-    <h2>Gammes</h2>
-
-    <div class="columns">
-        <div class="col" *ngFor="let column of columns">
-            <div *ngFor="let gamme of column" class="gamme-item">
-                <!-- Case à cocher pour chaque gamme -->
-                <input type="checkbox" [checked]="isSelected(gamme.id!)" (change)="toggleSelection(gamme.id!)" />
-
-                <!-- Bouton pour afficher la gamme -->
-                <button (click)="goToGamme(gamme.id!)" class="gamme-button"
-                    [class.selected]="gamme.id === selectedGammeId">
-                    {{ gamme.nom }}
-                </button>
+    <div class="gammes-list">
+        <div *ngFor="let gamme of gammes">
+            <div class="gamme-item">
+                <span>{{ gamme.nom }}</span>
+                <button (click)="goToGamme(gamme.id!)">Voir les ouvrages</button>
+                <button (click)="modifierNomGamme(gamme.id!)">Modifier le nom</button>
+                <button (click)="supprimerGamme(gamme.id!)">Supprimer</button>
             </div>
         </div>
     </div>

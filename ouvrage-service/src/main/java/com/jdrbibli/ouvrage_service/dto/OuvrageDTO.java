@@ -4,11 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class OuvrageDTO {
-    private Long id; 
-    private String titre; 
-    private String description; 
-     private Long gammeId;
-
+    private Long id;
+    private String titre;
+    private String description;
+    private Long gammeId;
 
     private String version;
     private String typeOuvrage;
