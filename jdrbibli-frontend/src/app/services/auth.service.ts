@@ -109,7 +109,7 @@ export class AuthService {
     const token = localStorage.getItem('jwt'); // Récupère le token JWT
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); // Ajoute le token dans l'en-tête
 
-    return this.http.delete(`${this.apiUrl}/auth/users/${pseudo}`, { headers }).pipe(
+    return this.http.delete(`${this.apiUrl}/${pseudo}`, { headers }).pipe(
       catchError(this.handleError)
     );
 
