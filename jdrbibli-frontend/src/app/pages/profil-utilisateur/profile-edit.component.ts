@@ -8,38 +8,14 @@ import { RouterModule } from '@angular/router';
     selector: 'app-profile-edit',
     standalone: true,
     imports: [CommonModule, FormsModule, RouterModule],
-    template: `
-    <div *ngIf="loading">Chargement...</div>
-
-    <form *ngIf="!loading" (ngSubmit)="onSubmit()" #profileForm="ngForm">
-      <label for="pseudo">Pseudo :</label><br />
-      <input
-        id="pseudo"
-        name="pseudo"
-        [(ngModel)]="pseudo"
-        required
-        minlength="3"
-        maxlength="50"
-      /><br />
-
-      <label for="email">Email :</label><br />
-      <input
-        id="email"
-        name="email"
-        type="email"
-        [(ngModel)]="email"
-        required
-      /><br />
-
-      <button type="submit" [disabled]="profileForm.invalid">Mettre à jour</button>
-    </form>
-
-    <div *ngIf="message" [style.color]="error ? 'red' : 'green'">{{ message }}</div>
-  `,
+    templateUrl: './profile-edit.component.html', // On a extrait le HTML
 })
 export class ProfileEditComponent implements OnInit {
     pseudo = '';
     email = '';
+    newPassword = '';            // Nouveau mot de passe
+    confirmNewPassword = '';     // Confirmation du mot de passe
+    passwordMismatch = false;    // Validation de correspondance des mots de passe
     loading = true;
     message = '';
     error = false;
@@ -61,11 +37,22 @@ export class ProfileEditComponent implements OnInit {
         });
     }
 
+    // Vérifie que les mots de passe correspondent
+    checkPasswordMatch() {
+        this.passwordMismatch = this.newPassword !== this.confirmNewPassword;
+    }
+
     onSubmit() {
         this.message = '';
         this.error = false;
 
-        this.authService.updateProfile(this.pseudo, this.email).subscribe({
+        // Vérifier si les mots de passe correspondent
+        if (this.newPassword && this.newPassword !== this.confirmNewPassword) {
+            this.passwordMismatch = true;
+            return; // On ne soumet pas si les mots de passe ne correspondent pas
+        }
+
+        this.authService.updateProfile(this.pseudo, this.email, this.newPassword).subscribe({
             next: () => {
                 this.message = 'Profil mis à jour avec succès.';
             },
@@ -75,4 +62,9 @@ export class ProfileEditComponent implements OnInit {
             },
         });
     }
+
+    
+
+
+
 }

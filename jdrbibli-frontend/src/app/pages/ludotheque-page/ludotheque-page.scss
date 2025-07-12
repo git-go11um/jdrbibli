@@ -1,0 +1,29 @@
+.gamme-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+    /* aligne les boutons à gauche */
+}
+
+.gamme-button {
+    padding: 0.5rem 1rem;
+    font-size: 1.1rem;
+    border: 1px solid #007bff;
+    background-color: white;
+    color: #007bff;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: center;
+    width: auto;
+    /* ne prend que la largeur du contenu */
+    min-width: 100px;
+    /* largeur minimale, optionnel */
+    white-space: nowrap;
+    /* empêche le texte de passer à la ligne */
+}
+
+.gamme-button:hover {
+    background-color: #007bff;
+    color: white;
+}

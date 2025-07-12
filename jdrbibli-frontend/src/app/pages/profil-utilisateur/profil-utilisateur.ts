@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';  // Import du service AuthService
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
     selector: 'app-profil-utilisateur',
@@ -16,20 +16,19 @@ export class ProfilUtilisateur implements OnInit {
     motDePasse: string = '**********';  // Le mot de passe restera masqué
     avatarUrl: string = '';
 
-    constructor(private authService: AuthService) { }
+    constructor(private authService: AuthService, private router: Router) { }
 
     ngOnInit(): void {
-        this.loadUserInfo();  // Appeler la méthode pour charger les infos de l'utilisateur lors du chargement du composant
+        this.loadUserInfo();  // Charger les infos de l'utilisateur au démarrage
     }
 
-    // Méthode pour charger les informations de l'utilisateur
+    // Charger les infos utilisateur depuis l'API
     loadUserInfo(): void {
         this.authService.getUserInfo().subscribe(
             (data) => {
                 this.pseudo = data.pseudo;
                 this.email = data.email;
-                // L'avatar est optionnel, donc on vérifie s'il existe
-                this.avatarUrl = data.avatarUrl || '';  // Si pas d'avatar, on laisse une chaîne vide
+                this.avatarUrl = data.avatarUrl || '';
             },
             (error) => {
                 console.error('Erreur lors du chargement des informations utilisateur', error);
@@ -42,18 +41,18 @@ export class ProfilUtilisateur implements OnInit {
         const confirmDeletion = confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.');
 
         if (confirmDeletion) {
-            const userId = this.getUserPseudoFromLocalStorage();  // Récupérer l'ID de l'utilisateur
+            const userPseudo = this.getUserPseudoFromLocalStorage();  // Récupérer le pseudo
 
-            if (!userId) {
-                alert('ID utilisateur manquant');
+            if (!userPseudo) {
+                alert('Pseudo utilisateur manquant');
                 return;
             }
 
-            this.authService.deleteUser(userId).subscribe(
+            this.authService.deleteUser(userPseudo).subscribe(
                 () => {
-                    alert('Votre compte a été supprimé avec succès.');
+                    alert("Merci d'avoir utilisé nos services, n'hésitez pas à revenir.");
                     this.authService.logout();  // Déconnexion après suppression
-                    window.location.href = '/';  // Redirection vers la page d'accueil
+                    this.router.navigate(['/home-public']);  // Redirection vers la page publique d'accueil
                 },
                 (error) => {
                     alert('Une erreur est survenue lors de la suppression de votre compte.');
@@ -63,21 +62,15 @@ export class ProfilUtilisateur implements OnInit {
         }
     }
 
-    // Méthode pour récupérer le pseudo de l'utilisateur à partir du stockage local
+
+
+    // Récupérer le pseudo depuis le token JWT local
     getUserPseudoFromLocalStorage(): string | null {
         const token = localStorage.getItem('jwt');
         if (token) {
-            const decodedToken = this.authService.decodeJwt(token);  // Utilisation de la méthode decodeJwt dans le service
+            const decodedToken = this.authService.decodeJwt(token);
             return decodedToken.sub;  // Le pseudo est dans le champ "sub"
         }
         return null;
     }
-
-
-
-
-
-
-
-
 }

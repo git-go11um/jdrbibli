@@ -2,6 +2,7 @@ package com.jdrbibli.authservice.service;
 
 import org.springframework.mail.javamail.JavaMailSender;
 
+import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
 import com.jdrbibli.authservice.dto.ChangePasswordRequest;
 import com.jdrbibli.authservice.dto.UserResponseDTO;
 import com.jdrbibli.authservice.entity.User;
@@ -28,5 +29,7 @@ public interface IUserService {
     void deleteUserById(Long userId);
 
     void updateUserProfile(Long userId, String newPseudo, String newEmail);
+
+    void changeProfilePassword(String userEmail, ChangePasswordProfileRequest request);
 
 }

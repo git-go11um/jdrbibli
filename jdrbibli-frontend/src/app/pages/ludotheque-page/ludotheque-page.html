@@ -1,4 +1,7 @@
-<div class="ludotheque">
-    <h1>Bienvenue dans votre Ludothèque</h1>
-    <!-- Contenu de la ludothèque ici -->
+<h2>Ludothèque</h2>
+
+<div class="gamme-list">
+    <button *ngFor="let gamme of gammes" (click)="goToGamme(gamme.id)" class="gamme-button">
+        {{ gamme.nom }}
+    </button>
 </div>

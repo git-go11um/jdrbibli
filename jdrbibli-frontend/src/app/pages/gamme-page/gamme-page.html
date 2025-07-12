@@ -1,0 +1,9 @@
+<h2>{{ gamme?.nom }}</h2>
+<p>{{ gamme?.description }}</p>
+
+<h3>Ouvrages</h3>
+<ul>
+  <li *ngFor="let ouvrage of gamme?.ouvrages">
+    <button (click)="goToOuvrage(ouvrage.id)" class="ouvrage-button">{{ ouvrage.titre }}</button>
+  </li>
+</ul>

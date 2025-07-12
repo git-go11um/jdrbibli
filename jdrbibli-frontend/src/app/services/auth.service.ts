@@ -79,6 +79,12 @@ export class AuthService {
     );
   }
 
+  changeProfilePassword(email: string, newPassword: string) {
+    const url = `/auth/profile/password`; // URL de l'API backend pour changer le mot de passe
+    return this.http.put(url, { email, newPassword });
+  }
+
+
   private handleError(error: HttpErrorResponse) {
     let msg = 'Erreur inconnue';
     if (error.error instanceof ErrorEvent) {
@@ -103,14 +109,12 @@ export class AuthService {
     const token = localStorage.getItem('jwt'); // Récupère le token JWT
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); // Ajoute le token dans l'en-tête
 
-    return this.http.delete(`${this.apiUrl}/auth/${pseudo}`, { headers }).pipe(
-      catchError(this.handleError) // Gère les erreurs
+    return this.http.delete(`${this.apiUrl}/auth/users/${pseudo}`, { headers }).pipe(
+      catchError(this.handleError)
     );
+
+
   }
-
-
-
-
 
 
   // Cette méthode extrait l'ID de l'utilisateur depuis le token JWT
@@ -133,12 +137,25 @@ export class AuthService {
     return JSON.parse(decoded);  // Retourne le contenu JSON du token
   }
 
-  updateProfile(pseudo: string, email: string) {
+  updateProfile(pseudo: string, email: string, newPassword?: string) {
     const token = localStorage.getItem('jwt');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     const url = this.apiUrl + '/profile';
-    return this.http.put(url, { pseudo, email }, { headers });
+
+    // Construire l'objet à envoyer, y compris le mot de passe si fourni
+    const body: any = {
+      pseudo,
+      email,
+    };
+
+    // Si un mot de passe est fourni, on l'ajoute à l'objet body
+    if (newPassword) {
+      body.password = newPassword;
+    }
+
+    // Effectuer la requête PUT avec les données et les headers
+    return this.http.put(url, body, { headers });
   }
 
 

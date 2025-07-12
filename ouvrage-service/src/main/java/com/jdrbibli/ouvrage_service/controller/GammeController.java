@@ -1,6 +1,8 @@
 package com.jdrbibli.ouvrage_service.controller;
 
+import com.jdrbibli.ouvrage_service.dto.GammeDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
+import com.jdrbibli.ouvrage_service.mapper.GammeMapper;
 import com.jdrbibli.ouvrage_service.service.GammeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,41 +10,51 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/gammes")
 public class GammeController {
     private final GammeService gammeService;
+    private final GammeMapper gammeMapper;
 
-    public GammeController(GammeService gammeService) {
+    public GammeController(GammeService gammeService, GammeMapper gammeMapper) {
         this.gammeService = gammeService;
+        this.gammeMapper = gammeMapper;
     }
 
     @GetMapping
-    public List<Gamme> getAll() {
-        return gammeService.findAll();
+    public List<GammeDTO> getAll() {
+        return gammeService.findAll().stream()
+                .map(gammeMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
+    public ResponseEntity<GammeDTO> getById(@PathVariable Long id) {
         Optional<Gamme> gamme = gammeService.findById(id);
         if (gamme.isPresent()) {
-            return ResponseEntity.ok(gamme.get());
+            GammeDTO dto = gammeMapper.toDTO(gamme.get());
+            return ResponseEntity.ok(dto);
         }
         return ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public ResponseEntity<Gamme> create(@RequestBody Gamme gamme) {
+    public ResponseEntity<GammeDTO> create(@RequestBody GammeDTO gammeDTO) {
+        Gamme gamme = gammeMapper.toEntity(gammeDTO);
         Gamme saved = gammeService.save(gamme);
-        return ResponseEntity.ok(saved);
+        GammeDTO savedDTO = gammeMapper.toDTO(saved);
+        return ResponseEntity.ok(savedDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Gamme> update(@PathVariable Long id, @RequestBody Gamme gamme) {
+    public ResponseEntity<GammeDTO> update(@PathVariable Long id, @RequestBody GammeDTO gammeDTO) {
+        Gamme gamme = gammeMapper.toEntity(gammeDTO);
         gamme.setId(id);
         Gamme updated = gammeService.save(gamme);
-        return ResponseEntity.ok(updated);
+        GammeDTO updatedDTO = gammeMapper.toDTO(updated);
+        return ResponseEntity.ok(updatedDTO);
     }
 
     @DeleteMapping("/{id}")

@@ -13,6 +13,6 @@ import { RouterLink } from '@angular/router';
       <button>Déconnexion</button>
     </nav>
   `,
-  styleUrl: './navbar.scss'
+  styleUrls: ['./navbar.scss']
 })
 export class Navbar { }

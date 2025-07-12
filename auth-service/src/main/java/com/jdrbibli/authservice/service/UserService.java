@@ -1,5 +1,6 @@
 package com.jdrbibli.authservice.service;
 
+import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
 import com.jdrbibli.authservice.dto.ChangePasswordRequest;
 import com.jdrbibli.authservice.dto.UserResponseDTO;
 import com.jdrbibli.authservice.entity.Role;
@@ -11,11 +12,14 @@ import com.jdrbibli.authservice.util.PasswordValidator;
 import com.jdrbibli.authservice.repository.PasswordResetTokenRepository;
 
 import jakarta.mail.internet.MimeMessage;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +32,8 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+
+    @Autowired
     private PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
@@ -57,6 +63,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public void deleteUserById(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("Utilisateur avec id " + userId + " non trouvé");
@@ -193,6 +200,33 @@ public class UserService implements IUserService {
             user.setEmail(newEmail);
         }
 
+        userRepository.save(user);
+    }
+
+    @Override
+    public void changeProfilePassword(String userEmail, ChangePasswordProfileRequest request) {
+        // Vérifier que le nouveau mot de passe correspond à la confirmation
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new IllegalArgumentException("Les deux mots de passe ne correspondent pas");
+        }
+
+        // Valider la complexité du mot de passe
+        PasswordValidator.validate(request.getNewPassword());
+
+        // Récupérer l'utilisateur avec l'email
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec l'email " + userEmail + " non trouvé"));
+
+        // Vérifier que le mot de passe actuel est correct
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Mot de passe actuel incorrect");
+        }
+
+        // Mettre à jour le mot de passe (le hacher avant d'enregistrer)
+        String encodedNewPassword = passwordEncoder.encode(request.getNewPassword()); // Encoder le nouveau mot de passe
+        user.setPassword(encodedNewPassword);
+
+        // Sauvegarder l'utilisateur avec le nouveau mot de passe
         userRepository.save(user);
     }
 

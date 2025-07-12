@@ -1,6 +1,7 @@
 package com.jdrbibli.authservice.controller;
 
 import com.jdrbibli.authservice.dto.AuthenticationResponse;
+import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
 import com.jdrbibli.authservice.dto.ChangePasswordRequest;
 import com.jdrbibli.authservice.dto.InscriptionRequest;
 import com.jdrbibli.authservice.dto.LoginRequest;
@@ -8,6 +9,9 @@ import com.jdrbibli.authservice.dto.PasswordResetRequest;
 import com.jdrbibli.authservice.dto.UpdateUserRequest;
 import com.jdrbibli.authservice.dto.UserResponseDTO;
 import com.jdrbibli.authservice.dto.ReponseProfileChange;
+import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
+import com.jdrbibli.authservice.dto.ApiResponse;
+import com.jdrbibli.authservice.security.JwtTokenProvider;
 
 import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.security.JwtService;
@@ -19,17 +23,25 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder; // Injection du PasswordEncoder
 
     private final IUserService userService;
     private final AuthenticationManager authenticationManager;
@@ -151,7 +163,7 @@ public class AuthController {
     }
 
     // Route de suppression du compte utilisateur
-    @DeleteMapping("/auth/{pseudo}")
+    @DeleteMapping("/{pseudo}")
     public ResponseEntity<?> deleteUser(@PathVariable String pseudo, @RequestHeader("Authorization") String token) {
         try {
             // Extraire le pseudo (subject) du token
@@ -172,9 +184,11 @@ public class AuthController {
                         .body("Utilisateur non trouvé.");
             }
         } catch (Exception e) {
+            e.printStackTrace(); // <-- ajoute ça
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Erreur lors de la suppression du compte.");
         }
+
     }
 
     // Route pour mettre à jour le profil (pseudo et email)
@@ -188,6 +202,29 @@ public class AuthController {
             return ResponseEntity.ok(new ReponseProfileChange("Profil mis à jour avec succès"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new ReponseProfileChange(e.getMessage()));
+        }
+    }
+
+    // Nouvelle méthode pour modifier le mot de passe via le profil connecté
+    @PutMapping("/profile/password")
+    public ResponseEntity<?> changeProfilePassword(
+            @RequestBody ChangePasswordProfileRequest request,
+            Principal principal) {
+
+        String email = principal.getName(); // Récupérer l'email de l'utilisateur connecté
+
+        try {
+            // Appeler le service pour changer le mot de passe
+            userService.changeProfilePassword(email, request);
+
+            // Générer un nouveau token JWT après la mise à jour du mot de passe
+            String newToken = jwtTokenProvider.createToken(email); // Générer le token
+
+            // Retourner la réponse avec un message de succès et le nouveau token
+            return ResponseEntity.ok(new ApiResponse("Mot de passe mis à jour avec succès", true, newToken));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse("Erreur lors de la mise à jour du mot de passe", false, null));
         }
     }
 
