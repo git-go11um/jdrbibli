@@ -72,10 +72,11 @@ public class GammeController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        gammeDTO.setOwnerPseudo(ownerPseudo); // assure cohérence
-        Gamme updatedGamme = gammeMapper.toEntity(gammeDTO);
-        updatedGamme.setId(id);
-        Gamme saved = gammeService.save(updatedGamme);
+        // Mise à jour des champs modifiables
+        existing.setNom(gammeDTO.getNom());
+        existing.setDescription(gammeDTO.getDescription());
+
+        Gamme saved = gammeService.save(existing);
         return ResponseEntity.ok(gammeMapper.toDTO(saved));
     }
 
