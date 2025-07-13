@@ -24,6 +24,7 @@ export class ProfilUtilisateur implements OnInit {
         this.loadUserInfo();  // Charger les infos de l'utilisateur au démarrage
         this.testUserService();
     }
+    
     testUserService(): void {
         this.http.get('/api/users').subscribe(
             (response) => {

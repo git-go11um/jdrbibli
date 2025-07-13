@@ -4,26 +4,35 @@ import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.service.UserProfileService;
 import com.jdrbibli.userservice.service.UserSyncService;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserProfileController {
     private final UserProfileService userProfileService;
-
-    public UserProfileController(UserProfileService userProfileService) {
-        this.userProfileService = userProfileService;
-    }
+private final UserSyncService userSyncService;
+    private final String uploadDir = "uploads/avatars/"; // Répertoire pour les avatars
 
     @Autowired
-    private UserSyncService userSyncService;
+    public UserProfileController(UserProfileService userProfileService, UserSyncService userSyncService) {
+        this.userProfileService = userProfileService;
+        this.userSyncService = userSyncService;
+    }
+
 
     @GetMapping
     public List<UserProfile> getAllUsers() {
@@ -48,14 +57,35 @@ public class UserProfileController {
         return ResponseEntity.noContent().build();
     }
 
-    // Nouvel endpoint pour uploader l'avatar
+    // POST http://localhost:8082/users/{pseudo}/avatar
     @PostMapping("/{pseudo}/avatar")
     public ResponseEntity<?> uploadAvatar(@PathVariable String pseudo, @RequestParam("file") MultipartFile file) {
         try {
             String avatarUrl = userProfileService.uploadAvatar(pseudo, file);
-            return ResponseEntity.ok().body(java.util.Map.of("avatarUrl", avatarUrl));
+            // Retourne l'URL de l'avatar pour que le front-end puisse l'afficher
+            return ResponseEntity.ok().body(Map.of("avatarUrl", avatarUrl));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+      // GET http://localhost:8082/users/avatars/{filename}
+    // Ce endpoint sert à afficher l'image de l'avatar dans le navigateur
+    @GetMapping("/avatars/{filename:.+}") // L'expression régulière :.+ est importante pour gérer les extensions de fichier
+    public ResponseEntity<Resource> serveAvatar(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get(uploadDir + filename);
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() && resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG) // Vous pouvez le rendre plus dynamique si nécessaire
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 
