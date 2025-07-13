@@ -13,15 +13,17 @@ import com.jdrbibli.authservice.repository.PasswordResetTokenRepository;
 
 import jakarta.mail.internet.MimeMessage;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,16 +34,18 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final WebClient.Builder webClientBuilder;
 
     @Autowired
     private PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JavaMailSender mailSender) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JavaMailSender mailSender, WebClient.Builder webClientBuilder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailSender = mailSender;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.webClientBuilder = webClientBuilder;
     }
 
     @Override
@@ -162,7 +166,25 @@ public class UserService implements IUserService {
         Set<String> roleNames = user.getRoles().stream()
                 .map(Role::getRoleName)
                 .collect(Collectors.toSet());
-        return new UserResponseDTO(user.getId(), user.getPseudo(), user.getEmail(), roleNames);
+
+        // Appel au user-service pour récupérer l'avatar
+        String avatarUrl = null;
+        try {
+            avatarUrl = webClientBuilder.baseUrl("http://localhost:8082")
+                    .build()
+                    .get()
+                    .uri("/api/users/" + user.getPseudo() + "/avatar")
+                    .retrieve()
+                    .bodyToMono(new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
+                    })
+                    .blockOptional()
+                    .map(map -> (String) map.get("avatarUrl"))
+                    .orElse(null);
+        } catch (Exception e) {
+            avatarUrl = null;
+        }
+
+        return new UserResponseDTO(user.getId(), user.getPseudo(), user.getEmail(), roleNames, avatarUrl);
     }
 
     /**
@@ -228,6 +250,10 @@ public class UserService implements IUserService {
 
         // Sauvegarder l'utilisateur avec le nouveau mot de passe
         userRepository.save(user);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
 }

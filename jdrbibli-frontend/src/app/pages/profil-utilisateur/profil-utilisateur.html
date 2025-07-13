@@ -24,6 +24,14 @@
             </div>
         </div>
 
+        <div class="avatar-upload">
+            <h3>Modifier l'avatar</h3>
+            <input type="file" accept="image/" (change)="onFileSelected($event)" #fileInput>
+            <button *ngIf="selectedFile" (click)="uploadAvatar()" class="btn-upload">
+                Uploader l'avatar
+                </button>
+        </div>
+
         <div class="action-buttons">
             <button class="btn-modifier" routerLink="/profile-edit">Modifier le compte</button>
             <button onclick="window.location.href='/reset-profil-password';">Modifier mon mot de passe</button>

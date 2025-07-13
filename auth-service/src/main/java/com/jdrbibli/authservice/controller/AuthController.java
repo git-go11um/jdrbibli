@@ -25,8 +25,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +48,16 @@ public class AuthController {
     private final IUserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final WebClient.Builder webClientBuilder;
 
     public AuthController(IUserService userService,
             AuthenticationManager authenticationManager,
-            JwtService jwtService) {
+            JwtService jwtService,
+            WebClient.Builder webClientBuilder) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.webClientBuilder = webClientBuilder;
     }
 
     // Inscription
@@ -60,7 +65,31 @@ public class AuthController {
     public ResponseEntity<AuthenticationResponse> inscrire(@RequestBody InscriptionRequest request) {
         User newUser = userService.inscrireNewUser(request.getPseudo(), request.getEmail(), request.getMotDePasse());
         String token = jwtService.generateToken(newUser.getPseudo());
+        // Synchroniser avec le user-service
+        syncUserToUserService(newUser);
         return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(newUser)));
+    }
+
+    // Nouvelle méthode pour synchroniser l'utilisateur vers le user-service
+    private void syncUserToUserService(User user) {
+        try {
+            System.out.println("Synchronisation vers user-service pour " + user.getPseudo() + " / " + user.getEmail());
+            webClientBuilder.baseUrl("http://localhost:8082")
+                    .build()
+                    .post()
+                    .uri("/api/users/sync")
+                    .bodyValue(java.util.Map.of(
+                            "pseudo", user.getPseudo(),
+                            "email", user.getEmail()))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .subscribe(
+                            result -> System.out
+                                    .println("Utilisateur synchronisé vers user-service: " + user.getPseudo()),
+                            error -> System.err.println("Erreur lors de la synchronisation: " + error.getMessage()));
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la synchronisation vers user-service: " + e.getMessage());
+        }
     }
 
     // Login
@@ -72,6 +101,8 @@ public class AuthController {
 
         User user = userService.getUserByPseudo(request.getPseudo());
         String token = jwtService.generateToken(user.getPseudo());
+        // Synchronise aussi à chaque login
+        syncUserToUserService(user);
 
         return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(user)));
     }
@@ -226,6 +257,16 @@ public class AuthController {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse("Erreur lors de la mise à jour du mot de passe", false, null));
         }
+    }
+
+    // Endpoint pour lister tous les utilisateurs (pour la synchronisation)
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        List<UserResponseDTO> userDTOs = users.stream()
+                .map(userService::toDTO)
+                .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(userDTOs);
     }
 
 }

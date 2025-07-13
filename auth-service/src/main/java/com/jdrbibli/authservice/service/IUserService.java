@@ -1,5 +1,7 @@
 package com.jdrbibli.authservice.service;
 
+import java.util.List;
+
 import org.springframework.mail.javamail.JavaMailSender;
 
 import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
@@ -17,6 +19,8 @@ public interface IUserService {
     UserResponseDTO toDTO(User user);
 
     User getUserByPseudo(String pseudo);
+
+    List<User> getAllUsers();
 
     void changePassword(String userEmail, ChangePasswordRequest request);
 
