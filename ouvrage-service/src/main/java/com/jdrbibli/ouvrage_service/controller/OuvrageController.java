@@ -1,7 +1,6 @@
 package com.jdrbibli.ouvrage_service.controller;
 
 import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
-import com.jdrbibli.ouvrage_service.entity.Gamme;
 import com.jdrbibli.ouvrage_service.entity.Ouvrage;
 import com.jdrbibli.ouvrage_service.mapper.OuvrageMapper;
 import com.jdrbibli.ouvrage_service.service.OuvrageService;
@@ -10,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,54 +24,80 @@ public class OuvrageController {
         this.ouvrageMapper = ouvrageMapper;
     }
 
-    // GET /api/ouvrages
+    // GET /api/ouvrages - Récupérer tous les ouvrages de l’utilisateur connecté
     @GetMapping
-    public List<OuvrageDTO> getAll() {
-        return ouvrageService.findAll()
-                .stream()
+    public ResponseEntity<List<OuvrageDTO>> getAll(@RequestHeader("X-User-Pseudo") String ownerPseudo) {
+        List<Ouvrage> ouvrages = ouvrageService.findByOwnerPseudo(ownerPseudo);
+        List<OuvrageDTO> dtos = ouvrages.stream()
                 .map(ouvrageMapper::toDTO)
                 .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
-    // GET /api/ouvrages/{id}
+    // GET /api/ouvrages/{id} - Récupérer un ouvrage par ID s’il appartient à
+    // l’utilisateur
     @GetMapping("/{id}")
-    public ResponseEntity<OuvrageDTO> getById(@PathVariable Long id) {
-        return ouvrageService.findById(id)
-                .map(ouvrageMapper::toDTO)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<OuvrageDTO> getById(@PathVariable Long id,
+            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+        Optional<Ouvrage> ouvrageOpt = ouvrageService.findById(id);
+        if (ouvrageOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Ouvrage ouvrage = ouvrageOpt.get();
+        if (!ownerPseudo.equals(ouvrage.getOwnerPseudo())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok(ouvrageMapper.toDTO(ouvrage));
     }
 
-    // POST /api/ouvrages
+    // POST /api/ouvrages - Créer un ouvrage en assignant ownerPseudo
     @PostMapping
-    public ResponseEntity<OuvrageDTO> create(@RequestBody OuvrageDTO dto) {
+    public ResponseEntity<OuvrageDTO> create(@RequestBody OuvrageDTO dto,
+            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
         try {
+            dto.setOwnerPseudo(ownerPseudo); // Assigne le propriétaire
             Ouvrage created = ouvrageService.createFromDTO(dto);
-            return new ResponseEntity<>(ouvrageMapper.toDTO(created), HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(ouvrageMapper.toDTO(created));
         } catch (RuntimeException ex) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
     }
 
-    // PUT /api/ouvrages/{id}
+    // PUT /api/ouvrages/{id} - Mettre à jour un ouvrage si propriétaire
     @PutMapping("/{id}")
-    public ResponseEntity<OuvrageDTO> update(@PathVariable Long id, @RequestBody OuvrageDTO dto) {
+    public ResponseEntity<OuvrageDTO> update(@PathVariable Long id,
+            @RequestBody OuvrageDTO dto,
+            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+        Optional<Ouvrage> existingOpt = ouvrageService.findById(id);
+        if (existingOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Ouvrage existing = existingOpt.get();
+        if (!ownerPseudo.equals(existing.getOwnerPseudo())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
+            dto.setOwnerPseudo(ownerPseudo); // Garantir la cohérence
             Ouvrage updated = ouvrageService.updateFromDTO(id, dto);
             return ResponseEntity.ok(ouvrageMapper.toDTO(updated));
         } catch (RuntimeException ex) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
     }
 
-    // DELETE /api/ouvrages/{id}
+    // DELETE /api/ouvrages/{id} - Supprimer un ouvrage si propriétaire
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (ouvrageService.findById(id).isPresent()) {
-            ouvrageService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } else {
+    public ResponseEntity<Void> delete(@PathVariable Long id,
+            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+        Optional<Ouvrage> existingOpt = ouvrageService.findById(id);
+        if (existingOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        Ouvrage existing = existingOpt.get();
+        if (!ownerPseudo.equals(existing.getOwnerPseudo())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        ouvrageService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

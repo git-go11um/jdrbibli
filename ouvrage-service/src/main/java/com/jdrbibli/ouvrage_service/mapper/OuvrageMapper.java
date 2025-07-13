@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class OuvrageMapper {
 
-    // Dans OuvrageMapper.java
-
     public OuvrageDTO toDTO(Ouvrage entity) {
         if (entity == null) {
             return null;
@@ -36,6 +34,9 @@ public class OuvrageMapper {
 
         // Ajout des liens médias
         dto.setLiensMedias(entity.getLiensMedias());
+
+        // ✅ Ajout du ownerPseudo
+        dto.setOwnerPseudo(entity.getOwnerPseudo());
 
         return dto;
     }
@@ -66,7 +67,9 @@ public class OuvrageMapper {
         // Ajout des liens médias
         entity.setLiensMedias(dto.getLiensMedias());
 
+        // ✅ Ajout du ownerPseudo
+        entity.setOwnerPseudo(dto.getOwnerPseudo());
+
         return entity;
     }
-
 }

@@ -25,11 +25,13 @@ public class OuvrageDTO {
     private List<String> autresOuvragesGamme;
     private List<String> liensMedias;
 
+    private String ownerPseudo; // ✅ nouveau champ
+
     // Constructeur vide
     public OuvrageDTO() {
     }
 
-    // Getters et setters pour les nouveaux champs
+    // Getters et setters
     public Long getId() {
         return id;
     }
@@ -54,7 +56,6 @@ public class OuvrageDTO {
         this.description = description;
     }
 
-    // ... le reste déjà présent (je te le laisse inchangé)
     public Long getGammeId() {
         return gammeId;
     }
@@ -181,5 +182,13 @@ public class OuvrageDTO {
 
     public void setLiensMedias(List<String> liensMedias) {
         this.liensMedias = liensMedias;
+    }
+
+    public String getOwnerPseudo() {
+        return ownerPseudo;
+    }
+
+    public void setOwnerPseudo(String ownerPseudo) {
+        this.ownerPseudo = ownerPseudo;
     }
 }

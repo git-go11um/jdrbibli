@@ -10,7 +10,12 @@ public class GammeMapper {
     public GammeDTO toDTO(Gamme gamme) {
         if (gamme == null)
             return null;
-        return new GammeDTO(gamme.getId(), gamme.getNom(), gamme.getDescription());
+        return new GammeDTO(
+                gamme.getId(),
+                gamme.getNom(),
+                gamme.getDescription(),
+                gamme.getOwnerPseudo() // ✅ on ajoute ownerPseudo
+        );
     }
 
     public Gamme toEntity(GammeDTO dto) {
@@ -20,7 +25,7 @@ public class GammeMapper {
         System.out.println("Nom reçu du DTO : " + dto.getNom());
         gamme.setNom(dto.getNom());
         gamme.setDescription(dto.getDescription());
+        gamme.setOwnerPseudo(dto.getOwnerPseudo()); // ✅ on ajoute ownerPseudo
         return gamme;
     }
-
 }

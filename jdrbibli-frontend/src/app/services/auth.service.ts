@@ -158,6 +158,18 @@ export class AuthService {
     return this.http.put(url, body, { headers });
   }
 
+  getUserPseudo(): string | null {
+    const token = localStorage.getItem('jwt');
+    if (!token) return null;
+
+    try {
+      const payload = this.decodeJwt(token);
+      return payload?.sub || null; // utiliser sub
+    } catch (e) {
+      console.error('Erreur décodage JWT pour pseudo:', e);
+      return null;
+    }
+  }
 
 
 

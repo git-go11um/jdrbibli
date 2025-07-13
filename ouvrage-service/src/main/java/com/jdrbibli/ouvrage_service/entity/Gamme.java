@@ -4,7 +4,7 @@ import java.util.List;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "gammes")  // <- indique explicitement la table à utiliser
+@Table(name = "gammes") // <- indique explicitement la table à utiliser
 public class Gamme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,6 +12,10 @@ public class Gamme {
 
     private String nom;
     private String description;
+
+    // Nouveau champ pour savoir quel utilisateur a créé cette gamme
+    @Column(nullable = false)
+    private String ownerPseudo;
 
     // Une gamme possède plusieurs ouvrages
     @OneToMany(mappedBy = "gamme", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -30,6 +34,10 @@ public class Gamme {
         return description;
     }
 
+    public String getOwnerPseudo() {
+        return ownerPseudo;
+    }
+
     public List<Ouvrage> getOuvrages() {
         return ouvrages;
     }
@@ -45,6 +53,10 @@ public class Gamme {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setOwnerPseudo(String ownerPseudo) {
+        this.ownerPseudo = ownerPseudo;
     }
 
     public void setOuvrages(List<Ouvrage> ouvrages) {

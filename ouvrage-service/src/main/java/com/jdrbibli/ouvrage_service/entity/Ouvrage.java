@@ -42,6 +42,10 @@ public class Ouvrage {
     private String errata;
     private String notes;
 
+    // Nouveau champ pour savoir quel utilisateur a créé cet ouvrage
+    @Column(nullable = false)
+    private String ownerPseudo;
+
     @ElementCollection
     @CollectionTable(name = "ouvrage_scenarios_contenus", joinColumns = @JoinColumn(name = "ouvrage_id"))
     @Column(name = "scenario")
@@ -58,7 +62,7 @@ public class Ouvrage {
     @Column(name = "lien")
     private List<String> liensMedias = new ArrayList<>();
 
-    // Getters & setters (ajoute liensMedias)
+    // Getters & setters (ajoute ownerPseudo aussi)
 
     public Long getId() {
         return id;
@@ -186,6 +190,14 @@ public class Ouvrage {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getOwnerPseudo() {
+        return ownerPseudo;
+    }
+
+    public void setOwnerPseudo(String ownerPseudo) {
+        this.ownerPseudo = ownerPseudo;
     }
 
     public List<String> getScenariosContenus() {
