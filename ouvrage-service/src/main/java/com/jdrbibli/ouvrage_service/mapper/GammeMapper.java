@@ -14,7 +14,7 @@ public class GammeMapper {
                 gamme.getId(),
                 gamme.getNom(),
                 gamme.getDescription(),
-                gamme.getOwnerPseudo() // ✅ on ajoute ownerPseudo
+                gamme.getOwnerPseudo() //  on ajoute ownerPseudo
         );
     }
 
@@ -25,7 +25,7 @@ public class GammeMapper {
         System.out.println("Nom reçu du DTO : " + dto.getNom());
         gamme.setNom(dto.getNom());
         gamme.setDescription(dto.getDescription());
-        gamme.setOwnerPseudo(dto.getOwnerPseudo()); // ✅ on ajoute ownerPseudo
+        gamme.setOwnerPseudo(dto.getOwnerPseudo()); //  on ajoute ownerPseudo
         return gamme;
     }
 }

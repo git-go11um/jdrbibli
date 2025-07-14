@@ -35,7 +35,7 @@ public class OuvrageMapper {
         // Ajout des liens médias
         dto.setLiensMedias(entity.getLiensMedias());
 
-        // ✅ Ajout du ownerPseudo
+        //  Ajout du ownerPseudo
         dto.setOwnerPseudo(entity.getOwnerPseudo());
 
         return dto;
@@ -67,7 +67,7 @@ public class OuvrageMapper {
         // Ajout des liens médias
         entity.setLiensMedias(dto.getLiensMedias());
 
-        // ✅ Ajout du ownerPseudo
+        //  Ajout du ownerPseudo
         entity.setOwnerPseudo(dto.getOwnerPseudo());
 
         return entity;

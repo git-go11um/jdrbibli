@@ -41,6 +41,7 @@ public class OuvrageService {
 
         Ouvrage ouvrage = ouvrageMapper.toEntity(dto);
         ouvrage.setGamme(gamme);
+        ouvrage.setOwnerPseudo(dto.getOwnerPseudo());
         // ownerPseudo doit être déjà dans dto.setOwnerPseudo()
 
         return ouvrageRepository.save(ouvrage);
