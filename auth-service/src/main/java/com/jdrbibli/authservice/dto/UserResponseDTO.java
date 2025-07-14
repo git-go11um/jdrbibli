@@ -15,10 +15,33 @@ public class UserResponseDTO {
         this.roles = roles;
     }
 
+    public UserResponseDTO() {
+        // constructeur par défaut requis pour les frameworks et tests
+    }
+
     // Getters et setters
 
-    public Long getId() { return id; }
-    public String getPseudo() { return pseudo; }
-    public String getEmail() { return email; }
-    public Set<String> getRoles() { return roles; }
+    public Long getId() {
+        return id;
+    }
+
+    public String getPseudo() {
+        return pseudo;
+    }
+
+    public void setPseudo(String pseudo) {
+        this.pseudo = pseudo;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
 }

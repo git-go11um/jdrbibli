@@ -49,10 +49,12 @@ public class AuthController {
 
     public AuthController(IUserService userService,
             AuthenticationManager authenticationManager,
-            JwtService jwtService) {
+            JwtService jwtService,
+            JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     // Inscription

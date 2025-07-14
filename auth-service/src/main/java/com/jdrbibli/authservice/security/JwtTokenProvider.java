@@ -16,6 +16,15 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long validityInMilliseconds = 3600000; // 1 heure (en millisecondes)
 
+    // 👉 Setters uniquement pour les tests
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    public void setValidityInMilliseconds(long validityInMilliseconds) {
+        this.validityInMilliseconds = validityInMilliseconds;
+    }
+
     // Méthode pour créer un token JWT
     public String createToken(String username) {
         return Jwts.builder()
