@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,25 +173,30 @@ public class AuthController {
             String tokenPseudo = jwtService.extractPseudo(token.substring(7)); // Enlève "Bearer " du token
 
             if (!tokenPseudo.equals(pseudo)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Vous ne pouvez supprimer que votre propre compte.");
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Vous ne pouvez supprimer que votre propre compte.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
             }
 
             // Trouver l'utilisateur par son pseudo et le supprimer
             User user = userService.getUserByPseudo(pseudo); // Récupérer l'utilisateur par son pseudo
             if (user != null) {
                 userService.deleteUserById(user.getId()); // Supprimer l'utilisateur par son ID
-                return ResponseEntity.ok("Utilisateur supprimé avec succès.");
+
+                Map<String, String> successResponse = new HashMap<>();
+                successResponse.put("message", "Utilisateur supprimé avec succès.");
+                return ResponseEntity.ok(successResponse);
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Utilisateur non trouvé.");
+                Map<String, String> notFoundResponse = new HashMap<>();
+                notFoundResponse.put("message", "Utilisateur non trouvé.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(notFoundResponse);
             }
         } catch (Exception e) {
-            e.printStackTrace(); // <-- ajoute ça
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erreur lors de la suppression du compte.");
+            e.printStackTrace();
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Erreur lors de la suppression du compte.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
-
     }
 
     // Route pour mettre à jour le profil (pseudo et email)

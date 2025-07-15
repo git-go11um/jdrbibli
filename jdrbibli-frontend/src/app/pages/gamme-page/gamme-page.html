@@ -1,20 +1,34 @@
-<div class="gamme-container">
-  <h1>{{ gamme?.nom }}</h1>
-  <p>{{ gamme?.description }}</p>
+<div class="gamme">
+  <header class="gamme__header">
+    <h1 class="gamme__title">{{ gamme?.nom }}</h1>
+    <p class="gamme__description">{{ gamme?.description }}</p>
+  </header>
 
-  <h3>Ajouter un ouvrage</h3>
-  <div>
-    <input type="text" placeholder="Titre de l'ouvrage" [(ngModel)]="newOuvrageName" />
-    <textarea placeholder="Description" [(ngModel)]="newOuvrageDescription"></textarea>
-    <button (click)="ajouterOuvrage()">Ajouter un ouvrage</button>
-  </div>
+  <section class="gamme__add-ouvrage">
+    <h2>Ajouter un ouvrage</h2>
+    <div class="gamme__add-form">
+      <input type="text" placeholder="Titre de l'ouvrage" [(ngModel)]="newOuvrageName" class="gamme__input" />
+      <textarea placeholder="Description" [(ngModel)]="newOuvrageDescription" class="gamme__textarea"></textarea>
+      <button (click)="ajouterOuvrage()" class="gamme__button">
+        Ajouter
+      </button>
+    </div>
+  </section>
 
-  <h3>Ouvrages de la gamme</h3>
-  <ul>
-    <li *ngFor="let ouvrage of ouvrages">
-      <span>{{ ouvrage.titre }}</span>
-      <button (click)="modifierOuvrage(ouvrage.id!)">Modifier</button>
-      <button (click)="supprimerOuvrage(ouvrage.id!)">Supprimer</button>
-    </li>
-  </ul>
+  <section class="gamme__list">
+    <h2>Ouvrages de la gamme</h2>
+    <ul class="gamme__ouvrages">
+      <li *ngFor="let ouvrage of ouvrages" class="gamme__ouvrage-item">
+        <span class="gamme__ouvrage-title">{{ ouvrage.titre }}</span>
+        <div class="gamme__actions">
+          <button (click)="modifierOuvrage(ouvrage.id!)" class="gamme__button--edit">
+            Modifier
+          </button>
+          <button (click)="supprimerOuvrage(ouvrage.id!)" class="gamme__button--delete">
+            Supprimer
+          </button>
+        </div>
+      </li>
+    </ul>
+  </section>
 </div>

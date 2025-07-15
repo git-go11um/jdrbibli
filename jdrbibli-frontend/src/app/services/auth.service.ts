@@ -15,7 +15,6 @@ export class AuthService {
       { pseudo, motDePasse: password }
     ).pipe(
       tap((response: { token: string }) => {
-        // Stocke le token dans localStorage
         localStorage.setItem('jwt', response.token);
         console.log('Login réussi, token:', response.token);
       }),
@@ -23,10 +22,9 @@ export class AuthService {
     );
   }
 
-  // Nouvelle méthode pour récupérer les informations de l'utilisateur connecté
   getUserInfo() {
-    const token = localStorage.getItem('jwt'); // Récupère le token
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); // Ajoute le token dans les en-têtes
+    const token = localStorage.getItem('jwt');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     return this.http.get<any>(`${this.apiUrl}/me`, { headers }).pipe(
       catchError(this.handleError)
@@ -34,11 +32,11 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('jwt');  // Vérifie la présence du token
+    return !!localStorage.getItem('jwt');
   }
 
   logout() {
-    localStorage.removeItem('jwt'); // Supprime le token lors de la déconnexion
+    localStorage.removeItem('jwt');
   }
 
   register(pseudo: string, email: string, password: string) {
@@ -80,19 +78,74 @@ export class AuthService {
   }
 
   changeProfilePassword(email: string, newPassword: string) {
-    const url = `/auth/profile/password`; // URL de l'API backend pour changer le mot de passe
+    const url = `/auth/profile/password`;
     return this.http.put(url, { email, newPassword });
   }
 
+  deleteUser(pseudo: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.delete(`${this.apiUrl}/${pseudo}`, { headers }).pipe(
+      tap(response => {
+        console.log('Réponse backend deleteUser:', response);
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  updateProfile(pseudo: string, email: string, newPassword?: string) {
+    const token = localStorage.getItem('jwt');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    const url = this.apiUrl + '/profile';
+
+    const body: any = { pseudo, email };
+    if (newPassword) {
+      body.password = newPassword;
+    }
+
+    return this.http.put(url, body, { headers });
+  }
+
+  getUserIdFromToken(): number | null {
+    const token = localStorage.getItem('jwt');
+    if (!token) return null;
+
+    const payload = this.decodeJwt(token);
+    return payload ? payload.id : null;
+  }
+
+  getUserPseudo(): string | null {
+    const token = localStorage.getItem('jwt');
+    if (!token) return null;
+
+    try {
+      const payload = this.decodeJwt(token);
+      return payload?.sub || null;
+    } catch (e) {
+      console.error('Erreur décodage JWT pour pseudo:', e);
+      return null;
+    }
+  }
+
+  decodeJwt(token: string): any {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Token JWT invalide');
+    }
+    const decoded = atob(parts[1]);
+    return JSON.parse(decoded);
+  }
 
   private handleError(error: HttpErrorResponse) {
+    console.error('handleError triggered avec:', error);
+
     let msg = 'Erreur inconnue';
     if (error.error instanceof ErrorEvent) {
       msg = `Erreur: ${error.error.message}`;
-    } else if (error.status === 401) {
-      msg = 'Identifiants invalides';
     } else {
-      msg = `Erreur serveur (${error.status})`;
+      msg = `Erreur serveur (${error.status}) - message: ${JSON.stringify(error.error)}`;
     }
     return throwError(() => new Error(msg));
   }
@@ -104,76 +157,4 @@ export class AuthService {
   resetPassword(pseudo: string, code: string, newPassword: string) {
     return this.http.post(`${this.apiUrl}/reset-password`, { pseudo, code, newPassword });
   }
-
-  deleteUser(pseudo: string): Observable<any> {
-    const token = localStorage.getItem('jwt'); // Récupère le token JWT
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`); // Ajoute le token dans l'en-tête
-
-    return this.http.delete(`${this.apiUrl}/${pseudo}`, { headers }).pipe(
-      catchError(this.handleError)
-    );
-
-
-  }
-
-
-  // Cette méthode extrait l'ID de l'utilisateur depuis le token JWT
-  getUserIdFromToken(): number | null {
-    const token = localStorage.getItem('jwt');
-    if (!token) return null;
-
-    // Décoder le token pour en extraire l'ID utilisateur
-    const payload = this.decodeJwt(token);
-    return payload ? payload.id : null; // Récupérer l'ID de l'utilisateur dans le JWT
-  }
-
-  // Décoder le JWT sans librairie externe (ta méthode)
-  decodeJwt(token: string): any {
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      throw new Error('Token JWT invalide');
-    }
-    const decoded = atob(parts[1]);  // Décoder la partie centrale du JWT
-    return JSON.parse(decoded);  // Retourne le contenu JSON du token
-  }
-
-  updateProfile(pseudo: string, email: string, newPassword?: string) {
-    const token = localStorage.getItem('jwt');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-
-    const url = this.apiUrl + '/profile';
-
-    // Construire l'objet à envoyer, y compris le mot de passe si fourni
-    const body: any = {
-      pseudo,
-      email,
-    };
-
-    // Si un mot de passe est fourni, on l'ajoute à l'objet body
-    if (newPassword) {
-      body.password = newPassword;
-    }
-
-    // Effectuer la requête PUT avec les données et les headers
-    return this.http.put(url, body, { headers });
-  }
-
-  getUserPseudo(): string | null {
-    const token = localStorage.getItem('jwt');
-    if (!token) return null;
-
-    try {
-      const payload = this.decodeJwt(token);
-      return payload?.sub || null; // utiliser sub
-    } catch (e) {
-      console.error('Erreur décodage JWT pour pseudo:', e);
-      return null;
-    }
-  }
-
-
-
-
-
-
 }
