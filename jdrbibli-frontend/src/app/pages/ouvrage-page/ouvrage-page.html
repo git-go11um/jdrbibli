@@ -1,8 +1,9 @@
-<div class="page-container">
+<div class="page-container" *ngIf="ouvrage">
   <!-- Colonne gauche : informations de l'ouvrage -->
   <div class="left-column">
     <h2>{{ ouvrage.titre }}</h2>
-    <button (click)="goToGamme()" class="gamme-button">{{ gamme.nom }}</button>
+    <button (click)="goToGamme()" class="gamme-button">{{ gamme?.nom }}</button>
+
 
     <div class="field">
       <label>Version :</label>
@@ -11,10 +12,10 @@
 
     <div class="field">
       <label>Type d'ouvrage :</label>
-      <select [(ngModel)]="ouvrage.type">
+      <select [(ngModel)]="ouvrage.typeOuvrage">
         <option *ngFor="let option of typeOptions" [value]="option">{{ option }}</option>
       </select>
-      <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.type" />
+      <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.typeOuvrage" />
     </div>
 
     <div class="field">
@@ -44,12 +45,12 @@
 
     <div class="field">
       <label>EAN/ISBN :</label>
-      <input type="text" [(ngModel)]="ouvrage.eanIsbn" />
+      <input type="text" [(ngModel)]="ouvrage.isbn" />
     </div>
 
     <div class="field">
       <label>Lié à un autre ouvrage :</label>
-      <input type="text" [(ngModel)]="ouvrage.lieA" placeholder="Ensemble de la gamme" />
+      <input type="text" [(ngModel)]="ouvrage.ouvrageLie" placeholder="Ensemble de la gamme" />
     </div>
 
     <div class="field">
@@ -59,7 +60,7 @@
 
     <div class="field">
       <label>Prêt :</label>
-      <input type="text" [(ngModel)]="ouvrage.pret" placeholder="Non" />
+      <input type="checkbox" [(ngModel)]="ouvrage.pret" />
     </div>
 
     <div class="field">
@@ -72,39 +73,49 @@
     </div>
 
     <div class="field">
-      <label>Scénarios :</label>
-      <textarea [(ngModel)]="ouvrage.scenarios"
-        placeholder="Listez ici les scénarios contenus dans cet ouvrage..."></textarea>
+      <label>Scénarios contenus (séparés par des virgules) :</label>
+      <textarea [(ngModel)]="scenariosContenusString"
+        placeholder="Listez ici les scénarios contenus, séparés par des virgules..."></textarea>
     </div>
+
+    <button (click)="sauvegarderOuvrage()" [disabled]="isSaving">
+      {{ isSaving ? 'Sauvegarde en cours...' : 'Sauvegarder les modifications' }}
+    </button>
+
   </div>
 
   <!-- Colonne centrale -->
   <div class="center-column">
-  <div class="card">
-    <h3>Couverture</h3>
-    <div class="cover-placeholder">
-      <!-- Placeholder pour l'image -->
-      <span>Image à venir</span>
+    <div class="card">
+      <h3>Couverture</h3>
+      <div class="cover-placeholder">
+        <!-- Placeholder pour l'image -->
+        <span>Image à venir</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Liens vers d'autres médias :</h3>
+      <div class="field" *ngFor="let lien of ouvrage.liensMedias; let i = index">
+        <input type="url" [(ngModel)]="ouvrage.liensMedias[i]" placeholder="https://..." />
+      </div>
+      <button (click)="ajouterLien()">Ajouter un lien</button>
     </div>
   </div>
-
-  <div class="card">
-    <h3>Liens vers d'autres médias :</h3>
-    <div class="field" *ngFor="let lien of ouvrage.liens; let i = index">
-      <input type="url" [(ngModel)]="ouvrage.liens[i]" placeholder="https://..." />
-    </div>
-    <button (click)="ajouterLien()">Ajouter un lien</button>
-  </div>
-</div>
-
 
   <!-- Colonne droite : autres ouvrages dans la gamme -->
   <div class="right-column">
     <h3>Autres ouvrages dans la gamme</h3>
     <ul>
       <li *ngFor="let autre of autresOuvrages">
-        <a (click)="goToOuvrage(autre.id)">{{ autre.titre }}</a>
+        <a *ngIf="autre.id !== undefined" (click)="goToOuvrage(autre.id)">
+          {{ autre.titre }}
+        </a>
+        <span *ngIf="autre.id === undefined">
+          {{ autre.titre }}
+        </span>
       </li>
     </ul>
   </div>
+
 </div>

@@ -1,13 +1,176 @@
-.ouvrage-button {
-    border: none;
-    background: none;
-    color: #007bff;
-    cursor: pointer;
-    padding: 0;
-    font-size: 1rem;
-    text-decoration: underline;
-}
+.gamme {
+    max-width: 900px;
+    margin: 1rem auto;
+    padding: 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
 
-.ouvrage-button:hover {
-    color: #0056b3;
+    &__header {
+        text-align: center;
+        margin-bottom: 2rem;
+
+        &>.gamme__title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #1a73e8;
+        }
+
+        &>.gamme__description {
+            font-size: 1.1rem;
+            color: #555;
+            font-style: italic;
+        }
+    }
+
+    &__add-ouvrage {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+        h2 {
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #222;
+        }
+
+        &-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+
+            input[type='text'],
+            input[type='date'],
+            textarea {
+                width: 100%;
+                padding: 0.5rem 0.75rem;
+                font-size: 1rem;
+                border: 1.5px solid #ccc;
+                border-radius: 4px;
+                transition: border-color 0.3s ease;
+
+                &:focus {
+                    outline: none;
+                    border-color: #1a73e8;
+                    box-shadow: 0 0 6px #a4c0f9;
+                }
+            }
+
+            textarea {
+                min-height: 80px;
+                resize: vertical;
+            }
+
+            label {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            .gamme__button--add {
+                align-self: flex-start;
+                background-color: #1a73e8;
+                color: white;
+                border: none;
+                padding: 0.6rem 1.2rem;
+                font-weight: 600;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.25s ease;
+
+                &:hover {
+                    background-color: #155db2;
+                }
+            }
+        }
+    }
+
+    &__list {
+        h2 {
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #222;
+        }
+
+        &>.gamme__ouvrages {
+            list-style: none;
+            padding: 0;
+
+            .gamme__ouvrage-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.6rem 1rem;
+                border-bottom: 1px solid #ddd;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .gamme__ouvrage-title {
+                    font-weight: 500;
+                    font-size: 1.1rem;
+                    color: #333;
+                    flex-grow: 1;
+                }
+
+                .gamme__actions {
+                    display: flex;
+                    gap: 0.6rem;
+
+                    .gamme__button {
+                        padding: 0.3rem 0.7rem;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        transition: background-color 0.25s ease;
+                        color: white;
+
+                        &--edit {
+                            background-color: #4caf50;
+
+                            &:hover {
+                                background-color: #3b8e3a;
+                            }
+                        }
+
+                        &--delete {
+                            background-color: #e53935;
+
+                            &:hover {
+                                background-color: #ab2e28;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Responsive
+    @media (max-width: 600px) {
+        padding: 0.5rem;
+
+        &__add-ouvrage {
+            padding: 1rem;
+
+            &-form {
+                gap: 0.75rem;
+            }
+        }
+
+        &__list>.gamme__ouvrages .gamme__ouvrage-item {
+            flex-direction: column;
+            align-items: flex-start;
+
+            .gamme__actions {
+                margin-top: 0.5rem;
+            }
+        }
+    }
 }

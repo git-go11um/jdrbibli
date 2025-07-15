@@ -4,31 +4,114 @@
     <p class="gamme__description">{{ gamme?.description }}</p>
   </header>
 
-  <section class="gamme__add-ouvrage">
-    <h2>Ajouter un ouvrage</h2>
-    <div class="gamme__add-form">
-      <input type="text" placeholder="Titre de l'ouvrage" [(ngModel)]="newOuvrageName" class="gamme__input" />
-      <textarea placeholder="Description" [(ngModel)]="newOuvrageDescription" class="gamme__textarea"></textarea>
-      <button (click)="ajouterOuvrage()" class="gamme__button">
-        Ajouter
-      </button>
-    </div>
+  <!-- Bouton global Ajouter un ouvrage (visible uniquement si formulaire caché) -->
+  <button class="gamme__button--add" (click)="ouvrirFormulaireAjout()" *ngIf="!afficherFormulaireAjout">
+    Ajouter un ouvrage
+  </button>
+
+  <!-- Formulaire affiché uniquement si afficherFormulaireAjout == true -->
+  <section class="gamme__add-ouvrage" *ngIf="afficherFormulaireAjout">
+    <h2>{{ enEdition ? 'Modifier un ouvrage' : 'Ajouter un ouvrage' }}</h2>
+    <form (ngSubmit)="submitFormulaire()" #ouvrageForm="ngForm" class="gamme__add-form">
+
+      <label for="titre">Titre de l'ouvrage</label>
+      <input id="titre" type="text" placeholder="Titre de l'ouvrage" [(ngModel)]="currentOuvrage.titre" name="titre"
+        required />
+      <p></p>
+
+      <label for="description">Description</label>
+      <textarea id="description" placeholder="Description" [(ngModel)]="currentOuvrage.description"
+        name="description"></textarea>
+      <p></p>
+
+      <label for="version">Version</label>
+      <input id="version" type="text" placeholder="Version" [(ngModel)]="currentOuvrage.version" name="version" />
+      <p></p>
+
+      <label for="typeOuvrage">Type d'ouvrage</label>
+      <input id="typeOuvrage" type="text" placeholder="Type d'ouvrage" [(ngModel)]="currentOuvrage.typeOuvrage"
+        name="typeOuvrage" />
+      <p></p>
+
+      <label for="datePublication">Date de publication</label>
+      <input id="datePublication" type="date" placeholder="Date de publication"
+        [(ngModel)]="currentOuvrage.datePublication" name="datePublication" />
+      <p></p>
+
+      <label for="langue">Langue</label>
+      <input id="langue" type="text" placeholder="Langue" [(ngModel)]="currentOuvrage.langue" name="langue" />
+      <p></p>
+
+      <label for="editeur">Éditeur</label>
+      <input id="editeur" type="text" placeholder="Éditeur" [(ngModel)]="currentOuvrage.editeur" name="editeur" />
+      <p></p>
+
+      <label for="etat">État</label>
+      <input id="etat" type="text" placeholder="État" [(ngModel)]="currentOuvrage.etat" name="etat" />
+      <p></p>
+
+      <label for="isbn">ISBN</label>
+      <input id="isbn" type="text" placeholder="ISBN" [(ngModel)]="currentOuvrage.isbn" name="isbn" />
+      <p></p>
+
+      <label for="ouvrageLie">Ouvrage lié</label>
+      <input id="ouvrageLie" type="text" placeholder="Ouvrage lié" [(ngModel)]="currentOuvrage.ouvrageLie"
+        name="ouvrageLie" />
+      <p></p>
+
+      <label for="scenarioLie">Scénario lié</label>
+      <input id="scenarioLie" type="text" placeholder="Scénario lié" [(ngModel)]="currentOuvrage.scenarioLie"
+        name="scenarioLie" />
+      <p></p>
+
+      <label for="pret">
+        Prêt :
+        <input id="pret" type="checkbox" [(ngModel)]="currentOuvrage.pret" name="pret" />
+      </label>
+      <p></p>
+
+      <label for="errata">Errata</label>
+      <textarea id="errata" placeholder="Errata" [(ngModel)]="currentOuvrage.errata" name="errata"></textarea>
+      <p></p>
+
+      <label for="notes">Notes</label>
+      <textarea id="notes" placeholder="Notes" [(ngModel)]="currentOuvrage.notes" name="notes"></textarea>
+      <p></p>
+
+      <label for="scenariosContenus">Scénarios contenus (séparés par des virgules)</label>
+      <input id="scenariosContenus" type="text" placeholder="Scénarios contenus"
+        [(ngModel)]="currentOuvrage.scenariosContenusString" name="scenariosContenus" />
+      <p></p>
+
+      <label for="autresOuvragesGamme">Autres ouvrages de la gamme (séparés par des virgules)</label>
+      <input id="autresOuvragesGamme" type="text" placeholder="Autres ouvrages de la gamme"
+        [(ngModel)]="currentOuvrage.autresOuvragesGammeString" name="autresOuvragesGamme" />
+      <p></p>
+
+      <label for="liensMedias">Liens médias (séparés par des virgules)</label>
+      <input id="liensMedias" type="text" placeholder="Liens médias" [(ngModel)]="currentOuvrage.liensMediasString"
+        name="liensMedias" />
+      <p></p>
+
+      <button type="submit" class="gamme__button--add">{{ enEdition ? 'Modifier' : 'Ajouter' }}</button>
+      <button type="button" (click)="toggleFormulaireAjout()" style="margin-left: 1rem;">Annuler</button>
+    </form>
   </section>
 
+  <!-- Liste des ouvrages -->
   <section class="gamme__list">
     <h2>Ouvrages de la gamme</h2>
     <ul class="gamme__ouvrages">
       <li *ngFor="let ouvrage of ouvrages" class="gamme__ouvrage-item">
-        <span class="gamme__ouvrage-title">{{ ouvrage.titre }}</span>
+        <!-- Titre cliquable : -->
+        <a (click)="ouvrirPageOuvrage(ouvrage.id!)" class="gamme__ouvrage-title-link">{{ ouvrage.titre }}</a>
+
         <div class="gamme__actions">
-          <button (click)="modifierOuvrage(ouvrage.id!)" class="gamme__button--edit">
-            Modifier
-          </button>
-          <button (click)="supprimerOuvrage(ouvrage.id!)" class="gamme__button--delete">
-            Supprimer
-          </button>
+          <button (click)="modifierOuvrage(ouvrage.id!)" class="gamme__button gamme__button--edit">Modifier</button>
+          <button (click)="supprimerOuvrage(ouvrage.id!)" class="gamme__button gamme__button--delete">Supprimer</button>
         </div>
       </li>
     </ul>
+
   </section>
 </div>
