@@ -14,10 +14,14 @@ import { FormsModule } from '@angular/forms';
 })
 export class GammePage implements OnInit {
   gamme: GammeDTO | undefined;
-  ouvrages: OuvrageDTO[] = []; // Tableau d'ouvrages
-  newOuvrageName: string = '';
-  newOuvrageDescription: string = '';
-  newOuvrageDatePublication: Date | null = null; // Date au format Date
+  ouvrages: OuvrageDTO[] = [];
+
+  // Mode ajout ou édition ?
+  afficherFormulaireAjout: boolean = false;
+  enEdition: boolean = false;
+
+  // Objet pour le formulaire (ajout ou édition)
+  currentOuvrage: any = this.getEmptyOuvrage();
 
   constructor(
     private gammeService: GammeService,
@@ -27,108 +31,158 @@ export class GammePage implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const gammeId = Number(this.route.snapshot.paramMap.get('id')); // Récupère l'ID de la gamme dans l'URL
-
-    if (!gammeId) {
-      console.error("ID de la gamme invalide");
-      return;  // Si l'ID de la gamme est invalide, on arrête l'exécution.
+    const gammeId = Number(this.route.snapshot.paramMap.get('id'));
+    if (gammeId > 0) {
+      this.loadGamme(gammeId);
+      this.loadOuvrages(gammeId);
+    } else {
+      console.error('ID de gamme invalide ou manquant');
     }
-
-    this.loadGamme(gammeId);
-    this.loadOuvrages(gammeId); // Charger les ouvrages pour la gamme spécifiée
   }
 
-  /** Charge les détails d'une gamme */
   loadGamme(gammeId: number): void {
     this.gammeService.getById(gammeId).subscribe({
-      next: (data) => {
-        this.gamme = data;
-      },
-      error: (err) => {
-        console.error('Erreur lors du chargement de la gamme:', err);
-      }
+      next: (data) => this.gamme = data,
+      error: (err) => console.error('Erreur lors du chargement de la gamme:', err)
     });
   }
 
-  /** Charge les ouvrages de cette gamme */
   loadOuvrages(gammeId: number): void {
-    // Utilise une méthode qui récupère les ouvrages d'une gamme, pas `getById`
     this.ouvrageService.getByGamme(gammeId).subscribe({
-      next: (data: OuvrageDTO[]) => { // Assure-toi que 'data' est bien un tableau
-        this.ouvrages = data; // Remplir la liste des ouvrages
-      },
-      error: (err) => {
-        console.error('Erreur lors du chargement des ouvrages:', err);
-      }
+      next: (data) => this.ouvrages = data,
+      error: (err) => console.error('Erreur lors du chargement des ouvrages:', err)
     });
   }
 
-  /** Ajouter un ouvrage à cette gamme */
-  ajouterOuvrage(): void {
-    if (!this.newOuvrageName.trim()) {
-      alert('Veuillez saisir un titre pour l\'ouvrage.');
-      return;
-    }
+  // Crée un objet vierge pour le formulaire
+  private getEmptyOuvrage() {
+    return {
+      id: null,
+      titre: '',
+      description: '',
+      version: '',
+      typeOuvrage: '',
+      datePublication: '',
+      langue: '',
+      editeur: '',
+      etat: '',
+      isbn: '',
+      ouvrageLie: '',
+      scenarioLie: '',
+      pret: false,
+      errata: '',
+      notes: '',
+      scenariosContenusString: '',
+      autresOuvragesGammeString: '',
+      liensMediasString: ''
+    };
+  }
 
-    // Vérifie si la gamme est définie et si elle a un ID valide
-    if (!this.gamme || !this.gamme.id) {
-      console.error("ID de la gamme est invalide");
-      return;
-    }
+  // Ouvre le formulaire en mode ajout
+  ouvrirFormulaireAjout() {
+    this.enEdition = false;
+    this.currentOuvrage = this.getEmptyOuvrage();
+    this.afficherFormulaireAjout = true;
+  }
 
-    // Créer un nouvel ouvrage avec toutes les propriétés
-    const nouvelOuvrage: OuvrageDTO = {
-      titre: this.newOuvrageName.trim(),
-      description: this.newOuvrageDescription,
-      gammeId: this.gamme.id, // Assure-toi que la gamme est bien assignée
-      version: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      typeOuvrage: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      datePublication: this.newOuvrageDatePublication ? this.newOuvrageDatePublication.toISOString() : '', // Conversion en ISO string
-      langue: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      editeur: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      etat: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      isbn: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      ouvrageLie: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      scenarioLie: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      pret: false, // Par défaut, tu peux le laisser à false
-      errata: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      notes: '', // Par défaut, tu peux le laisser vide ou récupérer cette info du formulaire
-      scenariosContenus: [], // Liste vide par défaut
-      autresOuvragesGamme: [], // Liste vide par défaut
-      liensMedias: [] // Liste vide par défaut
+  // Ouvre le formulaire en mode édition avec chargement des données
+  ouvrirFormulaireEdition(ouvrageId: number) {
+    this.ouvrageService.getById(ouvrageId).subscribe({
+      next: (data) => {
+        this.enEdition = true;
+        this.currentOuvrage = {
+          ...data,
+          scenariosContenusString: data.scenariosContenus?.join(', ') || '',
+          autresOuvragesGammeString: data.autresOuvragesGamme?.join(', ') || '',
+          liensMediasString: data.liensMedias?.join(', ') || '',
+          datePublication: data.datePublication ? data.datePublication.substring(0, 10) : '' // si date ISO string
+        };
+        this.afficherFormulaireAjout = true;
+      },
+      error: (err) => console.error('Erreur chargement ouvrage pour édition:', err)
+    });
+  }
+
+  // Soumet le formulaire (ajout ou modification)
+  submitFormulaire() {
+    const dto: OuvrageDTO = {
+      id: this.currentOuvrage.id,
+      titre: this.currentOuvrage.titre.trim(),
+      description: this.currentOuvrage.description,
+      gammeId: this.gamme?.id!,
+      version: this.currentOuvrage.version,
+      typeOuvrage: this.currentOuvrage.typeOuvrage,
+      datePublication: this.currentOuvrage.datePublication,
+      langue: this.currentOuvrage.langue,
+      editeur: this.currentOuvrage.editeur,
+      etat: this.currentOuvrage.etat,
+      isbn: this.currentOuvrage.isbn,
+      ouvrageLie: this.currentOuvrage.ouvrageLie,
+      scenarioLie: this.currentOuvrage.scenarioLie,
+      pret: this.currentOuvrage.pret,
+      errata: this.currentOuvrage.errata,
+      notes: this.currentOuvrage.notes,
+      scenariosContenus: this.splitStringToArray(this.currentOuvrage.scenariosContenusString),
+      autresOuvragesGamme: this.splitStringToArray(this.currentOuvrage.autresOuvragesGammeString),
+      liensMedias: this.splitStringToArray(this.currentOuvrage.liensMediasString),
     };
 
-    this.ouvrageService.create(nouvelOuvrage).subscribe({
-      next: () => {
-        this.newOuvrageName = ''; // Reset
-        this.newOuvrageDescription = ''; // Reset
-        this.newOuvrageDatePublication = null; // Reset
-        if (this.gamme?.id) {
-          this.loadOuvrages(this.gamme.id); // Recharger les ouvrages uniquement si la gamme existe
-        }
-      },
-      error: (err) => {
-        console.error('Erreur lors de l\'ajout de l\'ouvrage:', err);
+    if (this.enEdition && dto.id != null) {
+      this.ouvrageService.update(dto.id, dto).subscribe({
+        next: () => {
+          console.log('Ouvrage modifié avec succès');
+          this.loadOuvrages(this.gamme!.id!);
+          this.afficherFormulaireAjout = false;
+          this.currentOuvrage = this.getEmptyOuvrage();
+        },
+        error: (err) => console.error('Erreur lors de la modification:', err)
+      });
+    } else {
+      // ajout
+      if (!dto.titre) {
+        alert('Le titre est obligatoire');
+        return;
       }
-    });
+      this.ouvrageService.create(dto).subscribe({
+        next: () => {
+          console.log('Ouvrage ajouté avec succès');
+          this.loadOuvrages(this.gamme!.id!);
+          this.afficherFormulaireAjout = false;
+          this.currentOuvrage = this.getEmptyOuvrage();
+        },
+        error: (err) => console.error('Erreur lors de la création:', err)
+      });
+    }
   }
 
-  /** Supprimer un ouvrage */
   supprimerOuvrage(ouvrageId: number): void {
+    if (!confirm('Voulez-vous vraiment supprimer cet ouvrage ?')) return;
     this.ouvrageService.delete(ouvrageId).subscribe({
-      next: () => {
-        if (this.gamme && this.gamme.id) {
-          this.loadOuvrages(this.gamme.id); // Recharger les ouvrages si la gamme est valide
-        }
-      },
-      error: (err) => {
-        console.error('Erreur lors de la suppression de l\'ouvrage:', err);
-      }
+      next: () => this.loadOuvrages(this.gamme!.id!),
+      error: (err) => console.error('Erreur lors de la suppression:', err)
     });
   }
 
-  /** Modifier un ouvrage (redirection vers la page de l'ouvrage) */
   modifierOuvrage(ouvrageId: number): void {
-    this.router.navigate(['/ouvrage', ouvrageId]); // Rediriger vers la page de modification de l'ouvrage
+    this.ouvrirFormulaireEdition(ouvrageId);
   }
+
+  toggleFormulaireAjout(): void {
+    if (this.afficherFormulaireAjout) {
+      this.afficherFormulaireAjout = false;
+      this.currentOuvrage = this.getEmptyOuvrage();
+      this.enEdition = false;
+    } else {
+      this.ouvrirFormulaireAjout();
+    }
+  }
+
+  private splitStringToArray(value: string): string[] {
+    return value ? value.split(',').map(s => s.trim()).filter(s => s.length > 0) : [];
+  }
+
+  ouvrirPageOuvrage(ouvrageId: number): void {
+    this.router.navigate(['/ouvrage', ouvrageId]);
+  }
+
 }

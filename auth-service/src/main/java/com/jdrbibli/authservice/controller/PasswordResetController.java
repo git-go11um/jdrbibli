@@ -3,7 +3,7 @@ package com.jdrbibli.authservice.controller;
 import com.jdrbibli.authservice.dto.PasswordResetRequest;
 import com.jdrbibli.authservice.dto.ChangePasswordRequest;
 import com.jdrbibli.authservice.dto.PasswordResetConfirmation;
-import com.jdrbibli.authservice.service.UserService;
+import com.jdrbibli.authservice.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import java.util.Map;
 public class PasswordResetController {
 
     @Autowired
-    private UserService userService; // Utilise le UserService modifié
+    private IUserService userService; // Utilise le UserService modifié
 
     // Méthode pour demander la réinitialisation du mot de passe (envoie du code par
     // email)

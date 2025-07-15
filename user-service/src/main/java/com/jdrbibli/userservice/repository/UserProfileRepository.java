@@ -9,4 +9,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     Optional<UserProfile> findByEmail(String email);
 
     Optional<UserProfile> findByPseudo(String pseudo);
+
+    Optional<UserProfile> findByPseudo(String pseudo);
+
 }

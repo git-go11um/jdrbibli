@@ -50,6 +50,30 @@ public class OuvrageController {
         return ResponseEntity.ok(ouvrageMapper.toDTO(ouvrage));
     }
 
+    // GET /api/ouvrages/gamme/{gammeId} - Récupérer tous les ouvrages d'une gamme
+    // pour l’utilisateur connecté
+    @GetMapping("/gamme/{gammeId}")
+    public ResponseEntity<List<OuvrageDTO>> getByGamme(
+            @PathVariable Long gammeId,
+            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+        List<Ouvrage> ouvrages = ouvrageService.findByGammeIdAndOwnerPseudo(gammeId, ownerPseudo);
+        List<OuvrageDTO> dtos = ouvrages.stream()
+                .map(ouvrage -> {
+                    OuvrageDTO dto = new OuvrageDTO();
+                    // Mapper manuellement ou via un mapper
+                    // Si tu as un mapper, préfère l’utiliser
+                    dto.setId(ouvrage.getId());
+                    dto.setTitre(ouvrage.getTitre());
+                    dto.setDescription(ouvrage.getDescription());
+                    dto.setGammeId(ouvrage.getGamme().getId());
+                    dto.setOwnerPseudo(ouvrage.getOwnerPseudo());
+                    // ... les autres propriétés ...
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
     // POST /api/ouvrages - Créer un ouvrage en assignant ownerPseudo
     @PostMapping
     public ResponseEntity<OuvrageDTO> create(@RequestBody OuvrageDTO dto,

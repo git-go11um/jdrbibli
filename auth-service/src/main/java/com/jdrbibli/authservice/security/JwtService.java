@@ -24,10 +24,20 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
+    // Ajoute ces setters pour pouvoir configurer dans les tests
+    public void setJwtSecret(String jwtSecret) {
+        this.jwtSecret = jwtSecret;
+    }
+
+    public void setJwtExpirationMs(long jwtExpirationMs) {
+        this.jwtExpirationMs = jwtExpirationMs;
+    }
+
     /**
      * Générer un token avec claims custom optionnels
+     * 
      * @param extraClaims : map de claims supplémentaires
-     * @param pseudo : pseudo de l'utilisateur (subject)
+     * @param pseudo      : pseudo de l'utilisateur (subject)
      */
     public String generateToken(Map<String, Object> extraClaims, String pseudo) {
         return Jwts.builder()
@@ -93,4 +103,5 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 }

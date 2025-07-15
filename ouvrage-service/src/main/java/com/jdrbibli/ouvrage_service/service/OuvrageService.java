@@ -41,6 +41,7 @@ public class OuvrageService {
 
         Ouvrage ouvrage = ouvrageMapper.toEntity(dto);
         ouvrage.setGamme(gamme);
+        ouvrage.setOwnerPseudo(dto.getOwnerPseudo());
         // ownerPseudo doit être déjà dans dto.setOwnerPseudo()
 
         return ouvrageRepository.save(ouvrage);
@@ -66,4 +67,9 @@ public class OuvrageService {
     public void deleteById(Long id) {
         ouvrageRepository.deleteById(id);
     }
+
+    public List<Ouvrage> findByGammeIdAndOwnerPseudo(Long gammeId, String ownerPseudo) {
+        return ouvrageRepository.findByGammeIdAndOwnerPseudo(gammeId, ownerPseudo);
+    }
+
 }

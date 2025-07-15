@@ -2,6 +2,7 @@ package com.jdrbibli.userservice.entity;
 
 import com.jdrbibli.userservice.dto.OuvrageDTO;
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -30,11 +31,15 @@ public class UserProfile {
     @Transient
     private List<OuvrageDTO> ludotheque;
 
-    // Pour plus tard : relations avec amis
-    // @OneToMany(mappedBy = "sender") private List<FriendRequest> sentRequests;
-    // @OneToMany(mappedBy = "receiver") private List<FriendRequest> receivedRequests;
+    /**
+     * Liste des amis (relation bidirectionnelle ManyToMany persistée en base).
+     */
+    @ManyToMany
+    @JoinTable(name = "user_friends", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "friend_id"))
+    private List<UserProfile> friends;
 
     // Getters et setters
+
     public Long getId() {
         return id;
     }
@@ -81,5 +86,13 @@ public class UserProfile {
 
     public void setLudotheque(List<OuvrageDTO> ludotheque) {
         this.ludotheque = ludotheque;
+    }
+
+    public List<UserProfile> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<UserProfile> friends) {
+        this.friends = friends;
     }
 }

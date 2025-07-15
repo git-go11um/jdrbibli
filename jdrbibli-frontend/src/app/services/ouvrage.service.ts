@@ -21,8 +21,9 @@ export interface OuvrageDTO {
     notes: string;
     scenariosContenus: string[];
     autresOuvragesGamme: string[];
-    gammeId: number;  // L'ID de la gamme à laquelle appartient l'ouvrage
-    liensMedias: [];
+    gammeId: number;
+    liensMedias: string[];
+
 }
 
 @Injectable({
@@ -30,47 +31,44 @@ export interface OuvrageDTO {
 })
 export class OuvrageService {
 
-    private apiUrl = 'http://localhost:8084/api/ouvrages';  // L'URL de ton API backend pour les ouvrages
+    private apiUrl = 'http://localhost:8084/api/ouvrage/ouvrages';
 
     constructor(private http: HttpClient, private authService: AuthService) { }
 
+    private createHeaders(): HttpHeaders {
+        const pseudo = this.authService.getUserPseudo() ?? '';
+        return new HttpHeaders({ 'X-User-Pseudo': pseudo });
+    }
 
-    // Récupérer tous les ouvrages
     getAll(): Observable<OuvrageDTO[]> {
         const headers = this.createHeaders();
         return this.http.get<OuvrageDTO[]>(this.apiUrl, { headers });
     }
 
-
-    // Récupérer un ouvrage par son ID
     getById(id: number): Observable<OuvrageDTO> {
-        return this.http.get<OuvrageDTO>(`${this.apiUrl}/${id}`);
+        const headers = this.createHeaders();
+        return this.http.get<OuvrageDTO>(`${this.apiUrl}/${id}`, { headers });
     }
 
-    // Créer un nouvel ouvrage
-    create(ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
-        return this.http.post<OuvrageDTO>(this.apiUrl, ouvrage);
-    }
-
-    // Mettre à jour un ouvrage existant
-    update(id: number, ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
-        return this.http.put<OuvrageDTO>(`${this.apiUrl}/${id}`, ouvrage);
-    }
-
-    // Supprimer un ouvrage
-    delete(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/${id}`);
-    }
-
+    /** Nouvelle méthode propre et claire */
     getByGamme(gammeId: number): Observable<OuvrageDTO[]> {
-        return this.http.get<OuvrageDTO[]>(`${this.apiUrl}/gammes/${gammeId}/ouvrages`); // L'URL doit correspondre à ton API
+        const headers = this.createHeaders();
+        return this.http.get<OuvrageDTO[]>(`${this.apiUrl}/gamme/${gammeId}`, { headers });
     }
 
-    private createHeaders(): HttpHeaders {
-        const pseudo = this.authService.getUserPseudo();
-        return new HttpHeaders({
-            'X-User-Pseudo': pseudo ?? ''
-        });
+    create(ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
+        const headers = this.createHeaders();
+        return this.http.post<OuvrageDTO>(this.apiUrl, ouvrage, { headers });
+    }
+
+    update(id: number, ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
+        const headers = this.createHeaders();
+        return this.http.put<OuvrageDTO>(`${this.apiUrl}/${id}`, ouvrage, { headers });
+    }
+
+    delete(id: number): Observable<void> {
+        const headers = this.createHeaders();
+        return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers });
     }
 
 

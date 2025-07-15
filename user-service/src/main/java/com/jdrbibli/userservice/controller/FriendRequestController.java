@@ -4,20 +4,23 @@ import com.jdrbibli.userservice.dto.FriendDTO;
 import com.jdrbibli.userservice.dto.FriendRequestDTO;
 import com.jdrbibli.userservice.entity.FriendRequest;
 import com.jdrbibli.userservice.entity.UserProfile;
+import com.jdrbibli.userservice.mapper.FriendMapper;
 import com.jdrbibli.userservice.mapper.FriendRequestMapper;
 import com.jdrbibli.userservice.service.FriendRequestService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/friends")
+@RequestMapping("/api/friends")
 public class FriendRequestController {
 
-    @Autowired
-    private FriendRequestService friendRequestService;
+    private final FriendRequestService friendRequestService;
+
+    public FriendRequestController(FriendRequestService friendRequestService) {
+        this.friendRequestService = friendRequestService;
+    }
 
     /**
      * Envoyer une demande d'ami.
@@ -47,7 +50,7 @@ public class FriendRequestController {
     }
 
     /**
-     * Supprimer un ami.
+     * Supprimer un ami existant.
      */
     @DeleteMapping("/{friendId}")
     public void removeFriend(@RequestParam Long userId, @PathVariable Long friendId) {
@@ -55,13 +58,22 @@ public class FriendRequestController {
     }
 
     /**
-     * Lister mes amis.
+     * Lister les amis d’un utilisateur.
      */
     @GetMapping
     public List<FriendDTO> listFriends(@RequestParam Long userId) {
         List<UserProfile> friends = friendRequestService.listFriends(userId);
         return friends.stream()
+                .map(FriendMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/requests/received")
+    public List<FriendRequestDTO> listReceivedRequests(@RequestParam Long userId) {
+        List<FriendRequest> requests = friendRequestService.listReceivedRequests(userId);
+        return requests.stream()
                 .map(FriendRequestMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
 }
