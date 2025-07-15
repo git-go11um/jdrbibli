@@ -1,0 +1,73 @@
+### Récupérer tous les utilisateurs
+GET http://localhost:8082/api/users
+Accept: application/json
+
+###
+
+### Créer un utilisateur
+POST http://localhost:8082/api/users
+Content-Type: application/json
+
+{
+  "pseudo": "alice",
+  "email": "alice@example.com",
+  "avatarUrl": "https://example.com/avatar-alice.png",
+  "ouvrageIds": []
+}
+
+###
+
+### Rechercher un utilisateur par pseudo
+GET http://localhost:8082/api/users/search?pseudo=alice
+Accept: application/json
+
+###
+
+### Créer un deuxième utilisateur
+POST http://localhost:8082/api/users
+Content-Type: application/json
+
+{
+  "pseudo": "bob",
+  "email": "bob@example.com",
+  "avatarUrl": "https://example.com/avatar-bob.png",
+  "ouvrageIds": []
+}
+
+###
+
+### Envoyer une demande d'ami de Alice à dede
+POST http://localhost:8082/api/friends/request?senderId=1&receiverId=2
+Accept: application/json
+
+###
+
+### Lister les demandes d'ami reçues par dede
+GET http://localhost:8082/api/friends/requests/received?userId=2
+Accept: application/json
+
+###
+
+### Accepter la demande d'ami (utilise l'id de la demande renvoyée précédemment)
+POST http://localhost:8082/api/friends/6/accept
+Accept: application/json
+
+###
+
+### Lister les amis de Alice
+GET http://localhost:8082/api/friends?userId=1
+Accept: application/json
+
+###
+
+### Supprimer l'ami Bob de la liste d'amis d'Alice
+DELETE http://localhost:8082/api/friends/2?userId=1
+Accept: application/json
+
+###
+
+### Supprimer un utilisateur (ex: Alice)
+DELETE http://localhost:8082/api/users/1
+Accept: application/json
+
+###

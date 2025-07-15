@@ -15,15 +15,16 @@ import java.util.stream.Collectors;
 @Service
 public class FriendRequestService {
 
-    @Autowired
-    private FriendRequestRepository friendRequestRepository;
+    private final FriendRequestRepository friendRequestRepository;
+    private final UserProfileRepository userProfileRepository;
 
     @Autowired
-    private UserProfileRepository userProfileRepository;
+    public FriendRequestService(FriendRequestRepository friendRequestRepository,
+            UserProfileRepository userProfileRepository) {
+        this.friendRequestRepository = friendRequestRepository;
+        this.userProfileRepository = userProfileRepository;
+    }
 
-    /**
-     * Envoyer une demande d'ami.
-     */
     public FriendRequest sendFriendRequest(Long senderId, Long receiverId) {
         if (senderId.equals(receiverId)) {
             throw new IllegalArgumentException("Vous ne pouvez pas vous envoyer une demande à vous-même.");
@@ -34,8 +35,8 @@ public class FriendRequestService {
         UserProfile receiver = userProfileRepository.findById(receiverId)
                 .orElseThrow(() -> new RuntimeException("Destinataire non trouvé"));
 
-        // Vérifier s'il existe déjà une demande
-        Optional<FriendRequest> existing = friendRequestRepository.findBySenderAndReceiver(sender, receiver);
+        Optional<FriendRequest> existing = friendRequestRepository
+                .findExistingRequestBetweenUsers(sender, receiver);
         if (existing.isPresent()) {
             throw new RuntimeException("Une demande existe déjà entre ces utilisateurs.");
         }
@@ -48,9 +49,6 @@ public class FriendRequestService {
         return friendRequestRepository.save(request);
     }
 
-    /**
-     * Accepter une demande d'ami.
-     */
     public FriendRequest acceptFriendRequest(Long requestId) {
         FriendRequest request = friendRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Demande non trouvée"));
@@ -59,9 +57,6 @@ public class FriendRequestService {
         return friendRequestRepository.save(request);
     }
 
-    /**
-     * Refuser une demande d'ami.
-     */
     public FriendRequest rejectFriendRequest(Long requestId) {
         FriendRequest request = friendRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Demande non trouvée"));
@@ -70,43 +65,38 @@ public class FriendRequestService {
         return friendRequestRepository.save(request);
     }
 
-    /**
-     * Supprimer un ami (supprime la relation FriendRequest).
-     */
     public void removeFriend(Long userId, Long friendId) {
         UserProfile user = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
         UserProfile friend = userProfileRepository.findById(friendId)
                 .orElseThrow(() -> new RuntimeException("Ami non trouvé"));
 
-        // Trouver la demande acceptée dans les deux sens
-        List<FriendRequest> requests = friendRequestRepository.findBySenderOrReceiver(user, user);
-        requests.addAll(friendRequestRepository.findBySenderOrReceiver(friend, friend));
+        Optional<FriendRequest> friendship = friendRequestRepository
+                .findAcceptedFriendshipBetweenUsers(user, friend);
 
-        for (FriendRequest fr : requests) {
-            boolean match = (fr.getSender().getId().equals(userId) && fr.getReceiver().getId().equals(friendId))
-                         || (fr.getSender().getId().equals(friendId) && fr.getReceiver().getId().equals(userId));
-            if (match && fr.getStatus() == Status.ACCEPTED) {
-                friendRequestRepository.delete(fr);
-                return;
-            }
+        if (friendship.isPresent()) {
+            friendRequestRepository.delete(friendship.get());
+        } else {
+            throw new RuntimeException("Amitié non trouvée.");
         }
-
-        throw new RuntimeException("Amitié non trouvée.");
     }
 
-    /**
-     * Lister mes amis (uniquement ceux acceptés).
-     */
     public List<UserProfile> listFriends(Long userId) {
         UserProfile user = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-        List<FriendRequest> requests = friendRequestRepository.findBySenderOrReceiver(user, user);
+        List<FriendRequest> requests = friendRequestRepository.findAcceptedFriendshipsOfUser(user);
 
         return requests.stream()
-                .filter(r -> r.getStatus() == Status.ACCEPTED)
                 .map(r -> r.getSender().getId().equals(userId) ? r.getReceiver() : r.getSender())
                 .collect(Collectors.toList());
     }
+
+    public List<FriendRequest> listReceivedRequests(Long userId) {
+        UserProfile user = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        return friendRequestRepository.findByReceiverAndStatus(user, Status.PENDING);
+    }
+
+    // Suppression de la méthode qui utilisait Long + String
 }
