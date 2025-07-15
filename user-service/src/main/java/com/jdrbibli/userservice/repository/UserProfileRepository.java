@@ -10,6 +10,6 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
 
     Optional<UserProfile> findByPseudo(String pseudo);
 
-    Optional<UserProfile> findByPseudo(String pseudo);
+   
 
 }
