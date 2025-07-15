@@ -1,71 +1,99 @@
+/* Style global pour la page Profil utilisateur */
 .profil-utilisateur {
     display: flex;
+    justify-content: space-between;
+    margin: 20px;
     padding: 20px;
-    gap: 30px;
+}
 
-    /* Colonne gauche - informations utilisateur */
-    .left-column {
-        flex: 1;
+/* Partie gauche - Profil utilisateur */
+.left-column {
+    width: 65%;
+    background-color: #EBF2FA;
+    /* Fond blanc cassé pour rester cohérent avec le reste du site */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
+/* Partie droite - Amis */
+.right-column {
+    width: 30%;
+    background-color: #A4BD01;
+    /* Fond vert clair pastel */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-        .user-info {
-            margin-bottom: 30px;
-        }
+/* Séparation entre les deux colonnes (ligne fine) */
+.profil-utilisateur .left-column {
+    border-right: 2px solid #EBF2FA;
+    /* Ligne de séparation */
+}
 
-        .info-item {
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            display: flex;
-            justify-content: space-between;
-            /* Aligne le label à gauche et la valeur à droite */
-            align-items: center;
-            /* Vertically center the label and value */
-        }
+/* Titres */
+h1,
+h2 {
+    font-size: 24px;
+    color: #06668C;
+    /* Bleu foncé pour les titres */
+}
 
-        .info-item label {
-            font-weight: bold;
-            width: 30%;
-            /* Ajoute une largeur pour le label */
-        }
+/* Style des informations du profil utilisateur */
+.user-info {
+    margin-bottom: 20px;
+}
 
-        .info-item span {
-            width: 65%;
-            /* Ajoute une largeur pour les valeurs (pseudo, email, etc.) */
-            text-align: left;
-            /* Aligne à gauche les valeurs */
-        }
+.info-item {
+    margin-bottom: 15px;
+}
 
-        .action-buttons {
-            display: flex;
-            gap: 15px;
+label {
+    font-weight: bold;
+}
 
-            button {
-                padding: 10px 20px;
-                border-radius: 25px;
-                font-size: 1rem;
-                background-color: #ffec99;
-                color: #333;
-                border: none;
-                cursor: pointer;
-                transition: background-color 0.3s;
-            }
+span {
+    display: block;
+    margin-top: 5px;
+    color: #333;
+}
 
-            button:hover {
-                background-color: #ffd700;
-            }
-        }
-    }
+/* Style des boutons */
+.action-buttons button {
+    color: #FFFFFF;
+    padding: 8px 20px;  /* Réduction de la largeur des boutons */
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;  /* Bordure arrondie (5px) pour la forme des boutons */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin-right: 10px;  /* Espace entre les boutons */
+}
 
-    /* Colonne droite : espace pour les amis */
-    .right-column {
-        flex: 1;
-        background-color: #f4f4f4;
-        padding: 15px;
-        border-radius: 8px;
-        height: 100%;
-    }
+/* Bouton Modifier le compte (bleu) */
+.btn-modifier {
+    background-color: #06668C;  /* Bleu pour le bouton Modifier */
+}
+
+.btn-modifier:hover {
+    background-color: #679436;  /* Vert au survol pour Modifier */
+}
+
+/* Bouton Supprimer le compte (rouge) */
+.btn-supprimer {
+    background-color: #FF4C4C;  /* Rouge pour la suppression */
+}
+
+.btn-supprimer:hover {
+    background-color: #FF1A1A;  /* Rouge plus foncé au survol */
+}
+
+/* Bouton Modifier le mot de passe (vert) */
+button {
+    background-color: #679436;  /* Vert pour les autres boutons */
+}
+
+button:hover {
+    background-color: #5A8A2D;  /* Variante plus foncée de vert */
 }

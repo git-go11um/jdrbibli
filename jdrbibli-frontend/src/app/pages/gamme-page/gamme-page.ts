@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router'; // Import du RouterModule
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OuvrageService, OuvrageDTO } from '../../services/ouvrage.service';
@@ -10,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-gamme-page',
   templateUrl: './gamme-page.html',
   styleUrls: ['./gamme-page.scss'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, RouterModule]
 })
 export class GammePage implements OnInit {
   gamme: GammeDTO | undefined;

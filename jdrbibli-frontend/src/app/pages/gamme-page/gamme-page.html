@@ -103,8 +103,8 @@
     <h2>Ouvrages de la gamme</h2>
     <ul class="gamme__ouvrages">
       <li *ngFor="let ouvrage of ouvrages" class="gamme__ouvrage-item">
-        <!-- Titre cliquable : -->
-        <a (click)="ouvrirPageOuvrage(ouvrage.id!)" class="gamme__ouvrage-title-link">{{ ouvrage.titre }}</a>
+        <!-- Lien vers la page de consultation de l'ouvrage -->
+        <a [routerLink]="['/ouvrage-detail', ouvrage.id]" class="gamme__ouvrage-title-link">{{ ouvrage.titre }}</a>
 
         <div class="gamme__actions">
           <button (click)="modifierOuvrage(ouvrage.id!)" class="gamme__button gamme__button--edit">Modifier</button>
@@ -112,6 +112,6 @@
         </div>
       </li>
     </ul>
-
   </section>
+
 </div>

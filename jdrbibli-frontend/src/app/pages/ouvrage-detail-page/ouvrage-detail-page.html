@@ -1,0 +1,82 @@
+<div *ngIf="loading" class="loading">Chargement...</div>
+
+<div *ngIf="!loading && ouvrage">
+    <h1>{{ ouvrage.titre }}</h1>
+
+    <section>
+        <h3>Description</h3>
+        <p>{{ ouvrage.description }}</p>
+    </section>
+
+    <section>
+        <h3>Informations</h3>
+        <p><strong>Version :</strong> {{ ouvrage.version }}</p>
+        <p><strong>Type :</strong> {{ ouvrage.typeOuvrage }}</p>
+        <p>Date de publication : {{ formatDate(ouvrage.datePublication) }}</p>
+
+        <p><strong>Langue :</strong> {{ ouvrage.langue }}</p>
+        <p><strong>Éditeur :</strong> {{ ouvrage.editeur }}</p>
+        <p><strong>État :</strong> {{ ouvrage.etat }}</p>
+        <p><strong>ISBN :</strong> {{ ouvrage.isbn }}</p>
+    </section>
+
+    <section *ngIf="ouvrage.ouvrageLie">
+        <h3>Ouvrage lié</h3>
+        <p>{{ ouvrage.ouvrageLie }}</p>
+    </section>
+
+    <section *ngIf="ouvrage.scenarioLie">
+        <h3>Scénario lié</h3>
+        <p>{{ ouvrage.scenarioLie }}</p>
+    </section>
+
+    <section *ngIf="ouvrage.pret != null">
+        <h3>Prêt</h3>
+        <p>{{ ouvrage.pret ? 'Disponible pour prêt' : 'Non disponible pour prêt' }}</p>
+    </section>
+
+    <section *ngIf="ouvrage.errata">
+        <h3>Errata</h3>
+        <p>{{ ouvrage.errata }}</p>
+    </section>
+
+    <section *ngIf="ouvrage.notes">
+        <h3>Notes</h3>
+        <p>{{ ouvrage.notes }}</p>
+    </section>
+
+    <section>
+        <div *ngIf="ouvrage.scenariosContenus && ouvrage.scenariosContenus.length">
+            <p>Scénarios contenus :</p>
+            <ul>
+                <li *ngFor="let scenario of ouvrage.scenariosContenus">{{ scenario }}</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div *ngIf="ouvrage.autresOuvragesGamme?.length > 0">
+            <p>Autres ouvrages de la gamme :</p>
+            <ul>
+                <li *ngFor="let ouvrage of ouvrage.autresOuvragesGamme">{{ ouvrage }}</li>
+            </ul>
+        </div>
+    </section>
+
+    <section><div *ngIf="ouvrage.liensMedias?.length > 0">
+    <p>Liens médias :</p>
+    <ul>
+        <li *ngFor="let lien of ouvrage.liensMedias">{{ lien }}</li>
+    </ul>
+</div>
+    </section>
+
+    <section>
+        <h3>Propriétaire</h3>
+        <p>{{ ouvrage.ownerPseudo }}</p>
+    </section>
+</div>
+
+<div *ngIf="!loading && errorMessage" class="error">
+    {{ errorMessage }}
+</div>

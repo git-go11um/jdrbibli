@@ -1,29 +1,72 @@
+body {
+  background-color: #EBF2FA;
+  /* Fond bleu clair pour l'ensemble de la page */
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Home Connected */
 .home-connected {
+  background-color: #EBF2FA;
+  /* Fond bleu clair */
+  padding: 40px 20px;
   text-align: center;
-  margin-top: 3rem;
+}
 
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
+/* Modification de la boîte contenant le texte */
+.home-connected .welcome-box {
+    background-color: #FFFFFF; /* Fond blanc pour le bloc de texte */
+    border: 2px solid #EBF2FA;  /* Bordure légère en bleu cassé */
+    border-radius: 8px;
+    padding: 40px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Ombre légère pour effet de profondeur */
+}
 
-  p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-  }
+.home-connected h1 {
+  color: #06668C;
+  /* Couleur titre */
+  font-size: 28px;
+  margin-bottom: 20px;
+}
 
-  .logout-btn {
-    background-color: #dc3545; // rouge Bootstrap-like
-    color: #fff;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 0.3rem;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
+.home-connected .highlighted-title {
+  font-weight: bold;
+  color: #06668C;
+  /* Couleur du titre avec JdrBibli */
+}
 
-    &:hover {
-      background-color: #c82333;
-    }
-  }
+.home-connected p {
+  color: #333333;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.logout-btn {
+  background-color: #679436;
+  /* Vert pour le bouton de déconnexion */
+  color: #FFFFFF;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #5A8A2D;
+  /* Légère variation au survol */
+  transform: scale(1.05);
+}
+
+.container {
+  max-width: 100%;
+    /* Enlever la limite de 1081px */
+  margin: 0 0px;
+  padding: 0 0px;
+  /* Espace latéral pour que le contenu ne touche pas les bords */
+  
 }

@@ -1,87 +1,114 @@
-.page-container {
-    padding: 1rem;
+/* Style global de la ludothèque */
+.ludotheque-container {
+    margin: 20px;
+    padding: 20px;
 }
 
-.actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+/* Espacement pour le titre */
+h1 {
+    font-size: 28px;
+    color: #06668C;  /* Bleu foncé pour le titre */
+    margin-bottom: 20px;
 }
 
-.add-button,
-.delete-button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.add-button {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.delete-button {
-    background-color: #f44336;
-    color: white;
-}
-
-.separator {
-    margin: 1rem 0;
-    border: none;
-    border-top: 1px solid #ccc;
-}
-
-.columns {
-    display: flex;
-    gap: 1rem;
-}
-
-.col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.gamme-button {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: white;
-    cursor: pointer;
-    text-align: left;
-}
-
-.gamme-button.selected {
-    background-color: #e0e0e0;
-}
-
+/* Conteneur pour l'ajout de gamme */
 .ajout-gamme-container {
+    margin-bottom: 20px;
     display: flex;
-    gap: 8px;
-    margin-bottom: 1rem;
+    justify-content: space-between;
     align-items: center;
 }
 
-.new-gamme-input {
-    flex-grow: 1;
-    padding: 0.4rem 0.6rem;
-    font-size: 1rem;
-    border: 1px solid #aaa;
-    border-radius: 4px;
+.ajout-gamme-container input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 70%;  /* Champ de texte plus large */
 }
 
-.add-button {
-    padding: 0.4rem 1rem;
-    background-color: #4CAF50;
-    /* vert */
-    color: white;
+.ajout-gamme-container button {
+    padding: 10px 20px;
+    background-color: #679436;  /* Vert pour le bouton Ajouter */
+    color: #FFFFFF;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.add-button:hover {
-    background-color: #45a049;
+.ajout-gamme-container button:hover {
+    background-color: #5A8A2D;  /* Variante plus foncée de vert au survol */
+}
+
+/* Liste des gammes */
+.gammes-list {
+    margin-top: 20px;
+}
+
+/* Conteneur pour chaque gamme */
+.gamme-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #EBF2FA;  /* Fond blanc cassé pour chaque gamme */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    align-items: center;  /* Aligner verticalement les éléments dans chaque ligne */
+}
+/* Titre de la gamme */
+.gamme-item span {
+    flex: 1;
+    font-size: 18px;
+    color: #06668C;
+    margin-right: 20px;  /* Espacement entre le titre et les boutons */
+}
+
+/* Conteneur des boutons */
+.gamme-item .buttons-container {
+    display: flex;
+    gap: 10px;  /* Espacement entre les boutons */
+    justify-content: flex-start;  /* Aligner à gauche */
+}
+
+/* Style des boutons */
+.gamme-item button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: auto;  /* Taille automatique pour que les boutons s'adaptent */
+}
+
+/* Bouton Voir les ouvrages */
+.gamme-item button:nth-child(2) {
+    background-color: #06668C;
+    color: #FFFFFF;
+}
+
+.gamme-item button:nth-child(2):hover {
+    background-color: #679436;
+}
+
+/* Bouton Modifier le nom */
+.gamme-item button:nth-child(3) {
+    background-color: #679436;
+    color: #FFFFFF;
+}
+
+.gamme-item button:nth-child(3):hover {
+    background-color: #5A8A2D;
+}
+
+/* Bouton Supprimer */
+.gamme-item button:nth-child(4) {
+    background-color: #FF4C4C;
+    color: #FFFFFF;
+}
+
+.gamme-item button:nth-child(4):hover {
+    background-color: #FF1A1A;
 }

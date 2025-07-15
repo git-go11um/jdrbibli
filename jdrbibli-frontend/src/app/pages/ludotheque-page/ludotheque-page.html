@@ -10,9 +10,11 @@
         <div *ngFor="let gamme of gammes">
             <div class="gamme-item">
                 <span>{{ gamme.nom }}</span>
-                <button (click)="goToGamme(gamme.id!)">Voir les ouvrages</button>
-                <button (click)="modifierNomGamme(gamme.id!)">Modifier le nom</button>
-                <button (click)="supprimerGamme(gamme.id!)">Supprimer</button>
+                <div class="buttons-container">
+                    <button (click)="goToGamme(gamme.id!)">Voir les ouvrages</button>
+                    <button (click)="modifierNomGamme(gamme.id!)">Modifier le nom</button>
+                    <button (click)="supprimerGamme(gamme.id!)">Supprimer</button>
+                </div>
             </div>
         </div>
     </div>

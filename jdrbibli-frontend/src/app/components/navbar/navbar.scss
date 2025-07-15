@@ -1,6 +1,6 @@
 /* Style global pour la navbar */
 .navbar {
-    background-color: #b7e4c7;
+    background-color: #A4BD01;
     /* Vert clair */
     padding: 10px 20px;
     display: flex;
@@ -13,14 +13,16 @@
 /* Style des liens et boutons */
 .navbar a,
 .navbar button {
-    padding: 10px 20px;
-    border-radius: 25px;
-    /* Arrondi */
-    font-size: 1rem;
-    text-decoration: none;
-    /* Enlever le souligné des liens */
-    color: #333;
     background-color: #e0e0e0;
+  /* Vert pour le bouton de déconnexion */
+  color: #333;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+    /* Enlever le souligné des liens */
+   
     /* Gris clair */
     margin-right: 10px;
     transition: background-color 0.3s, transform 0.3s;
@@ -37,15 +39,19 @@
 
 /* Spécifique au bouton déconnexion */
 .navbar button {
-    background-color: #dc3545;
-    /* Rouge pour le bouton déconnexion */
-    color: white;
-    border: none;
+    background-color: #679436;
+  /* Vert pour le bouton de déconnexion */
+  color: #FFFFFF;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 /* Hover sur le bouton déconnexion */
 .navbar button:hover {
-    background-color: #c82333;
+    background-color: #5A8A2D;
     /* Rouge plus foncé */
     transform: scale(1.05);
     /* Agrandissement pour le bouton déconnexion */

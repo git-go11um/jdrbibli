@@ -15,4 +15,79 @@
       background: #005a99;
     }
   }
+
+  /* Section de présentation avec ombre */
+  .site-presentation-with-shadow {
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .presentation-box {
+    background-color: #FFFFFF;
+    border: 2px solid #EBF2FA;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Titre avec ombre */
+  .presentation-box h3 {
+    color: #06668C;
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+
+
+  /* Texte */
+  .presentation-box p {
+    color: #333333;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: justify;
+  }
+
+  /* Section de bienvenue avec cadre */
+  .welcome-section {
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  .welcome-box {
+    background-color: #FFFFFF;
+    border: 2px solid #EBF2FA;
+    /* Bordure légère et discrète */
+    border-radius: 8px;
+    padding: 25px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Ombre légère */
+  }
+
+  /* Titre sans ombre */
+  .welcome-box h3 {
+    color: #06668C;
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+  .highlighted-title {
+    color: #06668C;
+    font-weight: bold;
+    /* Pas d'ombre ici */
+  }
+
+  /* Texte */
+  .welcome-box p {
+    color: #333333;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: justify;
+  }
+
+
+
 }
