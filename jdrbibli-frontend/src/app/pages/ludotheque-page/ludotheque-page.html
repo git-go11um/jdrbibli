@@ -1,21 +1,22 @@
 <div class="ludotheque-container">
-    <h1>Liste des Gammes</h1>
+  <h1>Liste des Gammes</h1>
 
-    <div class="ajout-gamme-container">
-        <input type="text" placeholder="Nom de la nouvelle gamme" [(ngModel)]="newGammeName" />
-        <button (click)="ajouterGamme()">Ajouter une gamme</button>
-    </div>
+  <div class="ajout-gamme-container">
+    <input type="text" placeholder="Nom de la nouvelle gamme" [(ngModel)]="newGammeName" />
+    <button (click)="ajouterGamme()">Ajouter une gamme</button>
+  </div>
 
-    <div class="gammes-list">
-        <div *ngFor="let gamme of gammes">
-            <div class="gamme-item">
-                <span>{{ gamme.nom }}</span>
-                <div class="buttons-container">
-                    <button (click)="goToGamme(gamme.id!)">Voir les ouvrages</button>
-                    <button (click)="modifierNomGamme(gamme.id!)">Modifier le nom</button>
-                    <button (click)="supprimerGamme(gamme.id!)">Supprimer</button>
-                </div>
-            </div>
+  <div class="gammes-list">
+    <div *ngFor="let gamme of gammes">
+      <div class="gamme-item">
+        <!-- Le nom devient un lien cliquable -->
+        <button class="gamme-button" (click)="goToGamme(gamme.id!)">{{ gamme.nom }}</button>
+
+        <div class="buttons-container">
+          <button (click)="modifierNomGamme(gamme.id!)">Modifier le nom</button>
+          <button (click)="supprimerGamme(gamme.id!)">Supprimer</button>
         </div>
+      </div>
     </div>
+  </div>
 </div>

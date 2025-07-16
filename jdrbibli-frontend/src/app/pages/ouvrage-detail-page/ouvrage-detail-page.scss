@@ -1,19 +1,96 @@
 .loading {
-    text-align: center;
-    font-size: 18px;
-    color: #888;
+  text-align: center;
+  font-size: 18px;
+  color: #888;
+  margin: 1.5rem 0;
 }
 
 .error {
-    color: red;
-    text-align: center;
+  color: red;
+  text-align: center;
+  margin: 1.5rem 0;
 }
 
-h2 {
+/* Cadre global autour de la carte */
+.card {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem 2rem;
+  background-color: #f9faff; /* fond légèrement bleu clair */
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+}
+
+/* Titres de section */
+.card h1 {
+  font-size: 2.4rem;
+  color: #1a73e8;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.card section {
+  margin-bottom: 1.5rem;
+}
+
+.card section h3 {
+  margin-bottom: 1rem;
+  color: #1a73e8;
+  border-bottom: 1px solid #c5d9ff;
+  padding-bottom: 0.3rem;
+  font-weight: 600;
+}
+
+/* Pour afficher label + contenu sur la même ligne */
+.card section p {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  margin: 0.3rem 0;
+  line-height: 1.4;
+}
+
+/* Le "label" en gras avec largeur fixe */
+.card section p strong {
+  display: inline-block;
+  width: 160px; /* largeur fixe pour aligner tous les labels */
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+/* Pour les listes, mettre un padding gauche */
+.card section ul {
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.card section ul li {
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+  color: #444;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0;       // un peu d’espace vertical
+
+  .label {
+    width: 150px;
+    font-weight: 600;
     color: #333;
-    margin-bottom: 20px;
+  }
+
+  .value {
+    flex: 1;
+    color: #555;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #ddd;  // ligne de séparation entre les lignes
+  }
 }
 
-p {
-    font-size: 16px;
-}

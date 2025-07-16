@@ -111,11 +111,27 @@
                 }
 
                 .gamme__ouvrage-title {
-                    font-weight: 500;
-                    font-size: 1.1rem;
-                    color: #333;
-                    flex-grow: 1;
-                }
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: #333;
+  background-color: #f0f0f0;       // petit fond gris clair pour rappeler que c'est un bouton
+  border: 1px solid #ccc;          // petite bordure
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  padding: 0.3rem 0.6rem;
+  width: auto;                     // largeur auto
+  max-width: 250px;                // pour éviter d'être trop large
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #e0e0e0;     // effet au survol
+  }
+}
+
 
                 .gamme__actions {
                     display: flex;

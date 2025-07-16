@@ -6,6 +6,7 @@ import { OuvrageService, OuvrageDTO } from '../../services/ouvrage.service';
 import { GammeService, GammeDTO } from '../../services/gamme.service';
 import { FormsModule } from '@angular/forms';
 
+
 @Component({
   standalone: true,
   selector: 'app-gamme-page',
@@ -183,7 +184,8 @@ export class GammePage implements OnInit {
   }
 
   ouvrirPageOuvrage(ouvrageId: number): void {
-    this.router.navigate(['/ouvrage', ouvrageId]);
-  }
+  this.router.navigate(['/ouvrage-detail', ouvrageId]);
+}
+
 
 }

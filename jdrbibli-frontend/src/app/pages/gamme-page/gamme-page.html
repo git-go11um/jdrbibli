@@ -104,7 +104,8 @@
     <ul class="gamme__ouvrages">
       <li *ngFor="let ouvrage of ouvrages" class="gamme__ouvrage-item">
         <!-- Lien vers la page de consultation de l'ouvrage -->
-        <a [routerLink]="['/ouvrage-detail', ouvrage.id]">{{ ouvrage.titre }}</a>
+        <button class="gamme__ouvrage-title"  (click)="ouvrirPageOuvrage(ouvrage.id!)">{{ ouvrage.titre }}</button>
+
 
 
 
