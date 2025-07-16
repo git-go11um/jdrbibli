@@ -13,15 +13,13 @@
 
 /* Cadre global autour de la carte */
 .card {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 1.5rem 2rem;
-  background-color: #f9faff; /* fond légèrement bleu clair */
-  border: 1.5px solid #ccc;
+  background-color: #f5f7fa; /* fond clair */
+  border: 1px solid #ddd;    /* bordure grise */
+  padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #222;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  gap: 1rem;
 }
 
 /* Titres de section */
@@ -79,7 +77,7 @@
   padding: 0.3rem 0;       // un peu d’espace vertical
 
   .label {
-    width: 150px;
+    width: 300px;
     font-weight: 600;
     color: #333;
   }
@@ -93,4 +91,51 @@
     border-bottom: 1px solid #ddd;  // ligne de séparation entre les lignes
   }
 }
+.detail-container {
+  display: flex;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.detail-left {
+  flex: 0 0 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-right {
+  flex: 0 0 30%;
+  display: flex;
+  flex-direction: column;
+
+  h2 {
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .other-book-btn {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    margin-bottom: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #1a73e8;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+
+    &:hover {
+      background-color: #155db2;
+    }
+  }
+}
+
+
+
 

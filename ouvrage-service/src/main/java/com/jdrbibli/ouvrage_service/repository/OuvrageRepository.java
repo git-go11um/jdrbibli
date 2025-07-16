@@ -15,11 +15,12 @@ public interface OuvrageRepository extends JpaRepository<Ouvrage, Long> {
     @Query("delete from Ouvrage o where o.gamme.id = :gammeId")
     void deleteByGammeId(Long gammeId);
 
-    //  Récupérer tous les ouvrages d’un utilisateur
+    // Récupérer tous les ouvrages d’un utilisateur
     List<Ouvrage> findByOwnerPseudo(String ownerPseudo);
 
-    //  Récupérer tous les ouvrages d’une gamme ET appartenant à un owner
+    // Récupérer tous les ouvrages d’une gamme ET appartenant à un owner
     List<Ouvrage> findByGammeIdAndOwnerPseudo(Long gammeId, String ownerPseudo);
 
+    List<Ouvrage> findByGammeIdAndIdNot(Long gammeId, Long excludeId);
 
 }

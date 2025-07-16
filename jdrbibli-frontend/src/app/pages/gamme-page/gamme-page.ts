@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router'; // Import du RouterModule
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OuvrageService, OuvrageDTO } from '../../services/ouvrage.service';

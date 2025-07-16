@@ -1,90 +1,63 @@
 <div *ngIf="loading" class="loading">Chargement...</div>
 
-<div *ngIf="!loading && ouvrage" class="card">
-  <h1>{{ ouvrage.titre }}</h1>
+<div *ngIf="!loading && ouvrage" class="detail-container">
+    <div class="detail-left">
+        <h1>{{ ouvrage.titre }}</h1>
 
-  <section>
-    <h3>Description</h3>
-    <div class="info-row">
-      <div class="label">Description :</div>
-      <div class="value">{{ ouvrage.description }}</div>
+        <div class="info-row"><span class="label">Description :</span> <span class="value">{{ ouvrage.description
+                }}</span></div>
+        <div class="info-row"><span class="label">Version :</span> <span class="value">{{ ouvrage.version }}</span>
+        </div>
+        <div class="info-row"><span class="label">Type :</span> <span class="value">{{ ouvrage.typeOuvrage }}</span>
+        </div>
+        <div class="info-row"><span class="label">Date de publication :</span> <span class="value">{{
+                formatDate(ouvrage.datePublication) }}</span></div>
+        <div class="info-row"><span class="label">Langue :</span> <span class="value">{{ ouvrage.langue }}</span></div>
+        <div class="info-row"><span class="label">Éditeur :</span> <span class="value">{{ ouvrage.editeur }}</span>
+        </div>
+        <div class="info-row"><span class="label">État :</span> <span class="value">{{ ouvrage.etat }}</span></div>
+        <div class="info-row"><span class="label">ISBN :</span> <span class="value">{{ ouvrage.isbn }}</span></div>
+
+        <div *ngIf="ouvrage.ouvrageLie" class="info-row"><span class="label">Ouvrage lié :</span> <span class="value">{{
+                ouvrage.ouvrageLie }}</span></div>
+        <div *ngIf="ouvrage.scenarioLie" class="info-row"><span class="label">Scénario lié :</span> <span
+                class="value">{{ ouvrage.scenarioLie }}</span></div>
+        <div *ngIf="ouvrage.pret != null" class="info-row">
+            <span class="label">Prêt :</span>
+            <span class="value">{{ ouvrage.pret ? 'Disponible pour prêt' : 'Non disponible pour prêt' }}</span>
+        </div>
+        <div *ngIf="ouvrage.errata" class="info-row"><span class="label">Errata :</span> <span class="value">{{
+                ouvrage.errata }}</span></div>
+        <div *ngIf="ouvrage.notes" class="info-row"><span class="label">Notes :</span> <span class="value">{{
+                ouvrage.notes }}</span></div>
+
+        <div *ngIf="ouvrage.scenariosContenus?.length" class="info-row scenarios">
+            <span class="label">Scénarios contenus :</span>
+            <span class="value">
+                <ul>
+                    <li *ngFor="let scenario of ouvrage.scenariosContenus">{{ scenario }}</li>
+                </ul>
+            </span>
+        </div>
+
+        <div class="info-row"><span class="label">Propriétaire :</span> <span class="value">{{ ouvrage.ownerPseudo
+                }}</span></div>
     </div>
-  </section>
 
-  <section>
-    <h3>Informations</h3>
-    <div class="info-row"><div class="label">Version :</div><div class="value">{{ ouvrage.version }}</div></div>
-    <div class="info-row"><div class="label">Type :</div><div class="value">{{ ouvrage.typeOuvrage }}</div></div>
-    <div class="info-row"><div class="label">Date de publication :</div><div class="value">{{ formatDate(ouvrage.datePublication) }}</div></div>
-    <div class="info-row"><div class="label">Langue :</div><div class="value">{{ ouvrage.langue }}</div></div>
-    <div class="info-row"><div class="label">Éditeur :</div><div class="value">{{ ouvrage.editeur }}</div></div>
-    <div class="info-row"><div class="label">État :</div><div class="value">{{ ouvrage.etat }}</div></div>
-    <div class="info-row"><div class="label">ISBN :</div><div class="value">{{ ouvrage.isbn }}</div></div>
-  </section>
-
-  <section *ngIf="ouvrage.ouvrageLie">
-    <h3>Ouvrage lié</h3>
-    <div class="info-row">
-      <div class="label">Ouvrage lié :</div>
-      <div class="value">{{ ouvrage.ouvrageLie }}</div>
+    <div class="detail-right">
+        <section class="autres-ouvrages">
+            <h3>Autres ouvrages de la gamme</h3>
+            <ul>
+                <li *ngFor="let autre of ouvragesGamme">
+                    <button (click)="ouvrirPageOuvrage(autre.id!)">{{ autre.titre }}</button>
+                </li>
+            </ul>
+            <ng-template #noOthers>
+                <p>Aucun autre ouvrage dans cette gamme.</p>
+            </ng-template>
+        </section>
     </div>
-  </section>
 
-  <section *ngIf="ouvrage.scenarioLie">
-    <h3>Scénario lié</h3>
-    <div class="info-row">
-      <div class="label">Scénario lié :</div>
-      <div class="value">{{ ouvrage.scenarioLie }}</div>
-    </div>
-  </section>
-
-  <section *ngIf="ouvrage.pret != null">
-    <h3>Prêt</h3>
-    <div class="info-row">
-      <div class="label">Prêt :</div>
-      <div class="value">{{ ouvrage.pret ? 'Disponible pour prêt' : 'Non disponible pour prêt' }}</div>
-    </div>
-  </section>
-
-  <section *ngIf="ouvrage.errata">
-    <h3>Errata</h3>
-    <div class="info-row">
-      <div class="label">Errata :</div>
-      <div class="value">{{ ouvrage.errata }}</div>
-    </div>
-  </section>
-
-  <section *ngIf="ouvrage.notes">
-    <h3>Notes</h3>
-    <div class="info-row">
-      <div class="label">Notes :</div>
-      <div class="value">{{ ouvrage.notes }}</div>
-    </div>
-  </section>
-
-  <section *ngIf="ouvrage.scenariosContenus?.length">
-    <h3>Scénarios contenus</h3>
-    <ul>
-      <li *ngFor="let scenario of ouvrage.scenariosContenus">{{ scenario }}</li>
-    </ul>
-  </section>
-
-  <section *ngIf="ouvrage.autresOuvragesGamme?.length">
-    <h3>Autres ouvrages de la gamme</h3>
-    <ul>
-      <li *ngFor="let autre of ouvrage.autresOuvragesGamme">{{ autre }}</li>
-    </ul>
-  </section>
-
-  <section *ngIf="ouvrage.liensMedias?.length">
-    <h3>Liens médias</h3>
-    <ul>
-      <li *ngFor="let lien of ouvrage.liensMedias">{{ lien }}</li>
-    </ul>
-  </section>
-
-  </div>
-
-<div *ngIf="!loading && errorMessage" class="error">
-  {{ errorMessage }}
 </div>
+
+<div *ngIf="!loading && errorMessage" class="error">{{ errorMessage }}</div>

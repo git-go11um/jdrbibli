@@ -1,37 +1,45 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { OuvrageService } from '../../services/ouvrage.service';
-
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { OuvrageService, OuvrageDTO } from '../../services/ouvrage.service';
 
 @Component({
     selector: 'app-ouvrage-detail-page',
-    standalone: true,  // Composant standalone
-    imports: [CommonModule],  // Retire DatePipe ici
+    standalone: true,
+    imports: [CommonModule, RouterModule],
     templateUrl: './ouvrage-detail-page.html',
     styleUrls: ['./ouvrage-detail-page.scss']
 })
 export class OuvrageDetailPage implements OnInit {
-    ouvrage: any = {};
+    ouvrage: OuvrageDTO | null = null;
     loading = true;
     errorMessage = '';
+    ouvragesGamme: OuvrageDTO[] = [];
 
     constructor(
         private route: ActivatedRoute,
-        private ouvrageService: OuvrageService
+        private ouvrageService: OuvrageService,
+        private router: Router
     ) { }
 
     ngOnInit(): void {
-        // Récupérer l'ID de l'ouvrage depuis l'URL
-        const ouvrageId = this.route.snapshot.paramMap.get('id');
-        console.log('ID de l\'ouvrage :', ouvrageId);  // Vérifie que l'ID est bien récupéré
+        const ouvrageIdParam = this.route.snapshot.paramMap.get('id');
+        const ouvrageId = ouvrageIdParam ? parseInt(ouvrageIdParam, 10) : null;
 
         if (ouvrageId) {
-            this.ouvrageService.getOuvrageById(ouvrageId).subscribe({
+            this.ouvrageService.getById(ouvrageId).subscribe({
                 next: (data) => {
-                    console.log('Données de l\'ouvrage:', data);
+                    console.log('Ouvrage chargé complet:', data);
                     this.ouvrage = data;
                     this.loading = false;
+
+                    const gammeId = data.gammeId;
+                    if (gammeId) {
+                        console.log('Chargement des autres ouvrages pour gammeId:', gammeId);
+                        this.loadOtherOuvragesInGamme(gammeId, data.id!);
+                    } else {
+                        console.warn('Aucun gammeId trouvé sur cet ouvrage.');
+                    }
                 },
                 error: (err) => {
                     console.error('Erreur lors de la récupération de l\'ouvrage', err);
@@ -39,17 +47,31 @@ export class OuvrageDetailPage implements OnInit {
                     this.loading = false;
                 }
             });
-
+        } else {
+            this.errorMessage = 'ID d\'ouvrage non trouvé dans l\'URL';
+            this.loading = false;
         }
     }
 
+    /** ✅ Récupérer les autres ouvrages de la même gamme en excluant celui qu’on consulte */
+    loadOtherOuvragesInGamme(gammeId: number, excludeId: number): void {
+        this.ouvrageService.getOtherOuvragesInGamme(gammeId, excludeId).subscribe({
+            next: (data) => {
+                this.ouvragesGamme = data;
+                console.log('Autres ouvrages récupérés :', this.ouvragesGamme.map(o => o.titre));
+            },
+            error: (err) => {
+                console.error('Erreur lors du chargement des autres ouvrages de la gamme', err);
+            }
+        });
+    }
 
+    /** Naviguer vers un autre ouvrage */
+    ouvrirPageOuvrage(ouvrageId: number): void {
+        this.router.navigate(['/ouvrage', ouvrageId]);
+    }
 
-
-    // Utilisation de toLocaleDateString pour formater la date
     formatDate(date: string): string {
-        const parsedDate = new Date(date);
-        return parsedDate.toLocaleDateString('fr-FR'); // Ou autre locale, selon ton besoin
+        return new Date(date).toLocaleDateString('fr-FR');
     }
 }
-

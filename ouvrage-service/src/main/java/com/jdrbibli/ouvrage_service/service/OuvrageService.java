@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OuvrageService {
@@ -70,6 +71,13 @@ public class OuvrageService {
 
     public List<Ouvrage> findByGammeIdAndOwnerPseudo(Long gammeId, String ownerPseudo) {
         return ouvrageRepository.findByGammeIdAndOwnerPseudo(gammeId, ownerPseudo);
+    }
+
+    public List<OuvrageDTO> getOuvragesByGamme(Long gammeId, Long excludeId) {
+        List<Ouvrage> ouvrages = ouvrageRepository.findByGammeIdAndIdNot(gammeId, excludeId);
+        return ouvrages.stream()
+                .map(ouvrageMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
 }

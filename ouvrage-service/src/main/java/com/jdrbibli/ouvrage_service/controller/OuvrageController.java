@@ -50,9 +50,9 @@ public class OuvrageController {
         return ResponseEntity.ok(ouvrageMapper.toDTO(ouvrage));
     }
 
-    // GET /api/ouvrages/gamme/{gammeId} - Récupérer tous les ouvrages d'une gamme
+    // GET /api/ouvrages/gammes/{gammeId} - Récupérer tous les ouvrages d'une gamme
     // pour l’utilisateur connecté
-    @GetMapping("/gamme/{gammeId}")
+    @GetMapping("/gammes/{gammeId}")
     public ResponseEntity<List<OuvrageDTO>> getByGamme(
             @PathVariable Long gammeId,
             @RequestHeader("X-User-Pseudo") String ownerPseudo) {
@@ -124,4 +124,11 @@ public class OuvrageController {
         ouvrageService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/gammes/{gammeId}/exclude/{id}")
+    public ResponseEntity<List<OuvrageDTO>> getOuvragesByGamme(@PathVariable Long gammeId, @PathVariable Long id) {
+        List<OuvrageDTO> ouvrages = ouvrageService.getOuvragesByGamme(gammeId, id);
+        return ResponseEntity.ok(ouvrages);
+    }
+
 }

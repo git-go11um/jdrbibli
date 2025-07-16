@@ -23,7 +23,7 @@ export interface OuvrageDTO {
     autresOuvragesGamme: string[];
     gammeId: number;
     liensMedias: string[];
-
+    ownerPseudo?: string;
 }
 
 @Injectable({
@@ -31,6 +31,7 @@ export interface OuvrageDTO {
 })
 export class OuvrageService {
 
+    // URL de base exposée par le gateway (comme tu l'as configurée)
     private apiUrl = 'http://localhost:8084/api/ouvrage/ouvrages';
 
     constructor(private http: HttpClient, private authService: AuthService) { }
@@ -47,13 +48,12 @@ export class OuvrageService {
 
     getById(id: number): Observable<OuvrageDTO> {
         const headers = this.createHeaders();
-        return this.http.get<OuvrageDTO>(`${this.apiUrl}/${id}`, { headers });
+        return this.http.get<OuvrageDTO>(`http://localhost:8084/api/ouvrage/ouvrages/${id}`, { headers });
     }
 
-    /** Nouvelle méthode propre et claire */
     getByGamme(gammeId: number): Observable<OuvrageDTO[]> {
         const headers = this.createHeaders();
-        return this.http.get<OuvrageDTO[]>(`${this.apiUrl}/gamme/${gammeId}`, { headers });
+        return this.http.get<OuvrageDTO[]>(`http://localhost:8084/api/ouvrage/ouvrages/gammes/${gammeId}`, { headers });
     }
 
     create(ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
@@ -63,28 +63,23 @@ export class OuvrageService {
 
     update(id: number, ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
         const headers = this.createHeaders();
-        return this.http.put<OuvrageDTO>(`${this.apiUrl}/${id}`, ouvrage, { headers });
+        return this.http.put<OuvrageDTO>(`http://localhost:8084/api/ouvrage/ouvrages/${id}`, ouvrage, { headers });
     }
 
     delete(id: number): Observable<void> {
         const headers = this.createHeaders();
-        return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers });
+        return this.http.delete<void>(`http://localhost:8084/api/ouvrage/ouvrages/${id}`, { headers });
     }
 
-    getOuvrageById(id: string): Observable<OuvrageDTO> {
-        const token = localStorage.getItem('jwt');
-        const pseudo = this.authService.getUserPseudo() ?? '';
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'X-User-Pseudo': pseudo
-        });
-
-        return this.http.get<OuvrageDTO>(`${this.apiUrl}/${id}`, { headers });
+    getOuvragesByGammeId(gammeId: number): Observable<OuvrageDTO[]> {
+        const headers = this.createHeaders();
+        return this.http.get<OuvrageDTO[]>(`http://localhost:8084/api/ouvrage/ouvrages/gammes/${gammeId}`, { headers });
     }
 
-
-
+    getOtherOuvragesInGamme(gammeId: number, excludeId: number): Observable<OuvrageDTO[]> {
+        const headers = this.createHeaders();
+        return this.http.get<OuvrageDTO[]>(`http://localhost:8084/api/ouvrage/ouvrages/gammes/${gammeId}/exclude/${excludeId}`, { headers });
+    }
 
 
 

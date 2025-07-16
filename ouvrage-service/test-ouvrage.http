@@ -1,0 +1,15 @@
+### 🔍 Récupérer un ouvrage par ID (par ex. id=23)
+GET http://localhost:8084/api/ouvrage/ouvrages/28
+X-User-Pseudo: vincent
+
+###
+
+### 📚 Récupérer tous les ouvrages (GET all)
+GET http://localhost:8084/api/ouvrage/ouvrages
+X-User-Pseudo: vincent
+
+###
+
+### 🧩 Récupérer les autres ouvrages dans la même gamme (par ex. gammeId=5, excludeId=23)
+GET http://localhost:8084/api/ouvrage/ouvrages/gammes/23/exclude/30
+X-User-Pseudo: vincent
