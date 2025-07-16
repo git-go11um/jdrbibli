@@ -31,7 +31,7 @@ export interface OuvrageDTO {
 })
 export class OuvrageService {
 
-    private apiUrl = 'http://localhost:8084/api/ouvrage/';
+    private apiUrl = 'http://localhost:8084/api/ouvrage/ouvrages';
 
     constructor(private http: HttpClient, private authService: AuthService) { }
 

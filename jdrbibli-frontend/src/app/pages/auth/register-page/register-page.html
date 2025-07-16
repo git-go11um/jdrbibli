@@ -64,14 +64,18 @@
   </div>
 
   <!-- CGU -->
-  <label style="white-space: normal; display: flex; flex-direction: column; gap: 0.1rem;">
+  <label style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem;">
     <div>
-      J'ai lu et accepte les <a href="#" (click)="openCGU($event)">conditions générales d'utilisation</a>
+      J'ai lu et accepte les
+      <a href="#" (click)="openCGU($event)">conditions générales d'utilisation</a>
     </div>
-    <div style="display: flex; justify-content: flex-end;">
+    <div style="align-self: flex-end;">
       <input type="checkbox" name="acceptedCGU" [(ngModel)]="acceptedCGU" required />
     </div>
   </label>
+
+
+
 
   <!-- RGPD -->
   <label style="white-space: normal; display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem;">
@@ -80,8 +84,10 @@
     </div>
     <div>
       voir notre <a href="#" (click)="openRGPD($event)">charte de confidentialité</a>
+      <span style="margin-left: 2em;"></span>
+
+      <input type="checkbox" name="acceptedRGPD" [(ngModel)]="acceptedRGPD" required />
     </div>
-    <input type="checkbox" name="acceptedRGPD" [(ngModel)]="acceptedRGPD" required />
   </label>
 
 
