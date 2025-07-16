@@ -1,0 +1,36 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+app-root {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+main {
+    flex: 1;
+    /* prend toute la hauteur restante */
+}
+
+.footer-content {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    align-items: center;
+}
+
+.privacy-link {
+    color: white;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
