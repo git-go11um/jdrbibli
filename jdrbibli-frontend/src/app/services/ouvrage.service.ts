@@ -71,15 +71,19 @@ export class OuvrageService {
         return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers });
     }
 
-    getOuvrageById(id: string): Observable<any> {
-        const token = localStorage.getItem('jwt');  // Récupère le token depuis le localStorage
-        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);  // Ajoute le token dans les en-têtes
+    getOuvrageById(id: string): Observable<OuvrageDTO> {
+        const token = localStorage.getItem('jwt');
+        const pseudo = this.authService.getUserPseudo() ?? '';
 
-        // Si apiUrl est déjà "http://localhost:8084/api/ouvrage/", tu n'as pas besoin d'ajouter /ouvrages/
-        const url = `${this.apiUrl}${id}`;  // Juste concaténer l'ID sans "/ouvrages"
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`,
+            'X-User-Pseudo': pseudo
+        });
 
-        return this.http.get(url, { headers });  // Envoie la requête GET avec le token dans l'en-tête
+        return this.http.get<OuvrageDTO>(`${this.apiUrl}/${id}`, { headers });
     }
+
+
 
 
 
