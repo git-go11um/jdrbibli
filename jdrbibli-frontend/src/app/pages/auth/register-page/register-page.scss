@@ -76,3 +76,54 @@ form {
   font-weight: 600;
   text-align: center;
 }
+
+.modal {
+  display: block;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+}
+
+.close {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cgu-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  /* un peu d’espace entre la case et le texte */
+  margin: 1rem 0;
+}
+
+.cgu-checkbox input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+input[type="checkbox"] {
+  margin: 0;  /* pas de marge top/bottom */
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+label.cgu-label {
+  white-space: nowrap;
+}

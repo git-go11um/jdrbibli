@@ -25,10 +25,18 @@
 
   <label>
     Mot de passe:
+    <div class="password-rules">
+      <p>Le mot de passe doit contenir :</p>
+      <ul>
+        <li>Entre 8 et 72 caractères</li>
+        <li>Au moins 1 chiffre</li>
+        <li>Au moins 1 lettre minuscule</li>
+        <li>Au moins 1 lettre majuscule</li>
+      </ul>
+    </div>
     <input type="password" name="password" ngModel required minlength="8" autocomplete="new-password"
       #password="ngModel" />
   </label>
-
   <div *ngIf="
     (password.invalid && (password.dirty || password.touched)) ||
     (registerForm.submitted && password.invalid)
@@ -48,7 +56,6 @@
   " class="error">
     Les mots de passe ne correspondent pas.
   </div>
-
   <div *ngIf="
       (confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)) ||
       (registerForm.submitted && confirmPassword.invalid)
@@ -56,8 +63,146 @@
     La confirmation du mot de passe est requise.
   </div>
 
-  <button type="submit" [disabled]="registerForm.invalid || loading">Créer le compte</button>
+  <!-- CGU -->
+  <label style="white-space: normal; display: flex; flex-direction: column; gap: 0.1rem;">
+    <div>
+      J'ai lu et accepte les <a href="#" (click)="openCGU($event)">conditions générales d'utilisation</a>
+    </div>
+    <div style="display: flex; justify-content: flex-end;">
+      <input type="checkbox" name="acceptedCGU" [(ngModel)]="acceptedCGU" required />
+    </div>
+  </label>
+
+  <!-- RGPD -->
+  <label style="white-space: normal; display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem;">
+    <div>
+      J'accepte que mes données soient traitées dans le cadre de l'utilisation de JDRBibli,
+    </div>
+    <div>
+      voir notre <a href="#" (click)="openRGPD($event)">charte de confidentialité</a>
+    </div>
+    <input type="checkbox" name="acceptedRGPD" [(ngModel)]="acceptedRGPD" required />
+  </label>
+
+
+
+  <button type="submit" [disabled]="registerForm.invalid || loading || !acceptedCGU || !acceptedRGPD">Créer le
+    compte</button>
 </form>
+
+<!-- Modale CGU -->
+<div class="modal" *ngIf="showCGUModal">
+  <div class="modal-content">
+    <span class="close" (click)="closeCGU()">&times;</span>
+    <h2>Conditions Générales d’Utilisation (CGU) de JdrBibli</h2>
+    <p><strong>1. Objet</strong><br>
+      Les présentes Conditions Générales d’Utilisation régissent l’accès et l’utilisation du site jdrBibli
+      (https://www.jdrbibli.fr). jdrBibli est une plateforme destinée aux fans de jeux de rôle sur table pour gérer leur
+      ludothèque, créer des listes d’ouvrages recherchés, partager des informations avec des amis et contribuer à un
+      wiki communautaire.</p>
+
+    <p><strong>2. Acceptation des CGU</strong><br>
+      En accédant et utilisant le site, vous acceptez sans réserve ces CGU. Si vous ne les acceptez pas, merci de ne pas
+      utiliser jdrBibli.</p>
+
+    <p><strong>3. Inscription et compte utilisateur</strong><br>
+      • Pour accéder à certaines fonctionnalités, vous devez créer un compte.<br>
+      • Vous êtes responsable de la confidentialité de vos identifiants et de toute activité réalisée via votre
+      compte.<br>
+      • Vous vous engagez à fournir des informations exactes et à jour lors de l’inscription.</p>
+
+    <p><strong>4. Utilisation du site</strong><br>
+      • Vous vous engagez à utiliser jdrBibli de manière respectueuse, sans publier de contenus illicites, offensants,
+      ou portant atteinte aux droits d’autrui.<br>
+      • Vous êtes responsable des contenus que vous publiez sur le wiki et les autres espaces collaboratifs.</p>
+
+    <p><strong>5. Propriété intellectuelle</strong><br>
+      • Les contenus proposés par jdrBibli (textes, images, bases de données) sont protégés par le droit d’auteur.<br>
+      • Vous ne pouvez pas copier, reproduire ou diffuser ces contenus sans autorisation.</p>
+
+    <p><strong>6. Données personnelles</strong><br>
+      • Vos données personnelles sont traitées conformément à notre Charte de confidentialité accessible via un lien en
+      bas de page.</p>
+
+    <p><strong>7. Responsabilités</strong><br>
+      • jdrBibli ne peut être tenu responsable des interruptions, bugs ou pertes de données.<br>
+      • jdrBibli ne garantit pas l’exactitude des contenus publiés par les utilisateurs.</p>
+
+    <p><strong>8. Modification des CGU</strong><br>
+      jdrBibli se réserve le droit de modifier les présentes CGU à tout moment. Les modifications seront publiées sur le
+      site et prendront effet immédiatement.</p>
+
+    <p><strong>9. Loi applicable et juridiction</strong><br>
+      Ces CGU sont soumises au droit français. En cas de litige, seuls les tribunaux français sont compétents.</p>
+  </div>
+</div>
+
+<!-- Modale RGPD -->
+<div class="modal" *ngIf="showRGPDModal">
+  <div class="modal-content">
+    <span class="close" (click)="closeRGPD()">&times;</span>
+    <h2>Politique de Confidentialité</h2>
+    <p><em>Dernière mise à jour : [date]</em></p>
+    <p>Nous attachons une grande importance à la protection de vos données personnelles. Cette politique de
+      confidentialité explique comment nous collectons, utilisons, et protégeons les informations que vous partagez avec
+      nous sur notre site dédié aux collectionneurs de jeux de rôle.</p>
+    <h3>1. Données collectées</h3>
+    <p>Lors de l'inscription ou de l'utilisation de notre site, nous collectons certaines données personnelles afin de
+      vous permettre de profiter de nos services. Ces données incluent :</p>
+    <ul>
+      <li>Informations de profil : pseudonyme, adresse email, mot de passe (crypté) et données que vous ajoutez à votre
+        profil.</li>
+      <li>Données liées au contenu : les informations que vous ajoutez ou modifiez dans le wiki communautaire (qui
+        seront anonymisées après suppression de votre compte).</li>
+    </ul>
+    <p>Nous nous engageons à ne collecter que les données strictement nécessaires au bon fonctionnement de notre site.
+    </p>
+
+    <h3>2. Utilisation des données</h3>
+    <p>Les informations collectées sont utilisées uniquement pour les besoins suivants :</p>
+    <ul>
+      <li>Gérer votre compte utilisateur (connexion, gestion du profil, etc.).</li>
+      <li>Permettre la participation au wiki communautaire.</li>
+      <li>Vous envoyer des notifications relatives à l’utilisation du site (par exemple, des notifications sur des mises
+        à jour importantes ou des messages de la communauté).</li>
+      <li>Nous ne partageons jamais vos données avec des tiers, et aucun usage commercial n’en est fait.</li>
+    </ul>
+
+    <h3>3. Protection des données</h3>
+    <p>Nous mettons en œuvre des mesures de sécurité appropriées pour protéger vos informations personnelles contre
+      l'accès, la modification, ou la divulgation non autorisés. Votre mot de passe est crypté et stocké de manière
+      sécurisée.</p>
+
+    <h3>4. Partage des données</h3>
+    <p>Nous ne partageons, ne louons, ni ne vendons vos données personnelles à aucun tiers. Vos informations sont
+      exclusivement utilisées dans le cadre de l’utilisation du site et des fonctionnalités proposées.</p>
+
+    <h3>5. Conservation des données</h3>
+    <p>Nous conservons vos données personnelles tant que vous utilisez notre service. Si vous choisissez de supprimer
+      votre compte, toutes vos informations personnelles seront effacées. En revanche, les contributions que vous avez
+      faites dans le wiki communautaire seront anonymisées et remplacées par un identifiant unique sous forme de
+      chiffre, afin de préserver l'intégrité du contenu.</p>
+
+    <h3>6. Suppression de données</h3>
+    <p>Vous pouvez à tout moment demander la suppression de votre compte. Lorsque vous demandez la suppression de votre
+      compte, nous supprimerons toutes vos données personnelles, à l'exception des informations anonymisées concernant
+      vos contributions au wiki communautaire.</p>
+
+    <h3>7. Cookies</h3>
+    <p>Nous utilisons des cookies pour améliorer votre expérience sur notre site. Les cookies nous permettent de mieux
+      comprendre votre utilisation du site et d’améliorer les fonctionnalités. Vous pouvez contrôler les paramètres de
+      cookies via votre navigateur.</p>
+
+    <h3>8. Modifications de cette politique</h3>
+    <p>Nous nous réservons le droit de modifier cette politique de confidentialité à tout moment. Les modifications
+      seront publiées sur cette page avec la date de la dernière mise à jour. Il est donc important de la consulter
+      régulièrement.</p>
+
+    <h3>9. Contact</h3>
+    <p>Si vous avez des questions concernant cette politique de confidentialité ou si vous souhaitez exercer vos droits
+      relatifs à vos données personnelles, vous pouvez nous contacter à l'adresse suivante : [email admin].</p>
+  </div>
+</div>
 
 <div *ngIf="errorMessage" class="error-message">
   {{ errorMessage }}

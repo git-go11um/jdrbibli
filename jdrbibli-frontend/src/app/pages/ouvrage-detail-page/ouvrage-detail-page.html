@@ -1,6 +1,6 @@
 <div *ngIf="loading" class="loading">Chargement...</div>
 
-<div *ngIf="!loading && ouvrage">
+<div *ngIf="!loading && ouvrage" class="card">
     <h1>{{ ouvrage.titre }}</h1>
 
     <section>
@@ -12,8 +12,7 @@
         <h3>Informations</h3>
         <p><strong>Version :</strong> {{ ouvrage.version }}</p>
         <p><strong>Type :</strong> {{ ouvrage.typeOuvrage }}</p>
-        <p>Date de publication : {{ formatDate(ouvrage.datePublication) }}</p>
-
+        <p><strong>Date de publication :</strong> {{ formatDate(ouvrage.datePublication) }}</p>
         <p><strong>Langue :</strong> {{ ouvrage.langue }}</p>
         <p><strong>Éditeur :</strong> {{ ouvrage.editeur }}</p>
         <p><strong>État :</strong> {{ ouvrage.etat }}</p>
@@ -45,30 +44,25 @@
         <p>{{ ouvrage.notes }}</p>
     </section>
 
-    <section>
-        <div *ngIf="ouvrage.scenariosContenus && ouvrage.scenariosContenus.length">
-            <p>Scénarios contenus :</p>
-            <ul>
-                <li *ngFor="let scenario of ouvrage.scenariosContenus">{{ scenario }}</li>
-            </ul>
-        </div>
+    <section *ngIf="ouvrage.scenariosContenus?.length">
+        <h3>Scénarios contenus</h3>
+        <ul>
+            <li *ngFor="let scenario of ouvrage.scenariosContenus">{{ scenario }}</li>
+        </ul>
     </section>
 
-    <section>
-        <div *ngIf="ouvrage.autresOuvragesGamme?.length > 0">
-            <p>Autres ouvrages de la gamme :</p>
-            <ul>
-                <li *ngFor="let ouvrage of ouvrage.autresOuvragesGamme">{{ ouvrage }}</li>
-            </ul>
-        </div>
+    <section *ngIf="ouvrage.autresOuvragesGamme?.length">
+        <h3>Autres ouvrages de la gamme</h3>
+        <ul>
+            <li *ngFor="let autre of ouvrage.autresOuvragesGamme">{{ autre }}</li>
+        </ul>
     </section>
 
-    <section><div *ngIf="ouvrage.liensMedias?.length > 0">
-    <p>Liens médias :</p>
-    <ul>
-        <li *ngFor="let lien of ouvrage.liensMedias">{{ lien }}</li>
-    </ul>
-</div>
+    <section *ngIf="ouvrage.liensMedias?.length">
+        <h3>Liens médias</h3>
+        <ul>
+            <li *ngFor="let lien of ouvrage.liensMedias">{{ lien }}</li>
+        </ul>
     </section>
 
     <section>
