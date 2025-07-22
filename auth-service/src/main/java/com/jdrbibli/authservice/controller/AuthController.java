@@ -25,6 +25,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.BadCredentialsException;
+/* import java.lang.IllegalArgumentException; */
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -219,18 +221,18 @@ public class AuthController {
             @RequestBody ChangePasswordProfileRequest request,
             Principal principal) {
 
-        String email = principal.getName(); // Récupérer l'email de l'utilisateur connecté
+        String email = principal.getName();
 
         try {
-            // Appeler le service pour changer le mot de passe
             userService.changeProfilePassword(email, request);
-
-            // Générer un nouveau token JWT après la mise à jour du mot de passe
-            String newToken = jwtTokenProvider.createToken(email); // Générer le token
-
-            // Retourner la réponse avec un message de succès et le nouveau token
-            return ResponseEntity.ok(new ApiResponse("Mot de passe mis à jour avec succès", true, newToken));
+            String newToken = jwtTokenProvider.createToken(email); // 🔑 Nouveau token après changement
+            return ResponseEntity.ok(
+                    new ApiResponse("Mot de passe mis à jour avec succès", true, newToken));
+        } catch (IllegalArgumentException | BadCredentialsException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(e.getMessage(), false, null));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest()
                     .body(new ApiResponse("Erreur lors de la mise à jour du mot de passe", false, null));
         }

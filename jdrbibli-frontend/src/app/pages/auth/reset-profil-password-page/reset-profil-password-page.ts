@@ -39,4 +39,9 @@ export class ResetProfilPasswordPage {
       }
     });
   }
+
+  ngOnInit() {
+  console.log('reset-profil-password-page.ts utilisé');
+}
+
 }
