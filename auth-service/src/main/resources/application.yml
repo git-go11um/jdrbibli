@@ -40,7 +40,8 @@ mail:
         starttls.enable: false
 
 jwt:
-  secret: MaSuperClefSecreteTrèsLonguePourHmacSha256DontTuDoisPrendreSoin1234567890
+  secret: Z2dKbnRHY0NvcnNDWUR0bFhHZ3R3NzIzbVRZT3o0Sk5GZjBWT2tVdzBrckxKVXphMnJKZThCb21BZzk1OU9sWkQ=
+
   expiration: 3600000
 
 app:

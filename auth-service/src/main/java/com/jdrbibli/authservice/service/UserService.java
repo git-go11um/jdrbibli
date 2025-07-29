@@ -204,7 +204,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void changeProfilePassword(String userEmail, ChangePasswordProfileRequest request) {
+    public void changeProfilePassword(String userPseudo, ChangePasswordProfileRequest request) {
         // Vérifier que le nouveau mot de passe correspond à la confirmation
         if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
             throw new IllegalArgumentException("Les deux mots de passe ne correspondent pas");
@@ -214,8 +214,8 @@ public class UserService implements IUserService {
         PasswordValidator.validate(request.getNewPassword());
 
         // Récupérer l'utilisateur avec l'email
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec l'email " + userEmail + " non trouvé"));
+        User user = userRepository.findByPseudo(userPseudo)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec le pseudo " + userPseudo + " non trouvé"));
 
         // Vérifier que le mot de passe actuel est correct
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {

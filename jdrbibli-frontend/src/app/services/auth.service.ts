@@ -77,10 +77,20 @@ export class AuthService {
     );
   }
 
-  changeProfilePassword(email: string, newPassword: string) {
-    const url = `/auth/profile/password`;
-    return this.http.put(url, { email, newPassword });
+  changeProfilePassword(data: {
+    currentPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+  }) {
+    const url = `${this.apiUrl}/profile/password`;
+    const token = localStorage.getItem('jwt');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.put(url, data, { headers }).pipe(catchError(this.handleError));
   }
+
+
+
 
   deleteUser(pseudo: string): Observable<any> {
     const token = localStorage.getItem('jwt');

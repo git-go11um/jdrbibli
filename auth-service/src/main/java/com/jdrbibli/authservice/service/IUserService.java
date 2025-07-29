@@ -30,8 +30,6 @@ public interface IUserService {
 
     void updateUserProfile(Long userId, String newPseudo, String newEmail);
 
-    void changeProfilePassword(String userEmail, ChangePasswordProfileRequest request);
-
-    
+    void changeProfilePassword(String userPseudo, ChangePasswordProfileRequest request);
 
 }
