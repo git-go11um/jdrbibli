@@ -57,4 +57,33 @@ export class ProfilUtilisateur implements OnInit {
         }
     }
 
+    selectedFile: File | null = null;
+
+    onFileSelected(event: Event): void {
+        const fileInput = event.target as HTMLInputElement;
+        if (fileInput.files && fileInput.files.length > 0) {
+            this.selectedFile = fileInput.files[0];
+        }
+    }
+
+    uploadAvatar(): void {
+        if (!this.selectedFile) return;
+
+        const formData = new FormData();
+        formData.append('file', this.selectedFile);
+
+        this.authService.uploadAvatar(formData).subscribe({
+            next: (res: any) => {
+                console.log('Avatar uploadé avec succès', res);
+                this.loadUserInfo(); // recharger pour afficher l’avatar mis à jour
+                this.selectedFile = null;
+            },
+            error: (err) => {
+                console.error('Erreur lors de l’upload de l’avatar', err);
+                alert('Une erreur est survenue lors de l’upload.');
+            }
+        });
+    }
+
+
 }

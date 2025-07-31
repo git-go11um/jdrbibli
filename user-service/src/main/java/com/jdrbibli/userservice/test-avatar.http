@@ -1,0 +1,52 @@
+### UPLOAD AVATAR (PUT)
+PUT http://localhost:8082/api/users/profile/avatar
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2aW5jZW50IiwiaWF0IjoxNzUzOTQzMjM4LCJleHAiOjE3NTM5NDY4Mzh9.0cEzdUuhivV3caEuY3JmPiI0iFqLxgSpy3WfdOOqNvg
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="avatar.jpg"
+Content-Type: image/jpeg
+
+< ./src/main/resources/test/avatar.jpg
+--WebAppBoundary--
+
+###
+
+### RÉCUPÉRER AVATAR PAR ID
+GET http://localhost:8082/api/users/profile/avatar/{{userId}}
+Authorization: Bearer {{token}}
+
+
+
+
+
+### LOGIN POUR RÉCUPÉRER LE TOKEN JWT
+POST http://localhost:8084/api/auth/login
+Content-Type: application/json
+
+{
+  "pseudo": "vincent",
+  "motDePasse": "T@u1234567890"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+###
+
+### UPLOAD AVATAR (PUT)
+PUT http://localhost:8082/api/users/profile/avatar
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="avatar.png"
+Content-Type: image/png
+
+< ./test-avatar.png
+--boundary--
+
+###
+
+### RÉCUPÉRER AVATAR PAR ID
+GET http://localhost:8082/api/users/profile/avatar/{{userId}}
+Authorization: Bearer {{token}}

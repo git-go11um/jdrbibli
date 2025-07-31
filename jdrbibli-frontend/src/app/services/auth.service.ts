@@ -165,6 +165,12 @@ export class AuthService {
   }
 
   resetPassword(pseudo: string, code: string, newPassword: string) {
-    return this.http.post(`${this.apiUrl}/reset-password`, { pseudo, code, newPassword });
+    return this.http.put(`${this.apiUrl}/reset-password`, { pseudo, code, newPassword });
   }
+
+  uploadAvatar(fileData: FormData): Observable<any> {
+    return this.http.post('http://localhost:8082/api/users/profile/avatar', fileData);
+  }
+
+
 }

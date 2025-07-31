@@ -5,10 +5,16 @@ import com.jdrbibli.userservice.dto.OuvrageDTO;
 import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.mapper.FriendMapper;
 import com.jdrbibli.userservice.repository.UserProfileRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -63,10 +69,11 @@ public class UserProfileService {
     }
 
     /**
-     * Récupère la liste complète des ouvrages liés à un utilisateur via ouvrage-service.
+     * Récupère la liste complète des ouvrages liés à un utilisateur via
+     * ouvrage-service.
      */
     public List<OuvrageDTO> getOuvragesForUser(Long userId) {
-        return webClientBuilder.baseUrl("http://gateway:8084")  // URL du gateway
+        return webClientBuilder.baseUrl("http://gateway:8084") // URL du gateway
                 .build()
                 .get()
                 .uri("/ouvrages?userId=" + userId)
@@ -86,4 +93,48 @@ public class UserProfileService {
                 .map(FriendMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    public boolean saveUserAvatar(String pseudo, MultipartFile file) throws IOException {
+        UserProfile user = userProfileRepository.findByPseudo(pseudo)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
+        boolean wasEmpty = (user.getAvatarPath() == null || user.getAvatarPath().isBlank());
+
+        String uploadDir = "uploads/avatars/";
+        Files.createDirectories(Paths.get(uploadDir));
+
+        // Option: fixer un nom stable (id + extension) pour rester idempotent
+        String extension = Optional.ofNullable(file.getOriginalFilename())
+                .filter(n -> n.contains("."))
+                .map(n -> n.substring(n.lastIndexOf('.')))
+                .orElse(".bin");
+        String fileName = "user_" + user.getId() + extension;
+
+        java.nio.file.Path filePath = Paths.get(uploadDir, fileName);
+        Files.write(filePath, file.getBytes());
+
+        user.setAvatarPath(filePath.toString());
+        user.setAvatarUrl("/api/users/profile/avatar/" + user.getId());
+        userProfileRepository.save(user);
+
+        return wasEmpty; // true => 201 Created
+    }
+
+    public byte[] getUserAvatar(Long id) throws IOException {
+        UserProfile user = userProfileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        String path = user.getAvatarPath();
+        if (path == null || path.isBlank()) {
+            throw new FileNotFoundException("Aucun avatar disponible pour cet utilisateur.");
+        }
+
+        return Files.readAllBytes(Paths.get(path));
+    }
+
+    public UserProfile getUserProfileById(Long id) {
+        return userProfileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
 }

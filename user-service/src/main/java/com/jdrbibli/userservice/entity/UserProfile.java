@@ -15,7 +15,12 @@ public class UserProfile {
 
     private String pseudo;
     private String email;
+
+    @Column(nullable = true)
     private String avatarUrl;
+
+    @Column(nullable = true)
+    private String avatarPath;
 
     /**
      * Liste d'IDs des ouvrages liés à cet utilisateur (persistée en base).
@@ -94,5 +99,13 @@ public class UserProfile {
 
     public void setFriends(List<UserProfile> friends) {
         this.friends = friends;
+    }
+
+    public String getAvatarPath() {
+        return avatarPath;
+    }
+
+    public void setAvatarPath(String avatarPath) {
+        this.avatarPath = avatarPath;
     }
 }
