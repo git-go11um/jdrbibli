@@ -1,6 +1,8 @@
 package com.jdrbibli.authservice.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    // Ajoute ces setters pour pouvoir configurer dans les tests
+    // Setter utiles pour les tests
     public void setJwtSecret(String jwtSecret) {
         this.jwtSecret = jwtSecret;
     }
@@ -35,9 +37,6 @@ public class JwtService {
 
     /**
      * Générer un token avec claims custom optionnels
-     * 
-     * @param extraClaims : map de claims supplémentaires
-     * @param pseudo      : pseudo de l'utilisateur (subject)
      */
     public String generateToken(Map<String, Object> extraClaims, String pseudo) {
         return Jwts.builder()
@@ -103,5 +102,4 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
 }

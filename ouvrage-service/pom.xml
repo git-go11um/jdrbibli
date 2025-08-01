@@ -32,13 +32,12 @@
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
 
-    <!-- Driver mariadb -->
+    <!-- Driver MariaDB -->
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
-      <version>3.3.3</version> <!-- ou la dernière version -->
+      <version>3.3.3</version>
     </dependency>
-
 
     <!-- Lombok -->
     <dependency>
@@ -47,6 +46,32 @@
       <version>1.18.32</version>
       <scope>provided</scope>
       <optional>true</optional>
+    </dependency>
+
+    <!-- Flyway migration -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>9.22.3</version>
+    </dependency>
+
+    <!-- jjwt version 0.11.5 -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <version>0.11.5</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <version>0.11.5</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <version>0.11.5</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- Tests -->
@@ -62,21 +87,8 @@
       </exclusions>
     </dependency>
 
-    <!-- Flyway compatible Spring Boot 3.2.x -->
-    <dependency>
-      <groupId>org.flywaydb</groupId>
-      <artifactId>flyway-core</artifactId>
-      <version>9.22.3</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mariadb.jdbc</groupId>
-      <artifactId>mariadb-java-client</artifactId>
-      <version>3.3.2</version> <!-- ou une version stable équivalente -->
-    </dependency>
-
-
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -100,4 +112,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

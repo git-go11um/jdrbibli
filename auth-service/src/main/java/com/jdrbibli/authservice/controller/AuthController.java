@@ -142,7 +142,7 @@ public class AuthController {
     }
 
     // Réinitialiser le mot de passe
-    @PostMapping("/reset-password")
+    @PutMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest request) {
         try {
             // Appel du service pour réinitialiser le mot de passe
