@@ -4,6 +4,13 @@ server:
 spring:
   application:
     name: gateway
+  webflux:
+    cors:
+      allowed-origins: "http://localhost:4200"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      allow-credentials: true
+
 
   cloud:
     gateway:
@@ -11,24 +18,27 @@ spring:
         - id: auth-service
           uri: http://localhost:8081
           predicates:
-            - Path=/api/auth/** # on prend tout ce qui commence par /api/auth/
+            - Path=/api/auth/** # capture tout ce qui commence par /api/auth/
           filters:
-            - StripPrefix=1 # enlève le "api" → il reste /auth/**
+            - StripPrefix=1 # enlève le "api", il reste /auth/** côté service
 
         - id: user-service
           uri: http://localhost:8082
           predicates:
-            - Path=/user/**
+            - Path=/user/** # capture /user/** côté service
           filters:
-          #  - StripPrefix=1
+            # Si tu veux enlever un préfixe, tu peux ajouter StripPrefix=1
 
         - id: ouvrage-service
           uri: http://localhost:8083
           predicates:
             - Path=/api/ouvrage/**
           filters:
-            - StripPrefix=0
+            - StripPrefix=0 # pas de modification du chemin
 
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
+
+jwt:
+  secret: Z2dKbnRHY0NvcnNDWUR0bFhHZ3R3NzIzbVRZT3o0Sk5GZjBWT2tVdzBrckxKVXphMnJKZThCb21BZzk1OU9sWkQ=

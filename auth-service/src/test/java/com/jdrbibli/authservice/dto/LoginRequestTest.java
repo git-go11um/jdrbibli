@@ -10,9 +10,9 @@ public class LoginRequestTest {
         LoginRequest loginRequest = new LoginRequest();
 
         loginRequest.setPseudo("monPseudo");
-        loginRequest.setMotDePasse("monMotDePasse");
+        loginRequest.setPassword("monpassword");
 
         assertEquals("monPseudo", loginRequest.getPseudo());
-        assertEquals("monMotDePasse", loginRequest.getMotDePasse());
+        assertEquals("monpassword", loginRequest.getPassword());
     }
 }

@@ -2,7 +2,7 @@ package com.jdrbibli.authservice.dto;
 
 public class LoginRequest {
     private String pseudo;
-    private String motDePasse;
+    private String password;
 
     public LoginRequest() {
     }
@@ -15,11 +15,11 @@ public class LoginRequest {
         this.pseudo = pseudo;
     }
 
-    public String getMotDePasse() {
-        return motDePasse;
+    public String getPassword() {
+        return password;
     }
 
-    public void setMotDePasse(String motDePasse) {
-        this.motDePasse = motDePasse;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

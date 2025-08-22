@@ -15,11 +15,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -37,27 +32,22 @@ public class SecurityConfig {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Fournisseur d'authentification basé sur UserDetailsService + PasswordEncoder
-     */
+    // ------------------- AuthenticationProvider -------------------
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
+        provider.setPasswordEncoder(passwordEncoder); // injecté depuis PasswordEncoderConfig
         return provider;
     }
 
-    /**
-     * Permet d’injecter l'AuthenticationManager où on veut (ex: AuthController)
-     */
+    // ------------------- AuthenticationManager -------------------
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-
-
+    // ------------------- SecurityFilterChain -------------------
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -66,18 +56,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/password-reset/request").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/validate-reset-code").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/auth/reset-password").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/auth/profile/password").authenticated()
-                        .requestMatchers("/refresh").permitAll()
+                        .requestMatchers("/auth/refresh").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }

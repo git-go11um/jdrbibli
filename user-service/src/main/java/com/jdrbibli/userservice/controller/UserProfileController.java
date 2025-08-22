@@ -3,7 +3,11 @@ package com.jdrbibli.userservice.controller;
 import com.jdrbibli.userservice.dto.FriendDTO;
 import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.service.UserProfileService;
+import com.jdrbibli.userservice.utils.JwtUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +18,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping({ "/api/users", "/user" })
 public class UserProfileController {
+
+    private static final Logger log = LoggerFactory.getLogger(UserProfileController.class);
 
     private final UserProfileService userProfileService;
 
@@ -81,53 +86,73 @@ public class UserProfileController {
         return ResponseEntity.ok(friends);
     }
 
+    /**
+     * Upload de l’avatar avec récupération du pseudo via le header X-User-Name.
+     */
     @PutMapping(value = "/profile/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file, Principal principal) {
+    public ResponseEntity<?> uploadAvatar(
+            @RequestParam("file") MultipartFile file,
+            @RequestHeader(value = "X-User-Name", required = false) String pseudo) {
+
         if (file.isEmpty()) {
+            log.warn("Tentative d'upload d'un avatar vide");
             return ResponseEntity.badRequest().body("Fichier vide");
         }
+
+        if (pseudo == null || pseudo.isEmpty()) {
+            log.error("Header X-User-Name manquant ou vide");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur non authentifié");
+        }
+
         try {
-            String pseudo = principal.getName();
+            log.info("Upload avatar pour l'utilisateur: {}", pseudo);
 
             boolean created = userProfileService.saveUserAvatar(pseudo, file);
-            // => renvoie true si c'était le 1er avatar, false sinon
 
             return created
                     ? ResponseEntity.status(HttpStatus.CREATED).body("Avatar créé")
                     : ResponseEntity.ok("Avatar remplacé");
+
         } catch (Exception e) {
+            log.error("Erreur lors de l'upload de l'avatar", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Erreur upload avatar: " + e.getMessage());
         }
     }
 
+    /**
+     * Récupérer l’avatar d’un utilisateur par son ID.
+     */
     @GetMapping("/profile/avatar/{id}")
     public ResponseEntity<byte[]> getAvatar(@PathVariable Long id) {
         try {
-            UserProfile user = userProfileService.getUserProfileById(id); // méthode à exposer dans le service
+            UserProfile user = userProfileService.getUserProfileById(id);
             String avatarPath = user.getAvatarPath();
 
             if (avatarPath == null) {
+                log.warn("Aucun avatar trouvé pour l'utilisateur avec ID: {}", id);
                 return ResponseEntity.notFound().build();
             }
 
             Path path = Paths.get(avatarPath);
             byte[] image = Files.readAllBytes(path);
 
-            // Détection du type MIME (peut renvoyer null si type inconnu)
             String mimeType = Files.probeContentType(path);
             MediaType mediaType = (mimeType != null)
                     ? MediaType.parseMediaType(mimeType)
                     : MediaType.APPLICATION_OCTET_STREAM;
 
+            log.info("Avatar récupéré pour l'utilisateur ID: {}", id);
+
             return ResponseEntity.ok()
                     .contentType(mediaType)
                     .body(image);
         } catch (IOException e) {
+            log.error("Erreur IO lors de la récupération de l'avatar", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (Exception e) {
+            log.error("Erreur lors de la récupération de l'avatar", e);
             return ResponseEntity.notFound().build();
         }
     }
-
 }

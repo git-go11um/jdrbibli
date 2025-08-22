@@ -45,18 +45,18 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User inscrireNewUser(String pseudo, String email, String motDePasse) {
-        PasswordValidator.validate(motDePasse);
-        String hashedPassword = passwordEncoder.encode(motDePasse);
+    public User inscrireNewUser(String pseudo, String email, String password) {
+        PasswordValidator.validate(password);
+        String hashedPassword = passwordEncoder.encode(password);
         User newUser = new User(null, pseudo, email, hashedPassword, new HashSet<>(), null, null);
         return userRepository.save(newUser);
     }
 
     @Override
-    public User login(String email, String motDePasse) {
+    public User login(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
-        if (!passwordEncoder.matches(motDePasse, user.getPassword())) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("Mot de passe incorrect");
         }
         return user;

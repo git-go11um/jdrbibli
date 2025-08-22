@@ -47,23 +47,29 @@ export class ProfileEditComponent implements OnInit {
         this.error = false;
 
         // Vérifier si les mots de passe correspondent
-        if (this.newPassword && this.newPassword !== this.confirmNewPassword) {
-            this.passwordMismatch = true;
-            return; // On ne soumet pas si les mots de passe ne correspondent pas
+        this.checkPasswordMatch();
+        if (this.passwordMismatch) {
+            return; // Ne pas soumettre si les mots de passe ne correspondent pas
         }
 
-        this.authService.updateProfile(this.pseudo, this.email, this.newPassword).subscribe({
+        // Préparer les données
+        const passwordToUpdate = this.newPassword ? this.newPassword : undefined;
+
+        this.authService.updateProfile(this.pseudo, this.email, passwordToUpdate).subscribe({
             next: () => {
                 this.message = 'Profil mis à jour avec succès.';
+                this.error = false;
             },
             error: (err) => {
-                this.message = `Erreur lors de la mise à jour: ${err.message || err}`;
+                console.error('Erreur mise à jour profil:', err);
+                this.message = `Erreur lors de la mise à jour: ${err.error?.message || err.message || 'serveur inaccessible'}`;
                 this.error = true;
             },
         });
     }
 
-    
+
+
 
 
 

@@ -4,33 +4,35 @@
 
         <div class="user-info">
             <div class="info-item">
-                <label for="pseudo">Pseudo:</label>
-                <span id="pseudo">{{ pseudo }}</span>
+                <label>Pseudo:</label>
+                <span>{{ pseudo }}</span>
             </div>
             <div class="info-item">
-                <label for="email">Email:</label>
-                <span id="email">{{ email }}</span>
+                <label>Email:</label>
+                <span>{{ email }}</span>
             </div>
             <div class="info-item">
-                <label for="motDePasse">Mot de passe:</label>
-                <span id="motDePasse">{{ motDePasse }}</span>
+                <label>Mot de passe:</label>
+                <span>{{ motDePasse }}</span>
             </div>
             <div class="info-item">
-                <label for="avatar">Avatar:</label>
-                <div id="avatar">
+                <label>Avatar:</label>
+                <div class="avatar-section">
                     <img *ngIf="avatarUrl" [src]="avatarUrl" alt="Avatar utilisateur" width="100" height="100">
                     <p *ngIf="!avatarUrl">Aucun avatar uploadé</p>
+
+                    <!-- Input fichier et bouton upload -->
                     <input type="file" (change)="onFileSelected($event)" accept="image/*">
                     <button (click)="uploadAvatar()" [disabled]="!selectedFile">Envoyer l’avatar</button>
                 </div>
-            </div>
 
+            </div>
         </div>
 
         <div class="action-buttons">
             <button class="btn-modifier" routerLink="/profile-edit">Modifier le compte</button>
-            <button onclick="window.location.href='/reset-profil-password';">Modifier mon mot de passe</button>
-            <button class="btn-supprimer" (click)="deleteUser()">Supprimer le compte</button>
+            <button (click)="goToResetPassword()">Modifier mon mot de passe</button> <button class="btn-supprimer"
+                (click)="deleteUser()">Supprimer le compte</button>
         </div>
     </div>
 

@@ -7,7 +7,7 @@ import { ResetPasswordRequestComponent } from './pages/auth/reset-password-reque
 import { ResetPasswordCodePage } from './pages/auth/reset-password-code-page/reset-password-code-page';
 import { ResetPasswordNewpassPage } from './pages/auth/reset-password-newpass-page/reset-password-newpass-page';
 import { SuccessLoginPage } from './pages/success-login-page/success-login-page';
-import { authGuard } from './guards/auth.guard'; // import du guard
+import { AuthGuard } from './guards/auth.guard'; // import du guard
 import { LudothequePage } from './pages/ludotheque-page/ludotheque-page';
 import { ProfilUtilisateur } from './pages/profil-utilisateur/profil-utilisateur';
 import { ProfileEditComponent } from './pages/profil-utilisateur/profile-edit.component';
@@ -30,7 +30,7 @@ export const routes: Routes = [
     path: 'reset-password-newpass',
     loadComponent: () => import('./pages/auth/reset-password-newpass-page/reset-password-newpass-page').then(m => m.ResetPasswordNewpassPage)
   },
-  { path: 'home-connected', component: HomeConnected, canActivate: [authGuard] },
+  { path: 'home-connected', component: HomeConnected, canActivate: [AuthGuard] },
   { path: 'ludotheque', component: LudothequePage },
   { path: 'profil-utilisateur', component: ProfilUtilisateur },
   { path: 'profile-edit', component: ProfileEditComponent },
@@ -40,6 +40,7 @@ export const routes: Routes = [
   {
   path: 'reset-profil-password',
   loadComponent: () => import('./pages/auth/reset-profil-password-page/reset-profil-password-page').then(m => m.ResetProfilPasswordPage)
-}
+  },
+  { path: '**', redirectTo: 'login' }
 
 ];

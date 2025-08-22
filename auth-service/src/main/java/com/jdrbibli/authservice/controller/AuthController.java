@@ -1,129 +1,153 @@
 package com.jdrbibli.authservice.controller;
 
-import com.jdrbibli.authservice.dto.AuthenticationResponse;
-import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
-import com.jdrbibli.authservice.dto.ChangePasswordRequest;
-import com.jdrbibli.authservice.dto.InscriptionRequest;
-import com.jdrbibli.authservice.dto.LoginRequest;
-import com.jdrbibli.authservice.dto.PasswordResetRequest;
-import com.jdrbibli.authservice.dto.UpdateUserRequest;
-import com.jdrbibli.authservice.dto.UserResponseDTO;
-import com.jdrbibli.authservice.dto.ReponseProfileChange;
-import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
-import com.jdrbibli.authservice.dto.ApiResponse;
-import com.jdrbibli.authservice.security.JwtTokenProvider;
-
+import com.jdrbibli.authservice.dto.*;
 import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.security.JwtService;
+import com.jdrbibli.authservice.security.JwtTokenProvider;
 import com.jdrbibli.authservice.service.IUserService;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.authentication.BadCredentialsException;
-/* import java.lang.IllegalArgumentException; */
-
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
+import jakarta.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder; // Injection du PasswordEncoder
-
     private final IUserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
+    @Autowired
     public AuthController(IUserService userService,
             AuthenticationManager authenticationManager,
             JwtService jwtService,
-            JwtTokenProvider jwtTokenProvider) {
+            JwtTokenProvider jwtTokenProvider,
+            PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // Inscription
+    // ------------------- INSCRIPTION -------------------
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> inscrire(@RequestBody InscriptionRequest request) {
-        User newUser = userService.inscrireNewUser(request.getPseudo(), request.getEmail(), request.getMotDePasse());
-        String token = jwtService.generateToken(newUser.getPseudo());
-        return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(newUser)));
-    }
-
-    // Login
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest request) {
-        // Authentifier l'utilisateur
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getPseudo(), request.getMotDePasse()));
-
-        User user = userService.getUserByPseudo(request.getPseudo());
-        String token = jwtService.generateToken(user.getPseudo());
-
-        return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(user)));
-    }
-
-    @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-        // Le token arrive en header "Authorization: Bearer <token>"
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token manquant ou mal formé");
-        }
-
-        String token = authorizationHeader.substring(7); // on enlève "Bearer "
-
+    public ResponseEntity<?> register(@RequestBody InscriptionRequest request) {
         try {
-            // Extraire le pseudo du token (même s’il est expiré, il faut catch
-            // ExpiredJwtException)
-            String pseudo = jwtService.extractPseudo(token);
+            User newUser = userService.inscrireNewUser(request.getPseudo(), request.getEmail(), request.getPassword());
+            String token = jwtService.generateToken(newUser.getPseudo());
+            return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(newUser)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur lors de l'inscription : " + e.getMessage()));
+        }
+    }
 
-            // Ici on pourrait vérifier si le token n’est pas complètement invalide
-            // (blacklist, etc.)
-            // mais pour l’instant on se base sur la signature valide
+    // ------------------- LOGIN -------------------
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            System.out.println(
+                    "Tentative login pour pseudo: " + request.getPseudo() + ", password: " + request.getPassword());
 
-            // Générer un nouveau token
-            String newToken = jwtService.generateToken(pseudo);
+            User user = userService.getUserByPseudo(request.getPseudo());
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Utilisateur non trouvé"));
+            }
 
-            // Récupérer user + créer réponse
-            User user = userService.getUserByPseudo(pseudo);
-            AuthenticationResponse response = new AuthenticationResponse(newToken, userService.toDTO(user));
+            boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+            if (!matches) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Mot de passe incorrect"));
+            }
 
-            return ResponseEntity.ok(response);
+            System.out.println("----- Test AuthenticationManager -----");
+
+            if (user != null) {
+                System.out.println("Utilisateur trouvé : " + user.getPseudo());
+                matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+                System.out.println("Mot de passe correct ? " + matches);
+            } else {
+                System.out.println("Utilisateur non trouvé !");
+            }
+
+            // Authentification Spring Security
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getPseudo(), request.getPassword()));
+
+            String token = jwtService.generateToken(user.getPseudo());
+            return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(user)));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide ou expiré");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur lors du login : " + e.getMessage()));
         }
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<UserResponseDTO> getCurrentUser(Authentication authentication) {
-        String pseudo = authentication.getName();
-        User user = userService.getUserByPseudo(pseudo);
-        return ResponseEntity.ok(userService.toDTO(user));
+    // ------------------- REFRESH TOKEN -------------------
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Token manquant ou mal formé"));
+        }
+
+        String token = authHeader.substring(7);
+        try {
+            String pseudo = jwtService.extractPseudo(token);
+            String newToken = jwtService.generateToken(pseudo);
+            User user = userService.getUserByPseudo(pseudo);
+            return ResponseEntity.ok(new AuthenticationResponse(newToken, userService.toDTO(user)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Token invalide ou expiré"));
+        }
     }
 
-    @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request, Principal connectedUser) {
-        userService.changePassword(connectedUser.getName(), request);
-        return ResponseEntity.ok().body(Map.of("message", "Mot de passe changé avec succès"));
+    // ------------------- UTILISATEUR CONNECTÉ -------------------
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        try {
+            String pseudo = authentication.getName();
+            User user = userService.getUserByPseudo(pseudo);
+            return ResponseEntity.ok(userService.toDTO(user));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur lors de la récupération du profil"));
+        }
+    }
+
+    // ------------------- MOT DE PASSE -------------------
+    @PostMapping("/password-reset/request")
+    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> body) {
+        String pseudo = body.get("pseudo");
+        try {
+            userService.requestPasswordReset(pseudo);
+            return ResponseEntity.ok(Map.of("message", "Code de réinitialisation envoyé"));
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur lors de l'envoi du mail : " + e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
+        }
     }
 
     @PostMapping("/validate-reset-code")
@@ -136,101 +160,31 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Code invalide"));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
         }
     }
 
-    // Réinitialiser le mot de passe
     @PutMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest request) {
         try {
-            // Appel du service pour réinitialiser le mot de passe
             userService.resetPassword(request.getPseudo(), request.getCode(), request.getNewPassword());
             return ResponseEntity.ok(Map.of("message", "Mot de passe réinitialisé avec succès"));
         } catch (Exception e) {
-            // Si une erreur se produit, retourner une erreur serveur
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
-        }
-    }
-
-    @PostMapping("/password-reset/request")
-    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> body) {
-        try {
-            String pseudo = body.get("pseudo");
-            userService.requestPasswordReset(pseudo);
-            return ResponseEntity.ok(Map.of("message", "Code de réinitialisation envoyé"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
-        }
-    }
-
-    // Route de suppression du compte utilisateur
-    @DeleteMapping("/{pseudo}")
-    public ResponseEntity<?> deleteUser(@PathVariable String pseudo, @RequestHeader("Authorization") String token) {
-        try {
-            // Extraire le pseudo (subject) du token
-            String tokenPseudo = jwtService.extractPseudo(token.substring(7)); // Enlève "Bearer " du token
-
-            if (!tokenPseudo.equals(pseudo)) {
-                Map<String, String> errorResponse = new HashMap<>();
-                errorResponse.put("message", "Vous ne pouvez supprimer que votre propre compte.");
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
-            }
-
-            // Trouver l'utilisateur par son pseudo et le supprimer
-            User user = userService.getUserByPseudo(pseudo); // Récupérer l'utilisateur par son pseudo
-            if (user != null) {
-                userService.deleteUserById(user.getId()); // Supprimer l'utilisateur par son ID
-
-                Map<String, String> successResponse = new HashMap<>();
-                successResponse.put("message", "Utilisateur supprimé avec succès.");
-                return ResponseEntity.ok(successResponse);
-            } else {
-                Map<String, String> notFoundResponse = new HashMap<>();
-                notFoundResponse.put("message", "Utilisateur non trouvé.");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(notFoundResponse);
-            }
-        } catch (Exception e) {
             e.printStackTrace();
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("message", "Erreur lors de la suppression du compte.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
         }
     }
 
-    // Route pour mettre à jour le profil (pseudo et email)
-    @PutMapping("/profile")
-    public ResponseEntity<ReponseProfileChange> updateUserProfile(@RequestBody UpdateUserRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = ((User) userDetails).getId();
-
-        try {
-            userService.updateUserProfile(userId, request.getPseudo(), request.getEmail());
-            return ResponseEntity.ok(new ReponseProfileChange("Profil mis à jour avec succès"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ReponseProfileChange(e.getMessage()));
-        }
-    }
-
-    // Nouvelle méthode pour modifier le mot de passe via le profil connecté
     @PutMapping("/profile/password")
-    public ResponseEntity<?> changeProfilePassword(
-            @RequestBody ChangePasswordProfileRequest request,
+    public ResponseEntity<?> changeProfilePassword(@RequestBody ChangePasswordProfileRequest request,
             Principal principal) {
-
-        String email = principal.getName();
-
         try {
-            userService.changeProfilePassword(email, request);
-            String newToken = jwtTokenProvider.createToken(email); // 🔑 Nouveau token après changement
-            return ResponseEntity.ok(
-                    new ApiResponse("Mot de passe mis à jour avec succès", true, newToken));
-        } catch (IllegalArgumentException | BadCredentialsException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(e.getMessage(), false, null));
+            userService.changeProfilePassword(principal.getName(), request);
+            String newToken = jwtTokenProvider.createToken(principal.getName());
+            return ResponseEntity.ok(new ApiResponse("Mot de passe mis à jour avec succès", true, newToken));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest()
@@ -238,4 +192,43 @@ public class AuthController {
         }
     }
 
+    // ------------------- PROFIL -------------------
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateUserProfile(@RequestBody UpdateUserRequest request,
+            Principal principal) {
+        try {
+            User user = userService.getUserByPseudo(principal.getName());
+            userService.updateUserProfile(user.getId(), request.getPseudo(), request.getEmail());
+            return ResponseEntity.ok(new ReponseProfileChange("Profil mis à jour avec succès"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ReponseProfileChange(e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
+        }
+    }
+
+    // ------------------- SUPPRESSION UTILISATEUR -------------------
+    @DeleteMapping("/{pseudo}")
+    public ResponseEntity<?> deleteUser(@PathVariable String pseudo, @RequestHeader("Authorization") String token) {
+        try {
+            String tokenPseudo = jwtService.extractPseudo(token.substring(7));
+            if (!tokenPseudo.equals(pseudo)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Vous ne pouvez supprimer que votre propre compte."));
+            }
+
+            User user = userService.getUserByPseudo(pseudo);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Utilisateur non trouvé."));
+            }
+            userService.deleteUserById(user.getId());
+            return ResponseEntity.ok(Map.of("message", "Utilisateur supprimé avec succès."));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur lors de la suppression du compte : " + e.getMessage()));
+        }
+    }
 }

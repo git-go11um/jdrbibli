@@ -29,3 +29,12 @@ spring:
 logging:
   level:
     org.hibernate.SQL: DEBUG
+
+# Chemin où seront stockés les avatars
+user:
+  avatar:
+    upload-dir: uploads/avatars
+
+# JWT secret (doit être exactement le même que dans auth-service)
+jwt:
+  secret: Z2dKbnRHY0NvcnNDWUR0bFhHZ3R3NzIzbVRZT3o0Sk5GZjBWT2tVdzBrckxKVXphMnJKZThCb21BZzk1OU9sWkQ=

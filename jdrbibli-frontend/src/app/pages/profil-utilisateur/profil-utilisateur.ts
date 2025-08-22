@@ -8,20 +8,22 @@ import { RouterModule, Router } from '@angular/router';
     standalone: true,
     imports: [CommonModule, RouterModule],
     templateUrl: './profil-utilisateur.html',
-    styleUrls: ['./profil-utilisateur.scss'] // correction ici (styleUrls, pluriel)
+    styleUrls: ['./profil-utilisateur.scss']
 })
 export class ProfilUtilisateur implements OnInit {
     pseudo: string = '';
     email: string = '';
     motDePasse: string = '**********'; // mot de passe masqué
     avatarUrl: string = '';
+    selectedFile: File | null = null;
 
-    constructor(private authService: AuthService, private router: Router) { }
+    constructor(public authService: AuthService, private router: Router) { }
 
     ngOnInit(): void {
         this.loadUserInfo();
     }
 
+    /** Charge les informations de l’utilisateur */
     loadUserInfo(): void {
         this.authService.getUserInfo().subscribe({
             next: (data) => {
@@ -35,6 +37,7 @@ export class ProfilUtilisateur implements OnInit {
         });
     }
 
+    /** Supprime le compte utilisateur */
     deleteUser(): void {
         if (confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
             const userPseudo = this.authService.getUserPseudo();
@@ -57,8 +60,7 @@ export class ProfilUtilisateur implements OnInit {
         }
     }
 
-    selectedFile: File | null = null;
-
+    /** Sélection d’un fichier pour l’avatar */
     onFileSelected(event: Event): void {
         const fileInput = event.target as HTMLInputElement;
         if (fileInput.files && fileInput.files.length > 0) {
@@ -66,24 +68,38 @@ export class ProfilUtilisateur implements OnInit {
         }
     }
 
+    /** Upload de l’avatar */
     uploadAvatar(): void {
-        if (!this.selectedFile) return;
+        if (!this.selectedFile) {
+            alert('Veuillez sélectionner un fichier avant d’uploader.');
+            return;
+        }
 
         const formData = new FormData();
         formData.append('file', this.selectedFile);
 
+        // On réinitialise selectedFile pour éviter toute interférence
+        const fileToUpload = this.selectedFile;
+        this.selectedFile = null;
+
+        // Appel au service, qui doit inclure le JWT dans l'header
         this.authService.uploadAvatar(formData).subscribe({
             next: (res: any) => {
                 console.log('Avatar uploadé avec succès', res);
-                this.loadUserInfo(); // recharger pour afficher l’avatar mis à jour
-                this.selectedFile = null;
+                this.loadUserInfo(); // recharger les infos pour afficher le nouvel avatar
+                alert('Avatar mis à jour avec succès !');
             },
             error: (err) => {
                 console.error('Erreur lors de l’upload de l’avatar', err);
-                alert('Une erreur est survenue lors de l’upload.');
+                alert('Une erreur est survenue lors de l’upload de l’avatar. Vérifie le token ou le backend.');
             }
         });
     }
 
 
+
+    /** Redirige vers la page de réinitialisation du mot de passe */
+    goToResetPassword(): void {
+        this.router.navigate(['/reset-profil-password']);
+    }
 }

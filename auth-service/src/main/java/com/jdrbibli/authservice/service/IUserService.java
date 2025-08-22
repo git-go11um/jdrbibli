@@ -10,9 +10,9 @@ import com.jdrbibli.authservice.entity.User;
 import jakarta.mail.MessagingException;
 
 public interface IUserService {
-    User inscrireNewUser(String pseudo, String email, String motDePasse);
+    User inscrireNewUser(String pseudo, String email, String password);
 
-    User login(String email, String motDePasse);
+    User login(String email, String password);
 
     UserResponseDTO toDTO(User user);
 

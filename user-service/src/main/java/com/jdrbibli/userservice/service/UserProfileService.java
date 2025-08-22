@@ -1,5 +1,6 @@
 package com.jdrbibli.userservice.service;
 
+import com.jdrbibli.userservice.config.StorageProperties;
 import com.jdrbibli.userservice.dto.FriendDTO;
 import com.jdrbibli.userservice.dto.OuvrageDTO;
 import com.jdrbibli.userservice.entity.UserProfile;
@@ -18,18 +19,27 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 @Service
 public class UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
     private final WebClient.Builder webClientBuilder;
+    private final StorageProperties storageProperties;
 
     @Autowired
-    public UserProfileService(UserProfileRepository userProfileRepository, WebClient.Builder webClientBuilder) {
-        this.userProfileRepository = userProfileRepository;
-        this.webClientBuilder = webClientBuilder;
-    }
+public UserProfileService(UserProfileRepository userProfileRepository,
+                          WebClient.Builder webClientBuilder,
+                          StorageProperties storageProperties) {
+    this.userProfileRepository = userProfileRepository;
+    this.webClientBuilder = webClientBuilder;
+    this.storageProperties = storageProperties;
+}
+
 
     /**
      * Récupère tous les utilisateurs.
@@ -97,28 +107,36 @@ public class UserProfileService {
     public boolean saveUserAvatar(String pseudo, MultipartFile file) throws IOException {
         UserProfile user = userProfileRepository.findByPseudo(pseudo)
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
-
+    
         boolean wasEmpty = (user.getAvatarPath() == null || user.getAvatarPath().isBlank());
-
-        String uploadDir = "uploads/avatars/";
-        Files.createDirectories(Paths.get(uploadDir));
-
-        // Option: fixer un nom stable (id + extension) pour rester idempotent
+    
+        // 1. Créer le répertoire si nécessaire
+        Path uploadPath = Paths.get(storageProperties.getUploadDir());
+        Files.createDirectories(uploadPath);
+    
+        // 2. Déterminer l’extension du fichier
         String extension = Optional.ofNullable(file.getOriginalFilename())
                 .filter(n -> n.contains("."))
                 .map(n -> n.substring(n.lastIndexOf('.')))
                 .orElse(".bin");
+    
+        // 3. Nom du fichier stable pour l’utilisateur
         String fileName = "user_" + user.getId() + extension;
-
-        java.nio.file.Path filePath = Paths.get(uploadDir, fileName);
+    
+        // 4. Chemin complet
+        Path filePath = uploadPath.resolve(fileName);
+    
+        // 5. Écrire le fichier
         Files.write(filePath, file.getBytes());
-
+    
+        // 6. Mettre à jour l’avatar dans l’entité
         user.setAvatarPath(filePath.toString());
         user.setAvatarUrl("/api/users/profile/avatar/" + user.getId());
         userProfileRepository.save(user);
-
-        return wasEmpty; // true => 201 Created
+    
+        return wasEmpty; // true => avatar créé pour la première fois
     }
+    
 
     public byte[] getUserAvatar(Long id) throws IOException {
         UserProfile user = userProfileRepository.findById(id)

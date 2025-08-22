@@ -12,7 +12,7 @@ public class InscriptionRequest {
     private String email;
 
     @NotBlank(message = "Le mot de passe est obligatoire")
-    private String motDePasse;
+    private String password;
 
     // Getters et Setters
     public String getPseudo() {
@@ -31,11 +31,11 @@ public class InscriptionRequest {
         this.email = email;
     }
 
-    public String getMotDePasse() {
-        return motDePasse;
+    public String getPassword() {
+        return password;
     }
 
-    public void setMotDePasse(String motDePasse) {
-        this.motDePasse = motDePasse;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

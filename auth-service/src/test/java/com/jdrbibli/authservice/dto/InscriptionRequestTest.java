@@ -26,7 +26,7 @@ public class InscriptionRequestTest {
         InscriptionRequest request = new InscriptionRequest();
         request.setPseudo("monPseudo");
         request.setEmail("test@example.com");
-        request.setMotDePasse("motdepasse123");
+        request.setPassword("password123");
 
         Set<ConstraintViolation<InscriptionRequest>> violations = validator.validate(request);
         assertTrue(violations.isEmpty(), "Aucune violation attendue");
@@ -37,7 +37,7 @@ public class InscriptionRequestTest {
         InscriptionRequest request = new InscriptionRequest();
         request.setPseudo(""); // violation NotBlank
         request.setEmail("invalid-email"); // violation Email
-        request.setMotDePasse(null); // violation NotBlank
+        request.setPassword(null); // violation NotBlank
 
         Set<ConstraintViolation<InscriptionRequest>> violations = validator.validate(request);
         assertEquals(3, violations.size());
@@ -46,11 +46,11 @@ public class InscriptionRequestTest {
                 .anyMatch(v -> v.getPropertyPath().toString().equals("pseudo"));
         boolean emailViolation = violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("email"));
-        boolean motDePasseViolation = violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("motDePasse"));
+        boolean passwordViolation = violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("password"));
 
         assertTrue(pseudoViolation);
         assertTrue(emailViolation);
-        assertTrue(motDePasseViolation);
+        assertTrue(passwordViolation);
     }
 }
