@@ -13,7 +13,6 @@ import com.jdrbibli.authservice.repository.PasswordResetTokenRepository;
 
 import jakarta.mail.internet.MimeMessage;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,7 +41,6 @@ public class UserService implements IUserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailSender = mailSender;
-        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     @Override
@@ -106,8 +105,8 @@ public class UserService implements IUserService {
     public void requestPasswordReset(String pseudo) {
         User user = getUserByPseudo(pseudo);
 
-        // Générer un code court
-        String code = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        // Générer un code de 6 caractères alphanumériques
+        String code = generateResetCode(6);
 
         // Expiration dans 24h
         long expirationTime = System.currentTimeMillis() + 24 * 60 * 60 * 1000;
@@ -117,7 +116,20 @@ public class UserService implements IUserService {
 
         userRepository.save(user);
 
+        System.out.println("Code généré : " + code);
+
         sendResetPasswordEmail(user.getEmail(), code);
+    }
+
+    // Méthode utilitaire pour générer un code alphanumérique
+    private String generateResetCode(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder code = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            code.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return code.toString();
     }
 
     /**
@@ -129,8 +141,16 @@ public class UserService implements IUserService {
         String storedCode = user.getResetCode();
         Long expiration = user.getResetPasswordCodeExpiration();
 
-        return storedCode != null && storedCode.equals(code) && expiration != null
+        boolean isValid = storedCode != null
+                && storedCode.equalsIgnoreCase(code)
+                && expiration != null
                 && expiration > System.currentTimeMillis();
+
+        System.out.println("storedCode='" + storedCode + "' | code='" + code + "'");
+        System.out.println("lengths: " + storedCode.length() + " / " + code.length());
+        System.out.println("Résultat final validateResetCode=" + isValid);
+
+        return isValid;
     }
 
     /**
@@ -215,7 +235,8 @@ public class UserService implements IUserService {
 
         // Récupérer l'utilisateur avec l'email
         User user = userRepository.findByPseudo(userPseudo)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec le pseudo " + userPseudo + " non trouvé"));
+                .orElseThrow(
+                        () -> new UserNotFoundException("Utilisateur avec le pseudo " + userPseudo + " non trouvé"));
 
         // Vérifier que le mot de passe actuel est correct
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {

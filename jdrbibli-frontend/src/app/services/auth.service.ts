@@ -1,34 +1,26 @@
+// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:8084/api/auth';
+  private apiUrl = 'http://localhost:8084/api/auth'; // Gateway URL
 
   constructor(private http: HttpClient) { }
 
-  // --- LOGIN ---
+  // ---------------- LOGIN ----------------
   login(pseudo: string, password: string): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(
-      `${this.apiUrl}/login`,
-      { pseudo, password }
-    ).pipe(
-      tap(response => {
-        localStorage.setItem('jwt', response.token);
-        console.log('Login réussi, token:', response.token);
-      }),
+    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, { pseudo, password }).pipe(
+      tap(res => localStorage.setItem('jwt', res.token)),
       catchError(this.handleError)
     );
   }
 
-  // --- USER INFO ---
   getUserInfo(): Observable<any> {
-    const token = localStorage.getItem('jwt');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any>(`${this.apiUrl}/me`, { headers })
-      .pipe(catchError(this.handleError));
+    const headers = this.authHeaders();
+    return this.http.get<any>(`${this.apiUrl}/me`, { headers }).pipe(catchError(this.handleError));
   }
 
   isLoggedIn(): boolean {
@@ -39,13 +31,13 @@ export class AuthService {
     localStorage.removeItem('jwt');
   }
 
-  // --- REGISTER ---
+  // ---------------- REGISTER ----------------
   register(pseudo: string, email: string, password: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, { pseudo, email, password })
       .pipe(catchError(this.handleError));
   }
 
-  // --- PASSWORD RESET ---
+  // ---------------- PASSWORD RESET ----------------
   requestPasswordReset(pseudo: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/password-reset/request`, { pseudo })
       .pipe(catchError(this.handleError));
@@ -56,25 +48,18 @@ export class AuthService {
       .pipe(catchError(this.handleError));
   }
 
-  changePassword(pseudo: string, newPassword: string, code: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/password-reset/change`, { pseudo, newPassword, code })
-      .pipe(catchError(this.handleError));
+  confirmReset(pseudo: string, code: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/password-reset/confirm`, {
+      pseudo: pseudo,
+      code: code,               // <-- corrige ici
+      newPassword: newPassword
+    }).pipe(catchError(this.handleError));
   }
 
-  validateResetCode(pseudo: string, code: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/validate-reset-code`, { pseudo, code })
-      .pipe(catchError(this.handleError));
-  }
 
-  resetPassword(pseudo: string, code: string, newPassword: string): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/reset-password`, { pseudo, code, newPassword })
-      .pipe(catchError(this.handleError));
-  }
-
-  // --- PROFILE ---
+  // ---------------- PROFILE ----------------
   updateProfile(pseudo: string, email: string, newPassword?: string): Observable<any> {
-    const token = localStorage.getItem('jwt');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.authHeaders();
     const body: any = { pseudo, email };
     if (newPassword) body.password = newPassword;
     return this.http.put<any>(`${this.apiUrl}/profile`, body, { headers })
@@ -82,23 +67,33 @@ export class AuthService {
   }
 
   changeProfilePassword(data: { currentPassword: string; newPassword: string; confirmNewPassword: string }): Observable<any> {
-    const token = localStorage.getItem('jwt');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.authHeaders();
     return this.http.put<any>(`${this.apiUrl}/profile/password`, data, { headers })
       .pipe(catchError(this.handleError));
   }
 
   deleteUser(pseudo: string): Observable<any> {
-    const token = localStorage.getItem('jwt');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    const headers = this.authHeaders();
     return this.http.delete<any>(`${this.apiUrl}/${pseudo}`, { headers })
       .pipe(
-        tap(response => console.log('Réponse backend deleteUser:', response)),
+        tap(res => console.log('deleteUser response:', res)),
         catchError(this.handleError)
       );
   }
 
-  // --- JWT UTIL ---
+  // ---------------- AVATAR ----------------
+  uploadAvatar(fileData: FormData): Observable<any> {
+    const headers = this.authHeaders();
+    return this.http.put<any>('http://localhost:8084/user/profile/avatar', fileData, { headers })
+      .pipe(catchError(this.handleError));
+  }
+
+  // ---------------- JWT UTIL ----------------
+  private authHeaders(): HttpHeaders {
+    const token = localStorage.getItem('jwt');
+    return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
+  }
+
   getUserIdFromToken(): number | null {
     const token = localStorage.getItem('jwt');
     if (!token) return null;
@@ -126,28 +121,15 @@ export class AuthService {
   private decodeJwt(token: string): any {
     const parts = token.split('.');
     if (parts.length !== 3) throw new Error('Token JWT invalide');
-    const decoded = atob(parts[1]);
-    return JSON.parse(decoded);
+    return JSON.parse(atob(parts[1]));
   }
 
-  // --- AVATAR ---
-  uploadAvatar(fileData: FormData): Observable<any> {
-    const token = localStorage.getItem('jwt');
-    if (!token) return throwError(() => new Error('JWT manquant'));
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.put<any>('http://localhost:8084/user/profile/avatar', fileData, { headers })
-      .pipe(catchError(this.handleError));
-  }
-
-  // --- ERROR HANDLER ---
+  // ---------------- ERROR HANDLER ----------------
   private handleError(error: HttpErrorResponse) {
-    console.error('handleError triggered avec:', error);
-    let msg = 'Erreur inconnue';
-    if (error.error instanceof ErrorEvent) {
-      msg = `Erreur: ${error.error.message}`;
-    } else {
-      msg = `Erreur serveur (${error.status}) - message: ${JSON.stringify(error.error)}`;
-    }
+    console.error('handleError triggered:', error);
+    const msg = error.error instanceof ErrorEvent
+      ? `Erreur: ${error.error.message}`
+      : `Erreur serveur (${error.status}) - message: ${JSON.stringify(error.error)}`;
     return throwError(() => new Error(msg));
   }
 }

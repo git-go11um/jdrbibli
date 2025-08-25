@@ -75,7 +75,6 @@ public class PasswordResetControllerTest {
 
         // Construire l’objet PasswordResetConfirmation JSON
         PasswordResetConfirmation confirmation = new PasswordResetConfirmation();
-        confirmation.setToken("token123");
         confirmation.setCode("code123");
         confirmation.setNewPassword("newPassword1!");
 
@@ -92,7 +91,6 @@ public class PasswordResetControllerTest {
         Mockito.when(userService.validateResetCode(anyString(), anyString())).thenReturn(false);
 
         PasswordResetConfirmation confirmation = new PasswordResetConfirmation();
-        confirmation.setToken("token123");
         confirmation.setCode("badcode");
         confirmation.setNewPassword("newPassword1!");
 
@@ -110,7 +108,6 @@ public class PasswordResetControllerTest {
                 .thenThrow(new RuntimeException("Erreur inattendue"));
 
         PasswordResetConfirmation confirmation = new PasswordResetConfirmation();
-        confirmation.setToken("token123");
         confirmation.setCode("code123");
         confirmation.setNewPassword("newPassword1!");
 

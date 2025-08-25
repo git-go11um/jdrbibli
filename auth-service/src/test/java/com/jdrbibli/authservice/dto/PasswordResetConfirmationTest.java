@@ -10,12 +10,10 @@ public class PasswordResetConfirmationTest {
         PasswordResetConfirmation prc = new PasswordResetConfirmation(
                 "userPseudo",
                 "resetCode123",
-                "tokenXYZ",
                 "newPass456");
 
         assertEquals("userPseudo", prc.getPseudo());
         assertEquals("resetCode123", prc.getCode());
-        assertEquals("tokenXYZ", prc.getToken());
         assertEquals("newPass456", prc.getNewPassword());
     }
 
@@ -25,12 +23,10 @@ public class PasswordResetConfirmationTest {
 
         prc.setPseudo("pseudoSetter");
         prc.setCode("codeSetter");
-        prc.setToken("tokenSetter");
         prc.setNewPassword("passSetter");
 
         assertEquals("pseudoSetter", prc.getPseudo());
         assertEquals("codeSetter", prc.getCode());
-        assertEquals("tokenSetter", prc.getToken());
         assertEquals("passSetter", prc.getNewPassword());
     }
 }

@@ -24,14 +24,24 @@ public class SecurityConfig {
                     return config;
                 }))
                 .authorizeExchange(exchanges -> exchanges
+                        // Autoriser toutes les requêtes OPTIONS (préflight)
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .pathMatchers("/api/auth/**").permitAll()
-                        .anyExchange().authenticated())
 
+                        // Endpoints publics du microservice auth-service
+                        .pathMatchers("/api/auth/login").permitAll()
+                        .pathMatchers("/api/auth/register").permitAll()
+                        .pathMatchers("/api/auth/password-reset/request").permitAll()
+                        .pathMatchers("/api/auth/password-reset/verify-code").permitAll()
+                        .pathMatchers("/api/auth/password-reset/confirm").permitAll()
+                        .pathMatchers("/api/auth/validate-reset-code").permitAll()
+                        .pathMatchers("/api/auth/password-reset/change").permitAll()
+                        
+
+                        // Toutes les autres requêtes nécessitent authentification
+                        .anyExchange().authenticated())
                 .httpBasic().disable()
                 .formLogin().disable();
 
         return http.build();
     }
-
 }

@@ -2,20 +2,18 @@ package com.jdrbibli.authservice.dto;
 
 public class PasswordResetConfirmation {
 
-    private String pseudo; // Ajout du pseudo pour identifier l'utilisateur
-    private String code; // Code de réinitialisation envoyé par email
-    private String token; // Le token généré pour la réinitialisation
-    private String newPassword; // Nouveau mot de passe
-
-    // Constructeurs
+    private String pseudo;
+    private String code;
+    private String newPassword;
 
     public PasswordResetConfirmation() {
     }
 
-    public PasswordResetConfirmation(String pseudo, String code, String token, String newPassword) {
+    // Constructeurs
+
+    public PasswordResetConfirmation(String pseudo, String code, String newPassword) {
         this.pseudo = pseudo;
         this.code = code;
-        this.token = token;
         this.newPassword = newPassword;
     }
 
@@ -37,13 +35,7 @@ public class PasswordResetConfirmation {
         this.code = code;
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
+    
 
     public String getNewPassword() {
         return newPassword;

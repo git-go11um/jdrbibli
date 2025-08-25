@@ -52,5 +52,8 @@ export class ResetPasswordRequestComponent {
         this.loading = false;
       }
     });
+    console.log('Pseudo envoyé pour reset:', this.pseudo);
+
   }
+  
 }
