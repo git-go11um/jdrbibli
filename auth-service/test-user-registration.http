@@ -1,0 +1,27 @@
+### 1. Inscription d’un nouvel utilisateur
+POST http://localhost:8084/auth/register
+Content-Type: application/json
+
+{
+  "pseudo": "nouveauUser",
+  "email": "nouveau@user.com",
+  "password": "T@u123456789"
+}
+
+###
+
+# 2. Connexion avec ce nouvel utilisateur
+POST http://localhost:8084/auth/login
+Content-Type: application/json
+
+{
+  "pseudo": "nouveauUser",
+  "password": "secret123"
+}
+
+###
+
+# 3. (À FAIRE APRES : remplacer <TOKEN> par celui reçu au login ci-dessus)
+#    Vérification du profil utilisateur créé automatiquement dans user-service
+GET http://localhost:8084/user/profile/me
+Authorization: Bearer <TOKEN>

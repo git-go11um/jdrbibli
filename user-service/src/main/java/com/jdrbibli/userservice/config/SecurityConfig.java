@@ -2,6 +2,7 @@ package com.jdrbibli.userservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,13 +20,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/test/**").permitAll() // endpoints publics
-                .requestMatchers("/user/**", "/api/users/**").authenticated() // endpoints sécurisés
-                .anyRequest().permitAll()
-            )
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/test/**").permitAll() // endpoints publics
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // autoriser création de profil
+                                                                                    // depuis auth-service
+                        .requestMatchers("/user/**", "/api/users/**").authenticated() // tous les autres endpoints
+                                                                                      // sécurisés
+                        .anyRequest().permitAll())
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

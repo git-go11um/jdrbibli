@@ -47,6 +47,15 @@ public class JwtAuthenticationFilter implements jakarta.servlet.Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        String path = httpRequest.getServletPath();
+
+        // Ignorer certaines routes publiques
+        if ((path.equals("/api/users") && httpRequest.getMethod().equals("POST")) ||
+                path.startsWith("/test/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = httpRequest.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -63,12 +72,10 @@ public class JwtAuthenticationFilter implements jakarta.servlet.Filter {
                 String username = claims.getSubject(); // pseudo
                 log.info("Authentification JWT réussie pour l'utilisateur : {}", username);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                Collections.singleton(new SimpleGrantedAuthority("USER"))
-                        );
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        Collections.singleton(new SimpleGrantedAuthority("USER")));
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -84,4 +91,5 @@ public class JwtAuthenticationFilter implements jakarta.servlet.Filter {
 
         chain.doFilter(request, response);
     }
+
 }

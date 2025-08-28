@@ -1,6 +1,7 @@
 package com.jdrbibli.userservice.service;
 
 import com.jdrbibli.userservice.dto.OuvrageDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -12,18 +13,21 @@ public class UserLudothequeService {
 
     private final WebClient webClient;
 
+    @Autowired
     public UserLudothequeService(WebClient webClient) {
         this.webClient = webClient;
     }
 
     /**
      * Récupérer la liste des ouvrages complets depuis ouvrage-service via gateway.
+     * 
      * @param ouvrageIds Liste des IDs à chercher
      * @return Liste de OuvrageDTO
      */
     public List<OuvrageDTO> getOuvragesByIds(List<Long> ouvrageIds) {
-        // Ici on imagine que tu as un endpoint GET dans ouvrage-service comme :
-        // GET /ouvrages?ids=1,2,3
+        if (ouvrageIds == null || ouvrageIds.isEmpty()) {
+            return List.of();
+        }
 
         // Transforme liste en string "1,2,3"
         String idsParam = String.join(",", ouvrageIds.stream().map(String::valueOf).toList());
@@ -35,13 +39,24 @@ public class UserLudothequeService {
                 .bodyToFlux(OuvrageDTO.class)
                 .collectList();
 
-        return response.block(); //  block() => pour faire simple ici, à adapter en asynchrone plus tard
+        return response.block(); // blocage pour simplifier, tu pourras plus tard le rendre async
     }
+
+    /**
+     * Récupérer un ouvrage unique par son ID via gateway.
+     * 
+     * @param ouvrageId ID de l'ouvrage
+     * @return OuvrageDTO ou null si non trouvé
+     */
     public OuvrageDTO getOuvrageById(Long ouvrageId) {
-    return webClient.get()
-            .uri("/ouvrage-service/ouvrages/" + ouvrageId) // via gateway
-            .retrieve()
-            .bodyToMono(OuvrageDTO.class)
-            .block(); // blocage pour simplifier
-}
+        if (ouvrageId == null) {
+            return null;
+        }
+
+        return webClient.get()
+                .uri("/ouvrage-service/ouvrages/" + ouvrageId)
+                .retrieve()
+                .bodyToMono(OuvrageDTO.class)
+                .block(); // blocage pour simplifier
+    }
 }

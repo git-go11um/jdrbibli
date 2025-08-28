@@ -1,0 +1,27 @@
+### 1️⃣ Test POST /api/auth/login - récupération du token
+POST http://localhost:8084/api/auth/login
+Content-Type: application/json
+
+{
+    "pseudo": "ata2",
+    "motDePasse": "T@u1234567891"
+}
+
+### 2️⃣ Copier le token retourné dans les requêtes suivantes
+# Exemple de réponse attendue :
+# {
+#   "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhdGEyIiwiaWF0IjoxNzU2MTUzNzQwLCJleHAiOjE3NTYxNTczNDB9.RUn5wcIgQ9QZUX0H6dFZhlzNp2XWulizvmY0_VreD7M"
+# }
+
+### 3️⃣ Test GET /api/auth/me via gateway avec Authorization
+# Remplace <VOTRE_TOKEN_ICI> par le token récupéré à l'étape 1
+GET http://localhost:8084/api/auth/me
+Authorization: Bearer <VOTRE_TOKEN_ICI>
+Accept: application/json
+
+### 4️⃣ Test GET /api/auth/me directement sur auth-service (pour comparaison)
+# Ici tu dois ajouter X-User-Name pour que ça fonctionne
+GET http://localhost:8081/auth/me
+X-User-Name: ata2
+Authorization: Bearer <VOTRE_TOKEN_ICI>
+Accept: application/json

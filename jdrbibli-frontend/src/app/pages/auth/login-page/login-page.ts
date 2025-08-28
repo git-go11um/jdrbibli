@@ -37,7 +37,12 @@ export class LoginPage {
       },
       error: (err) => {
         console.error('Erreur de login', err);
-        this.errorMessage = err.message;
+
+        if (err.error && err.error.message) {
+          this.errorMessage = err.error.message;  // message fourni par ton backend
+        } else {
+          this.errorMessage = 'Échec de la connexion. Vérifiez vos identifiants.';
+        }
       }
     });
   }

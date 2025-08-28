@@ -45,6 +45,11 @@ public class JwtAuthenticationFilter implements WebFilter {
         String path = exchange.getRequest().getPath().value();
         HttpMethod method = exchange.getRequest().getMethod();
 
+        // 🔹 Afficher tous les headers pour debug
+        exchange.getRequest().getHeaders().forEach((name, values) -> {
+            values.forEach(value -> System.out.println(name + " = " + value));
+        });
+
         // 1️⃣ Laisser passer OPTIONS et endpoints publics
         if (method == HttpMethod.OPTIONS || PUBLIC_PATHS.stream().anyMatch(path::startsWith)) {
             log.debug(">>> Endpoint public ou requête OPTIONS, pas de vérification JWT pour {}", path);
@@ -71,7 +76,7 @@ public class JwtAuthenticationFilter implements WebFilter {
             log.info("JWT valide pour l'utilisateur : {}", username);
 
             exchange = exchange.mutate()
-                    .request(r -> r.header("X-User-Name", username))
+                    .request(r -> r.headers(headers -> headers.set("Authorization", "Bearer " + token)))
                     .build();
 
         } catch (Exception e) {

@@ -10,7 +10,7 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8084") // URL de ton gateway local
+                .baseUrl("http://localhost:8084") // Gateway
                 .build();
     }
 }

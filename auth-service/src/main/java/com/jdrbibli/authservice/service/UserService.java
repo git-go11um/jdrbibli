@@ -12,6 +12,7 @@ import com.jdrbibli.authservice.util.PasswordValidator;
 import com.jdrbibli.authservice.repository.PasswordResetTokenRepository;
 
 import jakarta.mail.internet.MimeMessage;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,11 +21,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class UserService implements IUserService {
@@ -32,6 +41,7 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Autowired
     private PasswordResetTokenRepository passwordResetTokenRepository;
@@ -48,7 +58,20 @@ public class UserService implements IUserService {
         PasswordValidator.validate(password);
         String hashedPassword = passwordEncoder.encode(password);
         User newUser = new User(null, pseudo, email, hashedPassword, new HashSet<>(), null, null);
-        return userRepository.save(newUser);
+        // Sauvegarde local auth-service
+        User savedUser = userRepository.save(newUser);
+
+        // Tentative de création non-bloquante du profil côté user-service
+        try {
+            createUserProfile(savedUser.getPseudo(), savedUser.getEmail());
+        } catch (Exception e) {
+            // Ne pas empêcher l'inscription si user-service est down — journaliser l'erreur
+            System.err.println("Échec création profil user-service pour pseudo=" + savedUser.getPseudo()
+                    + " : " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return savedUser;
     }
 
     @Override
@@ -249,6 +272,40 @@ public class UserService implements IUserService {
 
         // Sauvegarder l'utilisateur avec le nouveau mot de passe
         userRepository.save(user);
+    }
+
+    private void createUserProfile(String pseudo, String email) {
+        String url = "http://localhost:8082/api/users"; // endpoint user-service
+        RestTemplate restTemplate = new RestTemplate();
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("pseudo", pseudo);
+        body.put("email", email);
+
+        restTemplate.postForEntity(url, body, Void.class);
+    }
+
+    public void testUserServiceConnection() {
+        String url = "http://localhost:8082/api/users"; // URL user-service
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // JSON minimal pour créer un UserProfile
+        String jsonBody = "{ \"pseudo\": \"testHttp\", \"email\": \"testHttp@user.com\" }";
+        HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+            System.out.println("Réponse user-service : " + response.getStatusCode() + " | " + response.getBody());
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'appel à user-service : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @PostConstruct
+    public void init() {
+        testUserServiceConnection();
     }
 
 }

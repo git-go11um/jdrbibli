@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -120,9 +122,13 @@ public class AuthController {
 
     // ------------------- UTILISATEUR CONNECTÉ -------------------
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         try {
-            String pseudo = authentication.getName();
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Utilisateur non authentifié"));
+            }
+            String pseudo = userDetails.getUsername();
             User user = userService.getUserByPseudo(pseudo);
             return ResponseEntity.ok(userService.toDTO(user));
         } catch (Exception e) {
