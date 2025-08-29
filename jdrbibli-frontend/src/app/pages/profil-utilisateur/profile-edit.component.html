@@ -7,20 +7,7 @@
         <label>Email :</label>
         <input type="email" [(ngModel)]="email" name="email" required />
 
-        <!-- Nouveau champ mot de passe -->
-        <label for="newPassword">Nouveau mot de passe :</label>
-        <input type="password" id="newPassword" name="newPassword" [(ngModel)]="newPassword" />
-
-        <!-- Confirmation du mot de passe -->
-        <label for="confirmNewPassword">Confirmez le mot de passe :</label>
-        <input type="password" id="confirmNewPassword" name="confirmNewPassword" [(ngModel)]="confirmNewPassword" />
-
-        <!-- Message d'erreur si les mots de passe ne correspondent pas -->
-        <div *ngIf="passwordMismatch" style="color: red;">
-            Les mots de passe ne correspondent pas !
-        </div>
-
-        <button type="submit" [disabled]="profileForm.invalid || passwordMismatch">Mettre à jour</button>
+        <button type="submit" [disabled]="profileForm.invalid">Mettre à jour</button>
     </form>
 
     <div *ngIf="message" [style.color]="error ? 'red' : 'green'">{{ message }}</div>

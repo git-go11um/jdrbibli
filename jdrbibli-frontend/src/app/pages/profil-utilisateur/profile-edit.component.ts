@@ -8,14 +8,11 @@ import { RouterModule } from '@angular/router';
     selector: 'app-profile-edit',
     standalone: true,
     imports: [CommonModule, FormsModule, RouterModule],
-    templateUrl: './profile-edit.component.html', // On a extrait le HTML
+    templateUrl: './profile-edit.component.html',
 })
 export class ProfileEditComponent implements OnInit {
     pseudo = '';
     email = '';
-    newPassword = '';            // Nouveau mot de passe
-    confirmNewPassword = '';     // Confirmation du mot de passe
-    passwordMismatch = false;    // Validation de correspondance des mots de passe
     loading = true;
     message = '';
     error = false;
@@ -37,25 +34,11 @@ export class ProfileEditComponent implements OnInit {
         });
     }
 
-    // Vérifie que les mots de passe correspondent
-    checkPasswordMatch() {
-        this.passwordMismatch = this.newPassword !== this.confirmNewPassword;
-    }
-
     onSubmit() {
         this.message = '';
         this.error = false;
 
-        // Vérifier si les mots de passe correspondent
-        this.checkPasswordMatch();
-        if (this.passwordMismatch) {
-            return; // Ne pas soumettre si les mots de passe ne correspondent pas
-        }
-
-        // Préparer les données
-        const passwordToUpdate = this.newPassword ? this.newPassword : undefined;
-
-        this.authService.updateProfile(this.pseudo, this.email, passwordToUpdate).subscribe({
+        this.authService.updateProfile(this.pseudo, this.email).subscribe({
             next: () => {
                 this.message = 'Profil mis à jour avec succès.';
                 this.error = false;
@@ -67,10 +50,4 @@ export class ProfileEditComponent implements OnInit {
             },
         });
     }
-
-
-
-
-
-
 }
