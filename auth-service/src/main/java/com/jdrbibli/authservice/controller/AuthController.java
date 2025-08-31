@@ -202,16 +202,30 @@ public class AuthController {
     @PutMapping("/profile")
     public ResponseEntity<?> updateUserProfile(@RequestBody UpdateUserRequest request,
             Principal principal) {
+        System.out.println("PUT /auth/profile appelé pour pseudo=" + principal.getName());
         try {
+            // Récupération de l'utilisateur actuel
             User user = userService.getUserByPseudo(principal.getName());
-            userService.updateUserProfile(user.getId(), request.getPseudo(), request.getEmail());
-            return ResponseEntity.ok(new ReponseProfileChange("Profil mis à jour avec succès"));
+
+            // Mise à jour des infos
+            ReponseProfileChange response = userService.updateUserProfile(user.getId(), request.getPseudo(),
+                    request.getEmail());
+
+            // Génération d'un nouveau JWT
+            String newToken = jwtService.generateToken(request.getPseudo());
+
+            // Retourner le message + nouveau JWT
+            return ResponseEntity.ok(Map.of(
+                    "message", response.getMessage(),
+                    "token", newToken));
+
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ReponseProfileChange(e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage(), "token", null));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Erreur serveur : " + e.getMessage()));
+                    .body(Map.of("message", "Erreur serveur : " + e.getMessage(), "token", null));
         }
     }
 

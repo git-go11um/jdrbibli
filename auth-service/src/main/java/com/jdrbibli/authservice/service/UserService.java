@@ -2,12 +2,14 @@ package com.jdrbibli.authservice.service;
 
 import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
 import com.jdrbibli.authservice.dto.ChangePasswordRequest;
+import com.jdrbibli.authservice.dto.ReponseProfileChange;
 import com.jdrbibli.authservice.dto.UserResponseDTO;
 import com.jdrbibli.authservice.entity.Role;
 import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.exception.BadCredentialsException;
 import com.jdrbibli.authservice.exception.UserNotFoundException;
 import com.jdrbibli.authservice.repository.UserRepository;
+import com.jdrbibli.authservice.security.JwtTokenProvider;
 import com.jdrbibli.authservice.util.PasswordValidator;
 import com.jdrbibli.authservice.repository.PasswordResetTokenRepository;
 
@@ -20,11 +22,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
 import java.util.HashSet;
@@ -41,16 +44,23 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final JwtTokenProvider jwtTokenProvider;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Autowired
-    private PasswordResetTokenRepository passwordResetTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JavaMailSender mailSender) {
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JavaMailSender mailSender,
+            JwtTokenProvider jwtTokenProvider,
+            PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailSender = mailSender;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     @Override
@@ -231,19 +241,85 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void updateUserProfile(Long userId, String newPseudo, String newEmail) {
+    public ReponseProfileChange updateUserProfile(Long userId, String newPseudo, String newEmail) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
 
-        if (newPseudo != null && !newPseudo.trim().isEmpty()) {
+        String oldPseudo = user.getPseudo();
+        boolean pseudoChanged = false;
+        boolean emailChanged = false;
+
+        if (newPseudo != null && !newPseudo.trim().isEmpty() && !newPseudo.equals(oldPseudo)) {
+            System.out.println("🔄 Pseudo modifié : " + oldPseudo + " → " + newPseudo);
             user.setPseudo(newPseudo);
+            pseudoChanged = true;
         }
 
-        if (newEmail != null && !newEmail.trim().isEmpty()) {
+        if (newEmail != null && !newEmail.trim().isEmpty() && !newEmail.equals(user.getEmail())) {
+            System.out.println("🔄 Email modifié : " + user.getEmail() + " → " + newEmail);
             user.setEmail(newEmail);
+            emailChanged = true;
         }
 
+        if (!pseudoChanged && !emailChanged) {
+            System.out.println("ℹ️ Aucun changement détecté, rien à mettre à jour.");
+            return new ReponseProfileChange("Aucun changement détecté.", null);
+        }
+
+        // Sauvegarde dans auth-db
         userRepository.save(user);
+        System.out.println("✅ Utilisateur mis à jour dans auth-db : " + user.getPseudo());
+
+        // Générer un nouveau token JWT
+        String newToken = jwtTokenProvider.createToken(user.getPseudo());
+
+        // Synchronisation avec user-service
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // AJOUT DU JWT
+            headers.set("Authorization", "Bearer " + newToken);
+
+            Map<String, String> body = new HashMap<>();
+            body.put("pseudo", user.getPseudo());
+            body.put("email", user.getEmail());
+
+            HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+
+            // 1️⃣ Rechercher le profil dans user-service avec l'ancien pseudo
+            String searchUrl = "http://localhost:8082/api/users/search?pseudo=" + oldPseudo;
+            System.out.println("➡️ Appel GET " + searchUrl);
+
+            ResponseEntity<Map> searchResponse = restTemplate.getForEntity(searchUrl, Map.class);
+            System.out.println("⬅️ Réponse user-service : " + searchResponse.getStatusCode());
+
+            if (searchResponse.getStatusCode().is2xxSuccessful() && searchResponse.getBody() != null) {
+                Object profileIdObj = searchResponse.getBody().get("id");
+
+                if (profileIdObj != null) {
+                    String updateUrl = "http://localhost:8082/api/users/" + profileIdObj;
+                    System.out.println("➡️ Appel PUT " + updateUrl + " avec body=" + body);
+                    restTemplate.exchange(updateUrl, HttpMethod.PUT, request, Map.class);
+                    System.out.println("✅ Profil user-service mis à jour : " + user.getPseudo());
+                } else {
+                    System.out.println("⚠️ Profil trouvé mais pas d'ID → création forcée.");
+                    createUserProfile(user.getPseudo(), user.getEmail());
+                }
+            } else {
+                // 2️⃣ Profil non existant → création
+                System.out.println("⚠️ Aucun profil trouvé → création");
+                createUserProfile(user.getPseudo(), user.getEmail());
+            }
+
+        } catch (Exception e) {
+            System.err
+                    .println("❌ Erreur synchronisation user-service pour " + user.getPseudo() + " : " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return new ReponseProfileChange("Profil mis à jour avec succès.", newToken);
     }
 
     @Override
@@ -301,11 +377,6 @@ public class UserService implements IUserService {
             System.err.println("Erreur lors de l'appel à user-service : " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    @PostConstruct
-    public void init() {
-        testUserServiceConnection();
     }
 
 }

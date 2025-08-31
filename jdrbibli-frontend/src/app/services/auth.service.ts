@@ -7,6 +7,17 @@ import { catchError, tap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = 'http://localhost:8084/api/auth'; // Gateway URL
+  private currentUser: any = null;
+
+  setUserInfo(user: any) {
+    this.currentUser = user;
+    // Si tu utilises localStorage pour persister l’utilisateur
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  setToken(token: string) {
+    localStorage.setItem('token', token);
+  }
 
   constructor(private http: HttpClient) { }
 
@@ -62,9 +73,18 @@ export class AuthService {
     const headers = this.authHeaders();
     const body: any = { pseudo, email };
     if (newPassword) body.password = newPassword;
+
     return this.http.put<any>(`${this.apiUrl}/profile`, body, { headers })
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap(res => {
+          if (res.token) {
+            localStorage.setItem('jwt', res.token); // met à jour le token
+          }
+        }),
+        catchError(this.handleError)
+      );
   }
+
 
   changeProfilePassword(data: { currentPassword: string; newPassword: string; confirmNewPassword: string }): Observable<any> {
     const headers = this.authHeaders();

@@ -68,6 +68,25 @@ public class UserProfileController {
     }
 
     /**
+     * Mettre à jour un utilisateur existant par ID.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<UserProfile> updateUser(
+            @PathVariable Long id,
+            @RequestBody UserProfile updatedProfile) {
+
+        return userProfileService.getUserById(id)
+                .map(existingUser -> {
+                    existingUser.setPseudo(updatedProfile.getPseudo());
+                    existingUser.setEmail(updatedProfile.getEmail());
+                    // Ajoute d'autres champs si besoin
+                    UserProfile saved = userProfileService.createUser(existingUser); // ou updateUser()
+                    return ResponseEntity.ok(saved);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
      * Rechercher un utilisateur par pseudo.
      */
     @GetMapping("/search")

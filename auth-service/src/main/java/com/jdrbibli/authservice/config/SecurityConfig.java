@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/password-reset/verify-code").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/password-reset/confirm").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/profile").permitAll()
 
                         // Endpoints nécessitant authentification
                         .requestMatchers(HttpMethod.PUT, "/auth/profile/password").authenticated()

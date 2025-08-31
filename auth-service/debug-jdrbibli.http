@@ -1,0 +1,54 @@
+### 1️⃣ Inscription utilisateur
+POST http://localhost:8084/api/auth/register
+Content-Type: application/json
+
+{
+  "pseudo": "bbb",
+  "email": "bbb@gg.com",
+  "password": "T@u123456789"
+}
+
+### 2️⃣ Login pour récupérer JWT
+POST http://localhost:8084/api/auth/login
+Content-Type: application/json
+
+{
+  "pseudo": "bbb",
+  "password": "T@u123456789"
+}
+
+### 3️⃣ Vérification du token
+GET http://localhost:8084/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiYmIiLCJpYXQiOjE3NTY2NjcyNzgsImV4cCI6MTc1NjY3MDg3OH0.URVAFcA-I6Y-luwvCJFgNmyLTFgzTUK6OasbmGzTe0E
+
+
+
+### 4️⃣ Modification du profil
+PUT http://localhost:8084/api/auth/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiYmIiLCJpYXQiOjE3NTY2NjcyNzgsImV4cCI6MTc1NjY3MDg3OH0.URVAFcA-I6Y-luwvCJFgNmyLTFgzTUK6OasbmGzTe0E
+Content-Type: application/json
+
+{
+  "pseudo": "bbb-modif",
+  "email": "bbb-modif@gg.com"
+}
+
+### 5️⃣ Vérification côté user-service (profil existant)
+GET http://localhost:8082/api/users/search?pseudo=bbb-modif
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiYmIiLCJpYXQiOjE3NTY2NjcyNzgsImV4cCI6MTc1NjY3MDg3OH0.URVAFcA-I6Y-luwvCJFgNmyLTFgzTUK6OasbmGzTe0E
+Accept: application/json
+
+### 6️⃣ Si profil non trouvé, tentative création via auth-service (pour test)
+POST http://localhost:8084/api/auth/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiYmIiLCJpYXQiOjE3NTY2NjcyNzgsImV4cCI6MTc1NjY3MDg3OH0.URVAFcA-I6Y-luwvCJFgNmyLTFgzTUK6OasbmGzTe0E
+Content-Type: application/json
+
+{
+  "pseudo": "bbb-modif",
+  "email": "bbb-modif@gg.com"
+}
+
+### Rechercher un utilisateur par pseudo
+GET http://localhost:8082/api/users/search?pseudo=bbb-modif
+Accept: application/json
+

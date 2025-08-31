@@ -7,7 +7,7 @@ public class ReponseProfileChangeTest {
 
     @Test
     void testConstructorAndGetter() {
-        ReponseProfileChange response = new ReponseProfileChange("Modification réussie");
+        ReponseProfileChange response = new ReponseProfileChange("Modification réussie", null);
         assertEquals("Modification réussie", response.getMessage());
     }
 

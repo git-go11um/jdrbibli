@@ -20,6 +20,12 @@ export class ProfileEditComponent implements OnInit {
     constructor(private authService: AuthService) { }
 
     ngOnInit() {
+        this.loadUserInfo();
+    }
+
+    // Charge les infos utilisateur depuis le service
+    loadUserInfo() {
+        this.loading = true;
         this.authService.getUserInfo().subscribe({
             next: (user) => {
                 this.pseudo = user.pseudo;
@@ -39,9 +45,17 @@ export class ProfileEditComponent implements OnInit {
         this.error = false;
 
         this.authService.updateProfile(this.pseudo, this.email).subscribe({
-            next: () => {
-                this.message = 'Profil mis à jour avec succès.';
+            next: (res: any) => { //-- res contient maintenant { message, token }
+                // Mettre à jour le token dans le localStorage pour éviter le 403
+                if (res.token) {
+                    this.authService.setToken(res.token); //-- mise à jour du JWT
+                }
+
+                this.message = res.message || 'Profil mis à jour avec succès.';
                 this.error = false;
+
+                // Recharger les infos utilisateur avec le nouveau token
+                this.loadUserInfo(); //-- rafraîchit la page sans devoir se reconnecter
             },
             error: (err) => {
                 console.error('Erreur mise à jour profil:', err);
