@@ -1,54 +1,49 @@
-### 1️⃣ Inscription utilisateur
+### 1. Créer un utilisateur dans auth-service
 POST http://localhost:8084/api/auth/register
 Content-Type: application/json
 
 {
-  "pseudo": "bbb",
-  "email": "bbb@gg.com",
+  "pseudo": "testuser",
+  "email": "testuser@example.com",
   "password": "T@u123456789"
 }
 
-### 2️⃣ Login pour récupérer JWT
+### 2. Connexion pour récupérer le token JWT
 POST http://localhost:8084/api/auth/login
 Content-Type: application/json
 
 {
-  "pseudo": "bbb",
+  "pseudo": "aaa",
   "password": "T@u123456789"
 }
 
-### 3️⃣ Vérification du token
-GET http://localhost:8084/api/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiYmIiLCJpYXQiOjE3NTY2NjcyNzgsImV4cCI6MTc1NjY3MDg3OH0.URVAFcA-I6Y-luwvCJFgNmyLTFgzTUK6OasbmGzTe0E
+### Copier le token reçu dans la réponse et remplacer ci-dessous
+# Exemple : Authorization: Bearer <VOTRE_JWT_ICI>
 
-
-
-### 4️⃣ Modification du profil
-PUT http://localhost:8084/api/auth/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiYmIiLCJpYXQiOjE3NTY2NjcyNzgsImV4cCI6MTc1NjY3MDg3OH0.URVAFcA-I6Y-luwvCJFgNmyLTFgzTUK6OasbmGzTe0E
+### 3. Créer l’utilisateur côté user-service
+POST http://localhost:8082/api/users
 Content-Type: application/json
 
 {
-  "pseudo": "bbb-modif",
-  "email": "bbb-modif@gg.com"
+  "id": 1,  # <-- mettre ici l'ID renvoyé par auth-service
+  "pseudo": "testuser",
+  "email": "testuser@example.com"
 }
 
-### 5️⃣ Vérification côté user-service (profil existant)
-GET http://localhost:8082/api/users/search?pseudo=bbb-modif
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiYmIiLCJpYXQiOjE3NTY2NjcyNzgsImV4cCI6MTc1NjY3MDg3OH0.URVAFcA-I6Y-luwvCJFgNmyLTFgzTUK6OasbmGzTe0E
-Accept: application/json
+### 4. Récupérer l’utilisateur par ID
+GET http://localhost:8082/api/users/122
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYWEiLCJpYXQiOjE3NTcxOTA2NjgsImV4cCI6MTc1NzE5NDI2OH0.hsApdIEu_9DeXOQi5bMG1rEf9jPRRrrfGfm3EbmmwM8
 
-### 6️⃣ Si profil non trouvé, tentative création via auth-service (pour test)
-POST http://localhost:8084/api/auth/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJiYmIiLCJpYXQiOjE3NTY2NjcyNzgsImV4cCI6MTc1NjY3MDg3OH0.URVAFcA-I6Y-luwvCJFgNmyLTFgzTUK6OasbmGzTe0E
+### 5. Mettre à jour l’utilisateur
+PUT http://localhost:8082/api/users/1
+Authorization: Bearer <VOTRE_JWT_ICI>
 Content-Type: application/json
 
 {
-  "pseudo": "bbb-modif",
-  "email": "bbb-modif@gg.com"
+  "pseudo": "testuser_updated",
+  "email": "testuser_updated@example.com"
 }
 
-### Rechercher un utilisateur par pseudo
-GET http://localhost:8082/api/users/search?pseudo=bbb-modif
-Accept: application/json
-
+### 6. Supprimer l’utilisateur
+DELETE http://localhost:8082/api/users/by-pseudo/testuser_updated
+Authorization: Bearer <VOTRE_JWT_ICI>

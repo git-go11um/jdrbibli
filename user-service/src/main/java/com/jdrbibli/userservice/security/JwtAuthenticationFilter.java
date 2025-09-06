@@ -29,11 +29,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // Debug : afficher tous les headers
-        request.getHeaderNames().asIterator()
-                .forEachRemaining(h -> System.out.println(h + " = " + request.getHeader(h)));
-
         System.out.println("Header Authorization reçu : " + authHeader);
+
+        // 🔹 Debug : afficher secret et clé utilisée côté user-service
+        System.out.println("Secret JWT côté user-service : " + jwtService.getJwtSecret());
+        System.out.println("Clé signing côté user-service : " + jwtService.getSigningKeyForDebug());
 
         final String jwt;
         final String pseudo;
@@ -43,30 +43,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Extraire le token brut
         jwt = authHeader.substring(7);
         System.out.println("Token reçu : " + jwt);
 
-        // Extraire le pseudo
-        pseudo = jwtService.extractPseudo(jwt);
+        try {
+            pseudo = jwtService.extractPseudo(jwt);
+            System.out.println("Pseudo extrait du token : " + pseudo);
 
-        if (pseudo != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // ⚡ Ici on ne va pas chercher un vrai UserDetails (pas besoin de password dans
-            // user-service)
-            User userDetails = new User(pseudo, "", Collections.emptyList());
+            if (pseudo != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                User userDetails = new User(pseudo, "", Collections.emptyList());
 
-            if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
+                if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+
+        } catch (Exception e) {
+            // 🔹 Affiche l'erreur si le token est invalide
+            System.err.println("Erreur JWT : " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);
     }
+
 }

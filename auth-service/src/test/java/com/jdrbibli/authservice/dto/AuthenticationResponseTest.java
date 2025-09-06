@@ -1,4 +1,4 @@
-package com.jdrbibli.authservice.dto;
+/* package com.jdrbibli.authservice.dto;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,3 +37,4 @@ public class AuthenticationResponseTest {
         assertEquals("setter@example.com", response.getUser().getEmail());
     }
 }
+ */

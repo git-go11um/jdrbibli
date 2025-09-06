@@ -1,9 +1,9 @@
 package com.jdrbibli.userservice.controller;
 
 import com.jdrbibli.userservice.dto.FriendDTO;
-import com.jdrbibli.userservice.entity.UserProfile;
+import com.jdrbibli.userservice.dto.UserProfileDTO;
+import com.jdrbibli.userservice.entity.User;
 import com.jdrbibli.userservice.service.UserProfileService;
-import com.jdrbibli.userservice.utils.JwtUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -32,82 +32,60 @@ public class UserProfileController {
         this.userProfileService = userProfileService;
     }
 
-    /**
-     * Récupérer tous les utilisateurs.
-     */
+    /** Récupérer tous les utilisateurs */
     @GetMapping
-    public List<UserProfile> getAllUsers() {
+    public List<User> getAllUsers() {
         return userProfileService.getAllUsers();
     }
 
-    /**
-     * Récupérer un utilisateur par ID.
-     */
+    /** Récupérer un utilisateur par ID */
     @GetMapping("/{id}")
-    public ResponseEntity<UserProfile> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return userProfileService.getUserById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Créer un nouvel utilisateur.
-     */
-    @PostMapping
-    public UserProfile createUser(@RequestBody UserProfile userProfile) {
-        return userProfileService.createUser(userProfile);
-    }
-
-    /**
-     * Supprimer un utilisateur par ID.
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userProfileService.deleteUser(id);
+    /** Supprimer un utilisateur par pseudo */
+    @DeleteMapping("/by-pseudo/{pseudo}")
+    public ResponseEntity<Void> deleteUserByPseudo(@PathVariable String pseudo) {
+        userProfileService.deleteUserByPseudo(pseudo);
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Mettre à jour un utilisateur existant par ID.
-     */
+    /** Mettre à jour un utilisateur existant par ID */
     @PutMapping("/{id}")
-    public ResponseEntity<UserProfile> updateUser(
+    public ResponseEntity<UserProfileDTO> updateUser(
             @PathVariable Long id,
-            @RequestBody UserProfile updatedProfile) {
+            @RequestBody UserProfileDTO dto) {
 
         return userProfileService.getUserById(id)
                 .map(existingUser -> {
-                    existingUser.setPseudo(updatedProfile.getPseudo());
-                    existingUser.setEmail(updatedProfile.getEmail());
-                    // Ajoute d'autres champs si besoin
-                    UserProfile saved = userProfileService.createUser(existingUser); // ou updateUser()
-                    return ResponseEntity.ok(saved);
+                    existingUser.setPseudo(dto.getPseudo());
+                    existingUser.setEmail(dto.getEmail());
+                    UserProfileDTO updated = userProfileService.createUser(
+                            new UserProfileDTO(existingUser.getPseudo(), existingUser.getEmail()));
+                    return ResponseEntity.ok(updated);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Rechercher un utilisateur par pseudo.
-     */
+    /** Rechercher un utilisateur par pseudo */
     @GetMapping("/search")
-    public ResponseEntity<UserProfile> searchUserByPseudo(@RequestParam String pseudo) {
+    public ResponseEntity<UserProfileDTO> searchUserByPseudo(@RequestParam String pseudo) {
         return userProfileService.findByPseudo(pseudo)
-                .map(ResponseEntity::ok)
+                .map(user -> ResponseEntity.ok(new UserProfileDTO(user.getPseudo(), user.getEmail())))
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Récupérer la liste des amis d’un utilisateur.
-     */
+    /** Récupérer la liste des amis d’un utilisateur */
     @GetMapping("/friends/{pseudo}")
     public ResponseEntity<List<FriendDTO>> getFriends(@PathVariable String pseudo) {
         List<FriendDTO> friends = userProfileService.getFriends(pseudo);
         return ResponseEntity.ok(friends);
     }
 
-    /**
-     * Upload de l’avatar avec récupération du pseudo via le header X-User-Name.
-     */
+    /** Upload de l’avatar */
     @PutMapping(value = "/profile/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadAvatar(
             @RequestParam("file") MultipartFile file,
@@ -124,14 +102,10 @@ public class UserProfileController {
         }
 
         try {
-            log.info("Upload avatar pour l'utilisateur: {}", pseudo);
-
             boolean created = userProfileService.saveUserAvatar(pseudo, file);
-
             return created
                     ? ResponseEntity.status(HttpStatus.CREATED).body("Avatar créé")
                     : ResponseEntity.ok("Avatar remplacé");
-
         } catch (Exception e) {
             log.error("Erreur lors de l'upload de l'avatar", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -139,17 +113,14 @@ public class UserProfileController {
         }
     }
 
-    /**
-     * Récupérer l’avatar d’un utilisateur par son ID.
-     */
+    /** Récupérer l’avatar d’un utilisateur par son ID */
     @GetMapping("/profile/avatar/{id}")
     public ResponseEntity<byte[]> getAvatar(@PathVariable Long id) {
         try {
-            UserProfile user = userProfileService.getUserProfileById(id);
+            User user = userProfileService.getUserProfileById(id);
             String avatarPath = user.getAvatarPath();
 
             if (avatarPath == null) {
-                log.warn("Aucun avatar trouvé pour l'utilisateur avec ID: {}", id);
                 return ResponseEntity.notFound().build();
             }
 
@@ -161,8 +132,6 @@ public class UserProfileController {
                     ? MediaType.parseMediaType(mimeType)
                     : MediaType.APPLICATION_OCTET_STREAM;
 
-            log.info("Avatar récupéré pour l'utilisateur ID: {}", id);
-
             return ResponseEntity.ok()
                     .contentType(mediaType)
                     .body(image);
@@ -170,8 +139,14 @@ public class UserProfileController {
             log.error("Erreur IO lors de la récupération de l'avatar", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         } catch (Exception e) {
-            log.error("Erreur lors de la récupération de l'avatar", e);
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PostMapping
+    public ResponseEntity<UserProfileDTO> createUser(@RequestBody UserProfileDTO dto) {
+        UserProfileDTO created = userProfileService.createUser(dto);
+        return ResponseEntity.ok(created);
+    }
+
 }

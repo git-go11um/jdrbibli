@@ -3,6 +3,7 @@ package com.jdrbibli.authservice.service;
 import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
 import com.jdrbibli.authservice.dto.ChangePasswordRequest;
 import com.jdrbibli.authservice.dto.ReponseProfileChange;
+import com.jdrbibli.authservice.dto.UserProfileDTO;
 import com.jdrbibli.authservice.dto.UserResponseDTO;
 import com.jdrbibli.authservice.entity.Role;
 import com.jdrbibli.authservice.entity.User;
@@ -73,11 +74,10 @@ public class UserService implements IUserService {
 
         // Tentative de création non-bloquante du profil côté user-service
         try {
-            createUserProfile(savedUser.getPseudo(), savedUser.getEmail());
+            createUserProfile(savedUser.getId(), savedUser.getPseudo(), savedUser.getEmail());
         } catch (Exception e) {
-            // Ne pas empêcher l'inscription si user-service est down — journaliser l'erreur
-            System.err.println("Échec création profil user-service pour pseudo=" + savedUser.getPseudo()
-                    + " : " + e.getMessage());
+            System.err.println("Échec création profil user-service pour pseudo="
+                    + savedUser.getPseudo() + " : " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -97,20 +97,26 @@ public class UserService implements IUserService {
     @Override
     @Transactional
     public void deleteUserById(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("Utilisateur avec id " + userId + " non trouvé");
-        }
+        User user = userRepository.findById(userId) // -- ajout : récupérer le pseudo avant suppression
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec id " + userId + " non trouvé"));
 
         // Supprimer les tokens de réinitialisation associés à l'utilisateur
         deletePasswordResetTokens(userId);
 
         // Supprimer l'utilisateur de la base de données
         userRepository.deleteById(userId);
-    }
 
-    public void deletePasswordResetTokens(Long userId) {
-        // Supprimer les tokens associés à l'utilisateur
-        passwordResetTokenRepository.deleteByUserId(userId);
+        // Supprimer le profil côté user-service
+        try { // -- ajout
+            String url = "http://localhost:8082/api/users/by-pseudo/" + user.getPseudo();
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.delete(url);
+            System.out.println("✅ Profil user-service supprimé pour pseudo=" + user.getPseudo());
+        } catch (Exception e) {
+            System.err.println(
+                    "⚠️ Erreur suppression user-service pour pseudo=" + user.getPseudo() + " : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -282,11 +288,8 @@ public class UserService implements IUserService {
             // AJOUT DU JWT
             headers.set("Authorization", "Bearer " + newToken);
 
-            Map<String, String> body = new HashMap<>();
-            body.put("pseudo", user.getPseudo());
-            body.put("email", user.getEmail());
-
-            HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+            UserProfileDTO body = new UserProfileDTO(user.getPseudo(), user.getEmail());
+            HttpEntity<UserProfileDTO> request = new HttpEntity<>(body, headers);
 
             // 1️⃣ Rechercher le profil dans user-service avec l'ancien pseudo
             String searchUrl = "http://localhost:8082/api/users/search?pseudo=" + oldPseudo;
@@ -305,12 +308,14 @@ public class UserService implements IUserService {
                     System.out.println("✅ Profil user-service mis à jour : " + user.getPseudo());
                 } else {
                     System.out.println("⚠️ Profil trouvé mais pas d'ID → création forcée.");
-                    createUserProfile(user.getPseudo(), user.getEmail());
+                    createUserProfile(user.getId(), user.getPseudo(), user.getEmail()); // ✅
                 }
+
             } else {
                 // 2️⃣ Profil non existant → création
                 System.out.println("⚠️ Aucun profil trouvé → création");
-                createUserProfile(user.getPseudo(), user.getEmail());
+                createUserProfile(user.getId(), user.getPseudo(), user.getEmail()); // ✅
+
             }
 
         } catch (Exception e) {
@@ -350,15 +355,22 @@ public class UserService implements IUserService {
         userRepository.save(user);
     }
 
-    private void createUserProfile(String pseudo, String email) {
+    private void createUserProfile(Long id, String pseudo, String email) {
         String url = "http://localhost:8082/api/users"; // endpoint user-service
         RestTemplate restTemplate = new RestTemplate();
 
+        // Envoyer aussi l'ID
         Map<String, Object> body = new HashMap<>();
+        body.put("id", id);
         body.put("pseudo", pseudo);
         body.put("email", email);
 
-        restTemplate.postForEntity(url, body, Void.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+        restTemplate.postForEntity(url, request, Void.class);
     }
 
     public void testUserServiceConnection() {
@@ -377,6 +389,10 @@ public class UserService implements IUserService {
             System.err.println("Erreur lors de l'appel à user-service : " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void deletePasswordResetTokens(Long userId) {
+        passwordResetTokenRepository.deleteByUserId(userId);
     }
 
 }

@@ -103,4 +103,18 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    // 1️⃣ Getter pour récupérer le secret JWT (chaîne Base64) pour debug
+    public String getJwtSecret() {
+        return this.jwtSecret;
+        
+    }
+
+    // 2️⃣ Getter pour récupérer la clé de signature (Key) pour debug
+    public Key getSigningKeyForDebug() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(this.jwtSecret));
+    }
+
+    
+
 }

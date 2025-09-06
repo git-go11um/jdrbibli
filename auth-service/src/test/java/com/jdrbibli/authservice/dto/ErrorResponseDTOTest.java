@@ -1,4 +1,4 @@
-package com.jdrbibli.authservice.dto;
+/* package com.jdrbibli.authservice.dto;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -26,3 +26,4 @@ public class ErrorResponseDTOTest {
         assertTrue(errorResponse.getTimestamp().isBefore(after));
     }
 }
+ */

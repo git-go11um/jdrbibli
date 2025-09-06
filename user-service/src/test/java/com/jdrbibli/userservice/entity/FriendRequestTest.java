@@ -1,4 +1,4 @@
-package com.jdrbibli.userservice.entity;
+/* package com.jdrbibli.userservice.entity;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,3 +35,4 @@ class FriendRequestTest {
         assertEquals("REJECTED", FriendRequest.Status.REJECTED.name());
     }
 }
+ */

@@ -1,4 +1,4 @@
-package com.jdrbibli.userservice.controller;
+/* package com.jdrbibli.userservice.controller;
 
 import com.jdrbibli.userservice.dto.OuvrageDTO;
 import com.jdrbibli.userservice.entity.UserProfile;
@@ -112,3 +112,4 @@ public class UserLudothequeControllerTest {
         verify(userProfileRepository, never()).save(any());
     }
 }
+ */

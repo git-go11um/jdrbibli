@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.jdrbibli</groupId>
-    <artifactId>jdrbibli</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.1.0</version> <!-- Mets la version de Spring Boot que tu utilises -->
+    <relativePath /> <!-- lookup parent from repository -->
   </parent>
 
   <artifactId>ouvrage-service</artifactId>
@@ -16,9 +16,15 @@
 
   <properties>
     <java.version>21</java.version>
+    <spring-boot.version>3.0.0</spring-boot.version>
   </properties>
 
   <dependencies>
+    <!-- Spring Security -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
 
     <!-- Spring Boot Web -->
     <dependency>
@@ -85,6 +91,20 @@
           <artifactId>junit-vintage-engine</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <!-- Servlet API for Spring Boot and Web -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>3.1.0</version> <!-- Choisis la version qui correspond à ta version de Spring Boot -->
     </dependency>
 
   </dependencies>

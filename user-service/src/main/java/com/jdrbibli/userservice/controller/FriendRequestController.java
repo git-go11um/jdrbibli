@@ -3,10 +3,11 @@ package com.jdrbibli.userservice.controller;
 import com.jdrbibli.userservice.dto.FriendDTO;
 import com.jdrbibli.userservice.dto.FriendRequestDTO;
 import com.jdrbibli.userservice.entity.FriendRequest;
-import com.jdrbibli.userservice.entity.UserProfile;
+import com.jdrbibli.userservice.entity.User;
 import com.jdrbibli.userservice.mapper.FriendMapper;
 import com.jdrbibli.userservice.mapper.FriendRequestMapper;
 import com.jdrbibli.userservice.service.FriendRequestService;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,12 +63,15 @@ public class FriendRequestController {
      */
     @GetMapping
     public List<FriendDTO> listFriends(@RequestParam Long userId) {
-        List<UserProfile> friends = friendRequestService.listFriends(userId);
+        List<User> friends = friendRequestService.listFriends(userId); // ✅ maintenant c'est cohérent
         return friends.stream()
                 .map(FriendMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Lister les demandes d'amis reçues.
+     */
     @GetMapping("/requests/received")
     public List<FriendRequestDTO> listReceivedRequests(@RequestParam Long userId) {
         List<FriendRequest> requests = friendRequestService.listReceivedRequests(userId);
@@ -75,5 +79,4 @@ public class FriendRequestController {
                 .map(FriendRequestMapper::toDTO)
                 .collect(Collectors.toList());
     }
-
 }
