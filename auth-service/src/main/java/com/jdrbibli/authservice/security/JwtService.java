@@ -3,7 +3,10 @@ package com.jdrbibli.authservice.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +24,9 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long jwtExpirationMs;
 
-    // 🔑 Générer la clé à partir du secret
+    // 🔑 Générer la clé à partir du secret (Base64)
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
     // Setter utiles pour les tests
@@ -102,4 +105,21 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    // 1️⃣ Getter pour récupérer le secret JWT (chaîne Base64) pour debug
+    public String getJwtSecret() {
+        return this.jwtSecret;
+    }
+
+    // 2️⃣ Getter pour récupérer la clé de signature (Key) pour debug
+    public Key getSigningKeyForDebug() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+    }
+
+    @PostConstruct
+    public void init() {
+        System.out.println("🔑 JwtService (auth-service) initialisé avec secret=" + getJwtSecret());
+        System.out.println("Clé de signature (auth-service) : " + getSigningKeyForDebug());
+    }
+
 }

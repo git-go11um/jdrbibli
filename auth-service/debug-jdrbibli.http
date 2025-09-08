@@ -1,14 +1,4 @@
-### 1. Créer un utilisateur dans auth-service
-POST http://localhost:8084/api/auth/register
-Content-Type: application/json
-
-{
-  "pseudo": "testuser",
-  "email": "testuser@example.com",
-  "password": "T@u123456789"
-}
-
-### 2. Connexion pour récupérer le token JWT
+### 1️⃣ LOGIN - Récupérer le token
 POST http://localhost:8084/api/auth/login
 Content-Type: application/json
 
@@ -17,33 +7,40 @@ Content-Type: application/json
   "password": "T@u123456789"
 }
 
-### Copier le token reçu dans la réponse et remplacer ci-dessous
-# Exemple : Authorization: Bearer <VOTRE_JWT_ICI>
+###
 
-### 3. Créer l’utilisateur côté user-service
-POST http://localhost:8082/api/users
+### 2️⃣ UTILISATEUR CONNECTÉ - Vérifier le token
+GET http://localhost:8084/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsImlhdCI6MTc1NzMwNjI3OCwiZXhwIjoxNzU3MzA5ODc4fQ.0x4LrUbiqYIm5w3IvuKuW4pieGDL4WwXGukEzkKSQW4
+
+###
+
+### 3️⃣ MISE À JOUR DU PROFIL
+PUT http://localhost:8084/api/auth/profile
+Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-  "id": 1,  # <-- mettre ici l'ID renvoyé par auth-service
-  "pseudo": "testuser",
-  "email": "testuser@example.com"
+  "pseudo": "alice2",
+  "email": "alice2@example.com"
 }
 
-### 4. Récupérer l’utilisateur par ID
-GET http://localhost:8082/api/users/122
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYWEiLCJpYXQiOjE3NTcxOTA2NjgsImV4cCI6MTc1NzE5NDI2OH0.hsApdIEu_9DeXOQi5bMG1rEf9jPRRrrfGfm3EbmmwM8
+###
 
-### 5. Mettre à jour l’utilisateur
-PUT http://localhost:8082/api/users/1
-Authorization: Bearer <VOTRE_JWT_ICI>
+### 4️⃣ CHANGEMENT DE MOT DE PASSE
+PUT http://localhost:8084/api/auth/profile/password
+Authorization: Bearer {{TOKEN}}
 Content-Type: application/json
 
 {
-  "pseudo": "testuser_updated",
-  "email": "testuser_updated@example.com"
+  "currentPassword": "T@u123456789",
+  "newPassword": "T@u987654321",
+  "confirmNewPassword": "T@u987654321"
 }
 
-### 6. Supprimer l’utilisateur
-DELETE http://localhost:8082/api/users/by-pseudo/testuser_updated
-Authorization: Bearer <VOTRE_JWT_ICI>
+###
+
+### 5️⃣ SUPPRESSION DU COMPTE
+DELETE http://localhost:8084/api/auth/alice2
+Authorization: Bearer {{TOKEN}}
+

@@ -5,6 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,10 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
+
+    public long getJwtExpirationMs() {
+        return jwtExpirationMs;
+    }
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -107,14 +113,18 @@ public class JwtService {
     // 1️⃣ Getter pour récupérer le secret JWT (chaîne Base64) pour debug
     public String getJwtSecret() {
         return this.jwtSecret;
-        
+
     }
 
-    // 2️⃣ Getter pour récupérer la clé de signature (Key) pour debug
+    // publique, uniquement pour le filtre
     public Key getSigningKeyForDebug() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(this.jwtSecret));
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    
+    @PostConstruct
+    public void init() {
+        System.out.println("🔑 JwtService initialisé avec secret=" + getJwtSecret());
+        System.out.println("⏱️ Expiration configurée=" + getJwtExpirationMs() + " ms");
+    }
 
 }

@@ -1,15 +1,15 @@
 package com.jdrbibli.userservice.config;
 
+import com.jdrbibli.userservice.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import com.jdrbibli.userservice.security.JwtAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -24,11 +24,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Endpoints publics
                         .requestMatchers("/test/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()
-                        .requestMatchers("/user/**", "/api/users/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // création utilisateur
+                        .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll() // recherche profil
+
+                        // Tout le reste nécessite authentification
+                        .requestMatchers("/api/users/**", "/user/**").authenticated()
                         .anyRequest().permitAll())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -9,32 +9,51 @@ spring:
       allowed-origins: "http://localhost:4200"
       allowed-methods: "*"
       allowed-headers: "*"
+      exposed-headers: "Authorization"
       allow-credentials: true
-
 
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
       routes:
         - id: auth-service
           uri: http://localhost:8081
           predicates:
-            - Path=/api/auth/** # capture tout ce qui commence par /api/auth/
+            - Path=/api/auth/**
           filters:
-            - StripPrefix=1 # enlève le "api", il reste /auth/** côté service
+            - StripPrefix=1
+          metadata:
+            cors:
+              allowedOrigins: "*"
+              allowedMethods: "*"
+              allowedHeaders: "*"
+              exposedHeaders: "Authorization"
 
         - id: user-service
           uri: http://localhost:8082
           predicates:
-            - Path=/user/** # capture /user/** côté service
-          filters:
-            # Si tu veux enlever un préfixe, tu peux ajouter StripPrefix=1
+            - Path=/api/users/**, /user/**
+          filters: []
+          metadata:
+            cors:
+              allowedOrigins: "*"
+              allowedMethods: "*"
+              allowedHeaders: "*"
+              exposedHeaders: "Authorization"
 
         - id: ouvrage-service
           uri: http://localhost:8083
           predicates:
             - Path=/api/ouvrage/**
           filters:
-            - StripPrefix=0 # pas de modification du chemin
+            - StripPrefix=0
+          metadata:
+            cors:
+              allowedOrigins: "*"
+              allowedMethods: "*"
+              allowedHeaders: "*"
+              exposedHeaders: "Authorization"
 
 logging:
   level:
