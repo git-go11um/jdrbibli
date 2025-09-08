@@ -3,11 +3,9 @@ package com.jdrbibli.authservice.controller;
 import com.jdrbibli.authservice.dto.*;
 import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.security.JwtService;
-import com.jdrbibli.authservice.security.JwtTokenProvider;
 import com.jdrbibli.authservice.service.IUserService;
 
 import jakarta.mail.MessagingException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -30,19 +27,16 @@ public class AuthController {
     private final IUserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public AuthController(IUserService userService,
             AuthenticationManager authenticationManager,
             JwtService jwtService,
-            JwtTokenProvider jwtTokenProvider,
             PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
-        this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -64,40 +58,19 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            System.out.println(
-                    "Tentative login pour pseudo: " + request.getPseudo() + ", password: " + request.getPassword());
-
-            User user = userService.getUserByPseudo(request.getPseudo());
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Utilisateur non trouvé"));
-            }
-
-            boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
-            if (!matches) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Mot de passe incorrect"));
-            }
-
-            System.out.println("----- Test AuthenticationManager -----");
-
-            if (user != null) {
-                System.out.println("Utilisateur trouvé : " + user.getPseudo());
-                matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
-                System.out.println("Mot de passe correct ? " + matches);
-            } else {
-                System.out.println("Utilisateur non trouvé !");
-            }
-
             // Authentification Spring Security
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getPseudo(), request.getPassword()));
 
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User user = userService.getUserByPseudo(userDetails.getUsername());
+
             String token = jwtService.generateToken(user.getPseudo());
             return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(user)));
-
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Erreur lors du login : " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Pseudo ou mot de passe incorrect"));
         }
     }
 
@@ -111,8 +84,8 @@ public class AuthController {
         String token = authHeader.substring(7);
         try {
             String pseudo = jwtService.extractPseudo(token);
-            String newToken = jwtService.generateToken(pseudo);
             User user = userService.getUserByPseudo(pseudo);
+            String newToken = jwtService.generateToken(pseudo);
             return ResponseEntity.ok(new AuthenticationResponse(newToken, userService.toDTO(user)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -122,14 +95,14 @@ public class AuthController {
 
     // ------------------- UTILISATEUR CONNECTÉ -------------------
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         try {
-            if (userDetails == null) {
+            if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "Utilisateur non authentifié"));
             }
-            String pseudo = userDetails.getUsername();
-            User user = userService.getUserByPseudo(pseudo);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User user = userService.getUserByPseudo(userDetails.getUsername());
             return ResponseEntity.ok(userService.toDTO(user));
         } catch (Exception e) {
             e.printStackTrace();
@@ -184,48 +157,37 @@ public class AuthController {
         }
     }
 
+    // ------------------- PROFIL -------------------
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateUserProfile(@RequestBody UpdateUserRequest request, Authentication authentication) {
+        try {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User user = userService.getUserByPseudo(userDetails.getUsername());
+
+            ReponseProfileChange response = userService.updateUserProfile(user.getId(), request.getPseudo(),
+                    request.getEmail());
+
+            String newToken = jwtService.generateToken(request.getPseudo());
+            return ResponseEntity.ok(Map.of("message", response.getMessage(), "token", newToken));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur serveur : " + e.getMessage(), "token", null));
+        }
+    }
+
     @PutMapping("/profile/password")
     public ResponseEntity<?> changeProfilePassword(@RequestBody ChangePasswordProfileRequest request,
-            Principal principal) {
+            Authentication authentication) {
         try {
-            userService.changeProfilePassword(principal.getName(), request);
-            String newToken = jwtTokenProvider.createToken(principal.getName());
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            userService.changeProfilePassword(userDetails.getUsername(), request);
+            String newToken = jwtService.generateToken(userDetails.getUsername());
             return ResponseEntity.ok(new ApiResponse("Mot de passe mis à jour avec succès", true, newToken));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest()
                     .body(new ApiResponse("Erreur lors de la mise à jour du mot de passe", false, null));
-        }
-    }
-
-    // ------------------- PROFIL -------------------
-    @PutMapping("/profile")
-    public ResponseEntity<?> updateUserProfile(@RequestBody UpdateUserRequest request,
-            Principal principal) {
-        System.out.println("PUT /auth/profile appelé pour pseudo=" + principal.getName());
-        try {
-            // Récupération de l'utilisateur actuel
-            User user = userService.getUserByPseudo(principal.getName());
-
-            // Mise à jour des infos
-            ReponseProfileChange response = userService.updateUserProfile(user.getId(), request.getPseudo(),
-                    request.getEmail());
-
-            // Génération d'un nouveau JWT
-            String newToken = jwtService.generateToken(request.getPseudo());
-
-            // Retourner le message + nouveau JWT
-            return ResponseEntity.ok(Map.of(
-                    "message", response.getMessage(),
-                    "token", newToken));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", e.getMessage(), "token", null));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Erreur serveur : " + e.getMessage(), "token", null));
         }
     }
 

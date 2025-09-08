@@ -3,7 +3,7 @@ POST http://localhost:8084/api/auth/login
 Content-Type: application/json
 
 {
-  "pseudo": "aaa",
+  "pseudo": "ccc",
   "password": "T@u123456789"
 }
 
@@ -11,7 +11,7 @@ Content-Type: application/json
 
 ### 2️⃣ UTILISATEUR CONNECTÉ - Vérifier le token
 GET http://localhost:8084/api/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGljZSIsImlhdCI6MTc1NzMwNjI3OCwiZXhwIjoxNzU3MzA5ODc4fQ.0x4LrUbiqYIm5w3IvuKuW4pieGDL4WwXGukEzkKSQW4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjY2MiLCJpYXQiOjE3NTczMjc2NzIsImV4cCI6MTc1NzMzMTI3Mn0.qx0oDhdqjgsfo5j9N31WxBSqK_Yv6j4HTDH8mnAKSL4
 
 ###
 

@@ -32,7 +32,6 @@ public class SecurityConfig {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // ------------------- AuthenticationProvider -------------------
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -41,40 +40,33 @@ public class SecurityConfig {
         return provider;
     }
 
-    // ------------------- AuthenticationManager -------------------
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // ------------------- SecurityFilterChain -------------------
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors()
-                .and()
+                .cors().and()
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Autoriser toutes les requêtes OPTIONS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Endpoints publics (login, register, reset password)
+                        // Endpoints publics
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/password-reset/request").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/password-reset/verify-code").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/password-reset/confirm").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/password-reset/**").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/profile").permitAll()
 
                         // Endpoints nécessitant authentification
-                        .requestMatchers(HttpMethod.PUT, "/auth/profile/password").authenticated()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/auth/me").authenticated()
+                        .requestMatchers("/auth/profile/**").authenticated()
+                        .requestMatchers("/auth/**").authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }

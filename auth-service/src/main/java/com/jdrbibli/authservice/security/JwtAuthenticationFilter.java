@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,53 +24,54 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private CustomUserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
+    protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // 🔹 Afficher tous les headers reçus pour debug
+        // 🔹 Debug : afficher tous les headers
         request.getHeaderNames().asIterator()
                 .forEachRemaining(h -> System.out.println(h + " = " + request.getHeader(h)));
 
-        System.out.println("Header Authorization reçu : " + authHeader);
-        final String jwt;
-        final String pseudo;
+        System.out.println("Authorization Header: " + authHeader);
 
-        // Vérifier que le header Authorization existe et commence par "Bearer "
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("Aucun token JWT trouvé dans le header");
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Extraire le token brut
-        System.out.println("Header Authorization reçu : " + authHeader);
-        jwt = authHeader.substring(7);
-        System.out.println("Token reçu : " + jwt);
+        final String jwt = authHeader.substring(7);
+        String pseudo;
 
-        // Extraire le pseudo du token
-        pseudo = jwtService.extractPseudo(jwt);
+        try {
+            pseudo = jwtService.extractPseudo(jwt);
+            System.out.println("Pseudo extrait du token: " + pseudo);
+        } catch (Exception e) {
+            System.err.println("Erreur extraction pseudo du JWT: " + e.getMessage());
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        // Si pseudo non nul et pas encore authentifié dans le contexte
         if (pseudo != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Charger les infos utilisateur depuis UserDetailsService
-            UserDetails userDetails = userDetailsService.loadUserByUsername(pseudo);
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(pseudo);
 
-            // Vérifier la validité du token avec pseudo
-            if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
-                // Créer l'authentication token et l'ajouter au contexte
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+                            null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    System.out.println("✅ AuthenticationContext rempli pour: " + pseudo);
+                } else {
+                    System.out.println("❌ Token JWT invalide pour: " + pseudo);
+                }
+            } catch (Exception e) {
+                System.err.println("Erreur lors du chargement UserDetails: " + e.getMessage());
             }
         }
 
-        // Passer au filtre suivant
         filterChain.doFilter(request, response);
     }
 }

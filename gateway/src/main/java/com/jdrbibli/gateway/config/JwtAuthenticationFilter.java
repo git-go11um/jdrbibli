@@ -1,4 +1,4 @@
-package com.jdrbibli.gateway.config;
+/* package com.jdrbibli.gateway.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -88,3 +88,4 @@ public class JwtAuthenticationFilter implements WebFilter {
         return chain.filter(exchange);
     }
 }
+ */
