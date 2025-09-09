@@ -65,7 +65,6 @@ public class UserProfileService {
         User saved = userRepository.save(user);
         return new UserProfileDTO(saved.getId(), saved.getPseudo(), saved.getEmail());
     }
-    
 
     /** Supprime un utilisateur par pseudo */
     public void deleteUserByPseudo(String pseudo) {
@@ -143,4 +142,14 @@ public class UserProfileService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
     }
+
+    public Optional<UserProfileDTO> updateUser(Long id, UserProfileDTO dto) {
+        return userRepository.findById(id).map(user -> {
+            user.setPseudo(dto.getPseudo());
+            user.setEmail(dto.getEmail());
+            User saved = userRepository.save(user);
+            return new UserProfileDTO(saved.getId(), saved.getPseudo(), saved.getEmail());
+        });
+    }
+
 }

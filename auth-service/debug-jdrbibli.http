@@ -1,9 +1,35 @@
+
+PUT http://localhost:8084/api/auth/profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYWEiLCJpYXQiOjE3NTc0MTI4MzUsImV4cCI6MTc1NzQxNjQzNX0.oH_9mHgqawfl8PBsAygj7aVyhN4ITgRRi1V99JcBzds
+
+{
+  "pseudo": "aaaX",
+  "email": "aaaX@gg.com"
+}
+
+
+
+
+##########
+
+POST http://localhost:8082/api/users/
+Content-Type: application/json
+
+{
+    "id" : 
+    "pseudo": "ggg",
+    "email": "ggg@gg.com",
+
+}
+
+
 ### 1️⃣ LOGIN - Récupérer le token
 POST http://localhost:8084/api/auth/login
 Content-Type: application/json
 
 {
-  "pseudo": "ccc",
+  "pseudo": "aaa",
   "password": "T@u123456789"
 }
 
@@ -11,21 +37,24 @@ Content-Type: application/json
 
 ### 2️⃣ UTILISATEUR CONNECTÉ - Vérifier le token
 GET http://localhost:8084/api/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjY2MiLCJpYXQiOjE3NTczMjc2NzIsImV4cCI6MTc1NzMzMTI3Mn0.qx0oDhdqjgsfo5j9N31WxBSqK_Yv6j4HTDH8mnAKSL4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZGQiLCJpYXQiOjE3NTczMjkwNzMsImV4cCI6MTc1NzMzMjY3M30.pnnJCW6Le3iNjlR-n7QmW6DL5jUgDE8pm8hkUFBIGA0
 
 ###
 
 ### 3️⃣ MISE À JOUR DU PROFIL
-PUT http://localhost:8084/api/auth/profile
-Authorization: Bearer {{TOKEN}}
+PUT http://localhost:8084/api/users/131
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZGQiLCJpYXQiOjE3NTczMjkwNzMsImV4cCI6MTc1NzMzMjY3M30.pnnJCW6Le3iNjlR-n7QmW6DL5jUgDE8pm8hkUFBIGA0
 Content-Type: application/json
 
 {
-  "pseudo": "alice2",
-  "email": "alice2@example.com"
+  "pseudo": "ddd2",
+  "email": "ddd2@gg.com"
 }
 
 ###
+GET http://localhost:8082/api/users/search?pseudo=ggg
+
+
 
 ### 4️⃣ CHANGEMENT DE MOT DE PASSE
 PUT http://localhost:8084/api/auth/profile/password

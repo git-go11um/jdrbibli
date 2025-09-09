@@ -59,14 +59,8 @@ public class UserProfileController {
             @PathVariable Long id,
             @RequestBody UserProfileDTO dto) {
 
-        return userProfileService.getUserById(id)
-                .map(existingUser -> {
-                    existingUser.setPseudo(dto.getPseudo());
-                    existingUser.setEmail(dto.getEmail());
-                    UserProfileDTO updated = userProfileService.createUser(
-                            new UserProfileDTO(existingUser.getPseudo(), existingUser.getEmail()));
-                    return ResponseEntity.ok(updated);
-                })
+        return userProfileService.updateUser(id, dto)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 

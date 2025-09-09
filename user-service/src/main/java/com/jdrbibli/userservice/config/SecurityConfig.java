@@ -30,9 +30,8 @@ public class SecurityConfig {
                         .requestMatchers("/test/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // création utilisateur
                         .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll() // recherche profil
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*").permitAll()
 
-                        // Tout le reste nécessite authentification
-                        .requestMatchers("/api/users/**", "/user/**").authenticated()
                         .anyRequest().permitAll())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

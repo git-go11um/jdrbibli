@@ -216,6 +216,7 @@ public class UserService implements IUserService {
 
     @Override
     public ReponseProfileChange updateUserProfile(Long userId, String newPseudo, String newEmail) {
+        // Récupération du user dans auth_db
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
 
@@ -240,30 +241,18 @@ public class UserService implements IUserService {
         userRepository.save(user);
         String newToken = jwtTokenProvider.createToken(user.getPseudo());
 
+        // Synchronisation côté user-service
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + newToken);
+            headers.set("X-User-Name", user.getPseudo());
 
-            UserProfileDTO body = new UserProfileDTO(user.getPseudo(), user.getEmail());
+            UserProfileDTO body = new UserProfileDTO(user.getId(), user.getPseudo(), user.getEmail());
             HttpEntity<UserProfileDTO> request = new HttpEntity<>(body, headers);
 
-            String searchUrl = userServiceUrl + "/search?pseudo=" + oldPseudo;
-            ResponseEntity<Map> searchResponse = restTemplate.getForEntity(searchUrl, Map.class);
-
-            if (searchResponse.getStatusCode().is2xxSuccessful() && searchResponse.getBody() != null) {
-                Object profileIdObj = searchResponse.getBody().get("id");
-
-                if (profileIdObj != null) {
-                    String updateUrl = userServiceUrl + "/" + profileIdObj;
-                    restTemplate.exchange(updateUrl, HttpMethod.PUT, request, Map.class);
-                } else {
-                    createUserProfile(user.getId(), user.getPseudo(), user.getEmail());
-                }
-
-            } else {
-                createUserProfile(user.getId(), user.getPseudo(), user.getEmail());
-            }
+            // PUT direct vers /api/users/{id} sans rechercher l'ancien pseudo
+            String updateUrl = userServiceUrl + "/" + user.getId();
+            restTemplate.exchange(updateUrl, HttpMethod.PUT, request, Map.class);
 
         } catch (Exception e) {
             System.err.println("Erreur synchronisation user-service pour " + user.getPseudo() + " : " + e.getMessage());
