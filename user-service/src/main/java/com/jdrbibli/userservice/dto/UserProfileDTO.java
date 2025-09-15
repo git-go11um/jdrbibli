@@ -4,6 +4,7 @@ public class UserProfileDTO {
     private Long id;
     private String pseudo;
     private String email;
+    private String avatarUrl;
 
     // Constructeurs
     public UserProfileDTO() {
@@ -16,9 +17,10 @@ public class UserProfileDTO {
     }
 
     // Constructeur sans id (pour retour ou création côté front si tu veux)
-    public UserProfileDTO(String pseudo, String email) {
+    public UserProfileDTO(String pseudo, String email, String avatarUrl) {
         this.pseudo = pseudo;
         this.email = email;
+        this.avatarUrl = avatarUrl;
     }
 
     // Getters / Setters
@@ -45,5 +47,13 @@ public class UserProfileDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

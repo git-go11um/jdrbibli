@@ -7,6 +7,7 @@ import com.jdrbibli.authservice.service.IUserService;
 
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.http.HttpMethod;
 
 import java.security.Principal;
 import java.util.Map;
@@ -28,25 +32,52 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final WebClient webClient;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     public AuthController(IUserService userService,
             AuthenticationManager authenticationManager,
             JwtService jwtService,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            WebClient webClient) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.webClient = webClient;
     }
 
     // ------------------- INSCRIPTION -------------------
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody InscriptionRequest request) {
         try {
+            // 1️⃣ Création du User dans auth-service
             User newUser = userService.inscrireNewUser(request.getPseudo(), request.getEmail(), request.getPassword());
+
+            // 2️⃣ Création du UserProfile côté user-service
+            UserProfileDTO profileDto = new UserProfileDTO();
+            profileDto.setId(newUser.getId()); // même ID que auth-service
+            profileDto.setPseudo(newUser.getPseudo());
+            profileDto.setEmail(newUser.getEmail());
+
+            // Appel REST vers user-service (exemple avec WebClient)
+            WebClient.create("http://localhost:8082") // URL du user-service
+                    .post()
+                    .uri("/api/users")
+                    .bodyValue(profileDto)
+                    .retrieve()
+                    .bodyToMono(UserProfileDTO.class)
+                    .block();
+
+            // 3️⃣ Génération du token JWT
             String token = jwtService.generateToken(newUser.getPseudo());
+
+            // 4️⃣ Retour de la réponse avec token et DTO
             return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(newUser)));
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -195,22 +226,45 @@ public class AuthController {
     @DeleteMapping("/{pseudo}")
     public ResponseEntity<?> deleteUser(@PathVariable String pseudo, @RequestHeader("Authorization") String token) {
         try {
+            // Vérifie que le token correspond bien au pseudo
             String tokenPseudo = jwtService.extractPseudo(token.substring(7));
             if (!tokenPseudo.equals(pseudo)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("message", "Vous ne pouvez supprimer que votre propre compte."));
             }
 
+            // Récupère l'utilisateur dans auth-service
             User user = userService.getUserByPseudo(pseudo);
             if (user == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Utilisateur non trouvé."));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Utilisateur non trouvé."));
             }
+
+            // 1️⃣ Supprime dans auth_db.users
             userService.deleteUserById(user.getId());
-            return ResponseEntity.ok(Map.of("message", "Utilisateur supprimé avec succès."));
+
+            // 2️⃣ Supprime dans user-service (user_profiles)
+            // Assure-toi que RestTemplate est injecté
+            restTemplate.exchange(
+                    "http://localhost:8082/api/users/by-pseudo/" + pseudo,
+                    HttpMethod.DELETE,
+                    new HttpEntity<>(createHeaders(token)), // réutilise le token JWT
+                    Void.class);
+
+            return ResponseEntity.ok(Map.of("message", "Utilisateur supprimé avec succès des deux services."));
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erreur lors de la suppression du compte : " + e.getMessage()));
         }
     }
+
+    // Méthode utilitaire pour passer l'Authorization dans l'appel REST
+    private HttpHeaders createHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+        return headers;
+    }
+
 }

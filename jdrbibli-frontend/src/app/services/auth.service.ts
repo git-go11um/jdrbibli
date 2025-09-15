@@ -1,4 +1,3 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -6,12 +5,14 @@ import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:8084/api/auth'; // Gateway URL
+  private apiAuthUrl = 'http://localhost:8084/api/auth';
+  private apiUserUrl = 'http://localhost:8084/api/users';
   private currentUser: any = null;
+
+  constructor(private http: HttpClient) { }
 
   setUserInfo(user: any) {
     this.currentUser = user;
-    // Si tu utilises localStorage pour persister l’utilisateur
     localStorage.setItem('user', JSON.stringify(user));
   }
 
@@ -19,11 +20,9 @@ export class AuthService {
     localStorage.setItem('token', token);
   }
 
-  constructor(private http: HttpClient) { }
-
   // ---------------- LOGIN ----------------
   login(pseudo: string, password: string): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, { pseudo, password }).pipe(
+    return this.http.post<{ token: string }>(`${this.apiAuthUrl}/login`, { pseudo, password }).pipe(
       tap(res => localStorage.setItem('jwt', res.token)),
       catchError(this.handleError)
     );
@@ -31,7 +30,7 @@ export class AuthService {
 
   getUserInfo(): Observable<any> {
     const headers = this.authHeaders();
-    return this.http.get<any>(`${this.apiUrl}/me`, { headers }).pipe(catchError(this.handleError));
+    return this.http.get<any>(`${this.apiUserUrl}/profile/me`, { headers }).pipe(catchError(this.handleError));
   }
 
   isLoggedIn(): boolean {
@@ -44,29 +43,28 @@ export class AuthService {
 
   // ---------------- REGISTER ----------------
   register(pseudo: string, email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, { pseudo, email, password })
+    return this.http.post<any>(`${this.apiAuthUrl}/register`, { pseudo, email, password })
       .pipe(catchError(this.handleError));
   }
 
   // ---------------- PASSWORD RESET ----------------
   requestPasswordReset(pseudo: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/password-reset/request`, { pseudo })
+    return this.http.post<any>(`${this.apiAuthUrl}/password-reset/request`, { pseudo })
       .pipe(catchError(this.handleError));
   }
 
   verifyResetCode(pseudo: string, code: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/password-reset/verify-code`, { pseudo, code })
+    return this.http.post<any>(`${this.apiAuthUrl}/password-reset/verify-code`, { pseudo, code })
       .pipe(catchError(this.handleError));
   }
 
   confirmReset(pseudo: string, code: string, newPassword: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/password-reset/confirm`, {
-      pseudo: pseudo,
-      code: code,               // <-- corrige ici
-      newPassword: newPassword
+    return this.http.post<any>(`${this.apiAuthUrl}/password-reset/confirm`, {
+      pseudo,
+      code,
+      newPassword
     }).pipe(catchError(this.handleError));
   }
-
 
   // ---------------- PROFILE ----------------
   updateProfile(pseudo: string, email: string, newPassword?: string): Observable<any> {
@@ -74,27 +72,27 @@ export class AuthService {
     const body: any = { pseudo, email };
     if (newPassword) body.password = newPassword;
 
-    return this.http.put<any>(`${this.apiUrl}/profile`, body, { headers })
+    return this.http.put<any>(`${this.apiAuthUrl}/profile`, body, { headers })
       .pipe(
         tap(res => {
-          if (res.token) {
-            localStorage.setItem('jwt', res.token); // met à jour le token
-          }
+          if (res.token) localStorage.setItem('jwt', res.token);
         }),
         catchError(this.handleError)
       );
   }
 
-
   changeProfilePassword(data: { currentPassword: string; newPassword: string; confirmNewPassword: string }): Observable<any> {
     const headers = this.authHeaders();
-    return this.http.put<any>(`${this.apiUrl}/profile/password`, data, { headers })
+    return this.http.put<any>(`${this.apiAuthUrl}/profile/password`, data, { headers })
       .pipe(catchError(this.handleError));
   }
 
-  deleteUser(pseudo: string): Observable<any> {
+  deleteUser(): Observable<any> {  // <-- retourne un Observable
+    const pseudo = this.getUserPseudo();
+    if (!pseudo) return throwError(() => new Error('Pseudo utilisateur manquant'));
+
     const headers = this.authHeaders();
-    return this.http.delete<any>(`${this.apiUrl}/${pseudo}`, { headers })
+    return this.http.delete<any>(`${this.apiAuthUrl}/${pseudo}`, { headers })  // <-- appelle AuthController
       .pipe(
         tap(res => console.log('deleteUser response:', res)),
         catchError(this.handleError)
@@ -102,10 +100,12 @@ export class AuthService {
   }
 
   // ---------------- AVATAR ----------------
-  uploadAvatar(fileData: FormData): Observable<any> {
+  uploadAvatar(fileData: FormData): Observable<string> {
     const headers = this.authHeaders();
-    return this.http.put<any>('http://localhost:8084/user/profile/avatar', fileData, { headers })
-      .pipe(catchError(this.handleError));
+    return this.http.put(`${this.apiUserUrl}/profile/avatar`, fileData, {
+      headers,
+      responseType: 'text'
+    }).pipe(catchError(this.handleError));
   }
 
   // ---------------- JWT UTIL ----------------
@@ -144,12 +144,15 @@ export class AuthService {
     return JSON.parse(atob(parts[1]));
   }
 
-  // ---------------- ERROR HANDLER ----------------
   private handleError(error: HttpErrorResponse) {
     console.error('handleError triggered:', error);
     const msg = error.error instanceof ErrorEvent
       ? `Erreur: ${error.error.message}`
       : `Erreur serveur (${error.status}) - message: ${JSON.stringify(error.error)}`;
     return throwError(() => new Error(msg));
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('jwt');
   }
 }

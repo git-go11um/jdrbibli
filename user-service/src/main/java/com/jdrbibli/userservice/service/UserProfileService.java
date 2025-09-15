@@ -5,8 +5,9 @@ import com.jdrbibli.userservice.dto.FriendDTO;
 import com.jdrbibli.userservice.dto.OuvrageDTO;
 import com.jdrbibli.userservice.dto.UserProfileDTO;
 import com.jdrbibli.userservice.entity.User;
+import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.mapper.FriendMapper;
-import com.jdrbibli.userservice.repository.UserRepository;
+import com.jdrbibli.userservice.repository.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,56 +25,70 @@ import java.util.stream.Collectors;
 @Service
 public class UserProfileService {
 
-    private final UserRepository userRepository;
     private final WebClient webClient;
     private final StorageProperties storageProperties;
     private final FriendRequestService friendRequestService;
+    private final UserProfileRepository userProfileRepository;
 
     @Autowired
-    public UserProfileService(UserRepository userRepository,
+    public UserProfileService(UserProfileRepository userProfileRepository,
             FriendRequestService friendRequestService,
             WebClient webClient,
             StorageProperties storageProperties) {
-        this.userRepository = userRepository;
+        this.userProfileRepository = userProfileRepository;
         this.friendRequestService = friendRequestService;
         this.webClient = webClient;
         this.storageProperties = storageProperties;
     }
 
-    /** Récupère tous les utilisateurs */
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    /** Récupère tous les profils */
+    public List<UserProfile> getAllUsers() {
+        return userProfileRepository.findAll();
     }
 
-    /** Recherche un utilisateur par ID */
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    /** Recherche un profil par ID */
+    public Optional<UserProfile> getUserById(Long id) {
+        return userProfileRepository.findById(id);
     }
 
-    /** Recherche un utilisateur par pseudo */
-    public Optional<User> findByPseudo(String pseudo) {
-        return userRepository.findByPseudo(pseudo);
+    /** Recherche un profil par pseudo */
+    public Optional<UserProfile> findByPseudo(String pseudo) {
+        return userProfileRepository.findByPseudo(pseudo);
     }
 
-    /** Crée un nouvel utilisateur */
-    // UserProfileService
+    /** Crée un nouveau profil utilisateur */
     public UserProfileDTO createUser(UserProfileDTO dto) {
-        User user = new User();
-        user.setId(dto.getId()); // <- ID provenant d'auth-service
-        user.setPseudo(dto.getPseudo());
-        user.setEmail(dto.getEmail());
-        User saved = userRepository.save(user);
+        // Vérifie si un profil existe déjà avec le même ID
+        if (dto.getId() != null) {
+            Optional<UserProfile> existingById = userProfileRepository.findById(dto.getId());
+            if (existingById.isPresent()) {
+                UserProfile profile = existingById.get();
+                return new UserProfileDTO(profile.getId(), profile.getPseudo(), profile.getEmail());
+            }
+        }
+
+        // Vérifie si un profil existe déjà avec le même pseudo
+        Optional<UserProfile> existingByPseudo = userProfileRepository.findByPseudo(dto.getPseudo());
+        if (existingByPseudo.isPresent()) {
+            UserProfile profile = existingByPseudo.get();
+            return new UserProfileDTO(profile.getId(), profile.getPseudo(), profile.getEmail());
+        }
+
+        // Sinon, crée le profil
+        UserProfile profile = new UserProfile();
+        profile.setId(dto.getId());
+        profile.setPseudo(dto.getPseudo());
+        profile.setEmail(dto.getEmail());
+
+        UserProfile saved = userProfileRepository.save(profile);
         return new UserProfileDTO(saved.getId(), saved.getPseudo(), saved.getEmail());
     }
 
-    /** Supprime un utilisateur par pseudo */
+    /** Supprime un profil par pseudo */
     public void deleteUserByPseudo(String pseudo) {
-        Optional<User> user = userRepository.findByPseudo(pseudo);
-        if (user.isPresent()) {
-            userRepository.delete(user.get());
-        } else {
-            throw new RuntimeException("Utilisateur non trouvé avec le pseudo: " + pseudo);
-        }
+        UserProfile profile = userProfileRepository.findByPseudo(pseudo)
+                .orElseThrow(() -> new RuntimeException("Profil non trouvé avec le pseudo: " + pseudo));
+        userProfileRepository.delete(profile);
     }
 
     /** Récupère les ouvrages d’un utilisateur via ouvrage-service */
@@ -86,12 +101,12 @@ public class UserProfileService {
                 .block();
     }
 
-    /** Récupère la liste des amis d’un utilisateur sous forme de FriendDTO */
+    /** Récupère la liste des amis d’un utilisateur */
     public List<FriendDTO> getFriends(String pseudo) {
-        User user = userRepository.findByPseudo(pseudo)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé: " + pseudo));
+        UserProfile profile = userProfileRepository.findByPseudo(pseudo)
+                .orElseThrow(() -> new RuntimeException("Profil non trouvé: " + pseudo));
 
-        List<User> friends = friendRequestService.listFriends(user.getId());
+        List<User> friends = friendRequestService.listFriends(profile.getId());
         return friends.stream()
                 .map(FriendMapper::toDTO)
                 .collect(Collectors.toList());
@@ -99,10 +114,10 @@ public class UserProfileService {
 
     /** Sauvegarde l’avatar d’un utilisateur */
     public boolean saveUserAvatar(String pseudo, MultipartFile file) throws IOException {
-        User user = userRepository.findByPseudo(pseudo)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+        UserProfile profile = userProfileRepository.findByPseudo(pseudo)
+                .orElseThrow(() -> new RuntimeException("Profil utilisateur introuvable"));
 
-        boolean wasEmpty = (user.getAvatarPath() == null || user.getAvatarPath().isBlank());
+        boolean wasEmpty = (profile.getAvatarPath() == null || profile.getAvatarPath().isBlank());
 
         Path uploadPath = Paths.get(storageProperties.getUploadDir());
         Files.createDirectories(uploadPath);
@@ -112,42 +127,43 @@ public class UserProfileService {
                 .map(n -> n.substring(n.lastIndexOf('.')))
                 .orElse(".bin");
 
-        String fileName = "user_" + user.getId() + extension;
+        String fileName = "user_" + profile.getId() + extension;
         Path filePath = uploadPath.resolve(fileName);
 
         Files.write(filePath, file.getBytes());
 
-        user.setAvatarPath(filePath.toString());
-        user.setAvatarUrl("/api/users/profile/avatar/" + user.getId());
-        userRepository.save(user);
+        profile.setAvatarPath(filePath.toString());
+        profile.setAvatarUrl("/api/users/profile/avatar/" + profile.getId());
+        userProfileRepository.save(profile);
 
         return wasEmpty;
     }
 
     /** Récupère l’avatar d’un utilisateur */
     public byte[] getUserAvatar(Long id) throws IOException {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        UserProfile profile = userProfileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profil non trouvé"));
 
-        String path = user.getAvatarPath();
+        String path = profile.getAvatarPath();
         if (path == null || path.isBlank()) {
-            throw new FileNotFoundException("Aucun avatar disponible pour cet utilisateur.");
+            throw new FileNotFoundException("Aucun avatar disponible pour ce profil.");
         }
 
         return Files.readAllBytes(Paths.get(path));
     }
 
-    /** Récupère un utilisateur par ID */
-    public User getUserProfileById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+    /** Récupère un profil par ID */
+    public UserProfile getUserProfileById(Long id) {
+        return userProfileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profil non trouvé"));
     }
 
+    /** Met à jour un profil */
     public Optional<UserProfileDTO> updateUser(Long id, UserProfileDTO dto) {
-        return userRepository.findById(id).map(user -> {
-            user.setPseudo(dto.getPseudo());
-            user.setEmail(dto.getEmail());
-            User saved = userRepository.save(user);
+        return userProfileRepository.findById(id).map(profile -> {
+            profile.setPseudo(dto.getPseudo());
+            profile.setEmail(dto.getEmail());
+            UserProfile saved = userProfileRepository.save(profile);
             return new UserProfileDTO(saved.getId(), saved.getPseudo(), saved.getEmail());
         });
     }
