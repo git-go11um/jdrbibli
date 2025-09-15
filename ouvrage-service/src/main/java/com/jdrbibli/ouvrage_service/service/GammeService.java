@@ -1,6 +1,5 @@
 package com.jdrbibli.ouvrage_service.service;
 
-import com.jdrbibli.ouvrage_service.dto.GammeDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
 import com.jdrbibli.ouvrage_service.exception.ResourceNotFoundException;
 import com.jdrbibli.ouvrage_service.mapper.GammeMapper;
@@ -21,8 +20,9 @@ public class GammeService {
         this.gammeMapper = gammeMapper;
     }
 
-    public List<Gamme> findByOwnerPseudo(String ownerPseudo) {
-        return gammeRepository.findByOwnerPseudo(ownerPseudo);
+    /** Récupérer toutes les gammes d’un utilisateur */
+    public List<Gamme> findByOwnerId(Long ownerId) {
+        return gammeRepository.findByOwnerId(ownerId);
     }
 
     public Optional<Gamme> findById(Long id) {
@@ -30,9 +30,9 @@ public class GammeService {
     }
 
     public Gamme save(Gamme gamme) {
-        // Vérifie que ownerPseudo est bien défini
-        if (gamme.getOwnerPseudo() == null || gamme.getOwnerPseudo().isBlank()) {
-            throw new IllegalArgumentException("OwnerPseudo must be set");
+        // Vérifie que ownerId est bien défini
+        if (gamme.getOwnerId() == null) {
+            throw new IllegalArgumentException("OwnerId must be set");
         }
         return gammeRepository.save(gamme);
     }

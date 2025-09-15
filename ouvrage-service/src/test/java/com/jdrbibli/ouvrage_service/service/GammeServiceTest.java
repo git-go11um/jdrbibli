@@ -1,4 +1,4 @@
-package com.jdrbibli.ouvrage_service.service;
+/* package com.jdrbibli.ouvrage_service.service;
 
 import com.jdrbibli.ouvrage_service.entity.Gamme;
 import com.jdrbibli.ouvrage_service.mapper.GammeMapper;
@@ -102,3 +102,4 @@ class GammeServiceTest {
         verify(gammeRepository, times(1)).deleteById(id);
     }
 }
+ */

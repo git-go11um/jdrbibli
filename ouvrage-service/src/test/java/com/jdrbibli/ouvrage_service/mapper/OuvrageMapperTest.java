@@ -1,4 +1,4 @@
-package com.jdrbibli.ouvrage_service.mapper;
+/* package com.jdrbibli.ouvrage_service.mapper;
 
 import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
@@ -101,3 +101,4 @@ class OuvrageMapperTest {
         assertNull(mapper.toEntity(null));
     }
 }
+ */

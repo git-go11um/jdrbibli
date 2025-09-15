@@ -52,10 +52,13 @@ public class JwtService {
     }
 
     /**
-     * Générer un token simple sans claims custom
+     * Générer un token simple avec l'ID de l'utilisateur inclus dans les claims
      */
-    public String generateToken(String pseudo) {
-        return generateToken(Map.of(), pseudo);
+    public String generateToken(String pseudo, Long userId) {
+        Map<String, Object> claims = Map.of(
+                "id", userId // ✅ ID inclus automatiquement
+        );
+        return generateToken(claims, pseudo);
     }
 
     /**

@@ -24,111 +24,83 @@ public class OuvrageController {
         this.ouvrageMapper = ouvrageMapper;
     }
 
-    // GET /api/ouvrages - Récupérer tous les ouvrages de l’utilisateur connecté
     @GetMapping
-    public ResponseEntity<List<OuvrageDTO>> getAll(@RequestHeader("X-User-Pseudo") String ownerPseudo) {
-        List<Ouvrage> ouvrages = ouvrageService.findByOwnerPseudo(ownerPseudo);
+    public ResponseEntity<List<OuvrageDTO>> getAll(@RequestHeader("X-User-Id") Long ownerId) {
+        List<Ouvrage> ouvrages = ouvrageService.findByOwnerId(ownerId);
         List<OuvrageDTO> dtos = ouvrages.stream()
                 .map(ouvrageMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
 
-    // GET /api/ouvrages/{id} - Récupérer un ouvrage par ID s’il appartient à
-    // l’utilisateur
     @GetMapping("/{id}")
     public ResponseEntity<OuvrageDTO> getById(@PathVariable Long id,
-            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+            @RequestHeader("X-User-Id") Long ownerId) {
         Optional<Ouvrage> ouvrageOpt = ouvrageService.findById(id);
-        if (ouvrageOpt.isEmpty()) {
+        if (ouvrageOpt.isEmpty())
             return ResponseEntity.notFound().build();
-        }
+
         Ouvrage ouvrage = ouvrageOpt.get();
-        if (!ownerPseudo.equals(ouvrage.getOwnerPseudo())) {
+        if (!ownerId.equals(ouvrage.getOwnerId()))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+
         return ResponseEntity.ok(ouvrageMapper.toDTO(ouvrage));
     }
 
-    // GET /api/ouvrages/gammes/{gammeId} - Récupérer tous les ouvrages d'une gamme
-    // pour l’utilisateur connecté
     @GetMapping("/gammes/{gammeId}")
-    public ResponseEntity<List<OuvrageDTO>> getByGamme(
-            @PathVariable Long gammeId,
-            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
-        List<Ouvrage> ouvrages = ouvrageService.findByGammeIdAndOwnerPseudo(gammeId, ownerPseudo);
+    public ResponseEntity<List<OuvrageDTO>> getByGamme(@PathVariable Long gammeId,
+            @RequestHeader("X-User-Id") Long ownerId) {
+        List<Ouvrage> ouvrages = ouvrageService.findByGammeIdAndOwnerId(gammeId, ownerId);
         List<OuvrageDTO> dtos = ouvrages.stream()
-                .map(ouvrage -> {
-                    OuvrageDTO dto = new OuvrageDTO();
-                    // Mapper manuellement ou via un mapper
-                    // Si tu as un mapper, préfère l’utiliser
-                    dto.setId(ouvrage.getId());
-                    dto.setTitre(ouvrage.getTitre());
-                    dto.setDescription(ouvrage.getDescription());
-                    dto.setGammeId(ouvrage.getGamme().getId());
-                    dto.setOwnerPseudo(ouvrage.getOwnerPseudo());
-                    // ... les autres propriétés ...
-                    return dto;
-                })
+                .map(ouvrageMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
 
-    // POST /api/ouvrages - Créer un ouvrage en assignant ownerPseudo
     @PostMapping
     public ResponseEntity<OuvrageDTO> create(@RequestBody OuvrageDTO dto,
-            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
-        try {
-            dto.setOwnerPseudo(ownerPseudo); // Assigne le propriétaire
-            Ouvrage created = ouvrageService.createFromDTO(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(ouvrageMapper.toDTO(created));
-        } catch (RuntimeException ex) {
-            return ResponseEntity.badRequest().build();
-        }
+            @RequestHeader("X-User-Id") Long ownerId) {
+        dto.setOwnerId(ownerId);
+        Ouvrage created = ouvrageService.createFromDTO(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ouvrageMapper.toDTO(created));
     }
 
-    // PUT /api/ouvrages/{id} - Mettre à jour un ouvrage si propriétaire
     @PutMapping("/{id}")
     public ResponseEntity<OuvrageDTO> update(@PathVariable Long id,
             @RequestBody OuvrageDTO dto,
-            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+            @RequestHeader("X-User-Id") Long ownerId) {
         Optional<Ouvrage> existingOpt = ouvrageService.findById(id);
-        if (existingOpt.isEmpty()) {
+        if (existingOpt.isEmpty())
             return ResponseEntity.notFound().build();
-        }
+
         Ouvrage existing = existingOpt.get();
-        if (!ownerPseudo.equals(existing.getOwnerPseudo())) {
+        if (!ownerId.equals(existing.getOwnerId()))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        try {
-            dto.setOwnerPseudo(ownerPseudo); // Garantir la cohérence
-            Ouvrage updated = ouvrageService.updateFromDTO(id, dto);
-            return ResponseEntity.ok(ouvrageMapper.toDTO(updated));
-        } catch (RuntimeException ex) {
-            return ResponseEntity.badRequest().build();
-        }
+
+        dto.setOwnerId(ownerId);
+        Ouvrage updated = ouvrageService.updateFromDTO(id, dto);
+        return ResponseEntity.ok(ouvrageMapper.toDTO(updated));
     }
 
-    // DELETE /api/ouvrages/{id} - Supprimer un ouvrage si propriétaire
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id,
-            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+            @RequestHeader("X-User-Id") Long ownerId) {
         Optional<Ouvrage> existingOpt = ouvrageService.findById(id);
-        if (existingOpt.isEmpty()) {
+        if (existingOpt.isEmpty())
             return ResponseEntity.notFound().build();
-        }
+
         Ouvrage existing = existingOpt.get();
-        if (!ownerPseudo.equals(existing.getOwnerPseudo())) {
+        if (!ownerId.equals(existing.getOwnerId()))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+
         ouvrageService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/gammes/{gammeId}/exclude/{id}")
-    public ResponseEntity<List<OuvrageDTO>> getOuvragesByGamme(@PathVariable Long gammeId, @PathVariable Long id) {
+    public ResponseEntity<List<OuvrageDTO>> getOuvragesByGamme(@PathVariable Long gammeId,
+            @PathVariable Long id) {
         List<OuvrageDTO> ouvrages = ouvrageService.getOuvragesByGamme(gammeId, id);
         return ResponseEntity.ok(ouvrages);
     }
-
 }

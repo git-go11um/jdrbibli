@@ -1,13 +1,14 @@
 package com.jdrbibli.ouvrage_service.entity;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ouvrages")
 public class Ouvrage {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,9 +43,9 @@ public class Ouvrage {
     private String errata;
     private String notes;
 
-    // Nouveau champ pour savoir quel utilisateur a créé cet ouvrage
-    @Column(nullable = false)
-    private String ownerPseudo;
+    // Propriétaire de l'ouvrage (ID utilisateur)
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
 
     @ElementCollection
     @CollectionTable(name = "ouvrage_scenarios_contenus", joinColumns = @JoinColumn(name = "ouvrage_id"))
@@ -56,14 +57,12 @@ public class Ouvrage {
     @Column(name = "ouvrage")
     private List<String> autresOuvragesGamme = new ArrayList<>();
 
-    // Nouveau champ liensMedias (liens vers médias externes)
     @ElementCollection
     @CollectionTable(name = "ouvrage_liens_medias", joinColumns = @JoinColumn(name = "ouvrage_id"))
     @Column(name = "lien")
     private List<String> liensMedias = new ArrayList<>();
 
-    // Getters & setters (ajoute ownerPseudo aussi)
-
+    // Getters & Setters
     public Long getId() {
         return id;
     }
@@ -192,12 +191,12 @@ public class Ouvrage {
         this.notes = notes;
     }
 
-    public String getOwnerPseudo() {
-        return ownerPseudo;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwnerPseudo(String ownerPseudo) {
-        this.ownerPseudo = ownerPseudo;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public List<String> getScenariosContenus() {

@@ -73,7 +73,7 @@ public class AuthController {
                     .block();
 
             // 3️⃣ Génération du token JWT
-            String token = jwtService.generateToken(newUser.getPseudo());
+            String token = jwtService.generateToken(newUser.getPseudo(), newUser.getId());
 
             // 4️⃣ Retour de la réponse avec token et DTO
             return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(newUser)));
@@ -94,9 +94,20 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(request.getPseudo(), request.getPassword()));
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            // Récupérer l'utilisateur à partir du pseudo (username)
             User user = userService.getUserByPseudo(userDetails.getUsername());
 
-            String token = jwtService.generateToken(user.getPseudo());
+            // Si l'utilisateur est introuvable
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Utilisateur non trouvé"));
+            }
+
+            // Génération du token avec pseudo et ID de l'utilisateur
+            String token = jwtService.generateToken(user.getPseudo(), user.getId());
+
+            // Retourne la réponse avec le token et les informations de l'utilisateur
             return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(user)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,7 +127,7 @@ public class AuthController {
         try {
             String pseudo = jwtService.extractPseudo(token);
             User user = userService.getUserByPseudo(pseudo);
-            String newToken = jwtService.generateToken(pseudo);
+            String newToken = jwtService.generateToken(pseudo, user.getId());
             return ResponseEntity.ok(new AuthenticationResponse(newToken, userService.toDTO(user)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,8 +143,12 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "Utilisateur non authentifié"));
             }
+
+            // Récupérer l'objet User via le pseudo à partir de UserDetails
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             User user = userService.getUserByPseudo(userDetails.getUsername());
+
+            // Retourner les informations de l'utilisateur
             return ResponseEntity.ok(userService.toDTO(user));
         } catch (Exception e) {
             e.printStackTrace();
@@ -198,7 +213,8 @@ public class AuthController {
             ReponseProfileChange response = userService.updateUserProfile(user.getId(), request.getPseudo(),
                     request.getEmail());
 
-            String newToken = jwtService.generateToken(request.getPseudo());
+            // Génération du token avec pseudo et ID
+            String newToken = jwtService.generateToken(request.getPseudo(), user.getId());
             return ResponseEntity.ok(Map.of("message", response.getMessage(), "token", newToken));
         } catch (Exception e) {
             e.printStackTrace();
@@ -212,8 +228,22 @@ public class AuthController {
             Authentication authentication) {
         try {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            // Récupérer l'utilisateur à partir du pseudo
+            User user = userService.getUserByPseudo(userDetails.getUsername());
+
+            // Vérifier si l'utilisateur existe
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Utilisateur non trouvé"));
+            }
+
+            // Appel au service pour changer le mot de passe
             userService.changeProfilePassword(userDetails.getUsername(), request);
-            String newToken = jwtService.generateToken(userDetails.getUsername());
+
+            // Génération du token avec le pseudo et l'ID de l'utilisateur
+            String newToken = jwtService.generateToken(user.getPseudo(), user.getId());
+
             return ResponseEntity.ok(new ApiResponse("Mot de passe mis à jour avec succès", true, newToken));
         } catch (Exception e) {
             e.printStackTrace();
@@ -227,6 +257,11 @@ public class AuthController {
     public ResponseEntity<?> deleteUser(@PathVariable String pseudo, @RequestHeader("Authorization") String token) {
         try {
             // Vérifie que le token correspond bien au pseudo
+            if (token == null || !token.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Token manquant ou mal formé"));
+            }
+
             String tokenPseudo = jwtService.extractPseudo(token.substring(7));
             if (!tokenPseudo.equals(pseudo)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -244,11 +279,11 @@ public class AuthController {
             userService.deleteUserById(user.getId());
 
             // 2️⃣ Supprime dans user-service (user_profiles)
-            // Assure-toi que RestTemplate est injecté
+            HttpEntity<?> entity = new HttpEntity<>(createHeaders(token)); // réutilise le token JWT
             restTemplate.exchange(
                     "http://localhost:8082/api/users/by-pseudo/" + pseudo,
                     HttpMethod.DELETE,
-                    new HttpEntity<>(createHeaders(token)), // réutilise le token JWT
+                    entity,
                     Void.class);
 
             return ResponseEntity.ok(Map.of("message", "Utilisateur supprimé avec succès des deux services."));

@@ -29,3 +29,19 @@ DELETE http://localhost:8083/api/gammes/6
 
 ### Supprimer une gamme avec force (supprime aussi les ouvrages liés)
 DELETE http://localhost:8083/api/gammes/11?force=true
+
+####
+
+GET http://localhost:8084/api/ouvrage/ouvrages/gammes/43
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYWEiLCJpYXQiOjE3NTc5NDA3MDIsImV4cCI6MTc1Nzk0NDMwMn0.aefo_y-lfL8C_1SozO6uAdbc7XiMbkVi--HUzZMwK9U
+X-User-Pseudo: aaa
+Accept: application/json
+
+###
+
+GET http://localhost:8083/api/ouvrage/ouvrages/gammes/43
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYWEiLCJpYXQiOjE3NTc5NDA3MDIsImV4cCI6MTc1Nzk0NDMwMn0.aefo_y-lfL8C_1SozO6uAdbc7XiMbkVi--HUzZMwK9U
+X-User-Pseudo: aaa
+Accept: application/json
+
+

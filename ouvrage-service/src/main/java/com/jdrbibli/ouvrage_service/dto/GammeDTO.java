@@ -4,16 +4,16 @@ public class GammeDTO {
     private Long id;
     private String nom;
     private String description;
-    private String ownerPseudo; // nouveau champ
+    private Long ownerId; // <-- remplace ownerPseudo
 
     public GammeDTO() {
     }
 
-    public GammeDTO(Long id, String nom, String description, String ownerPseudo) {
+    public GammeDTO(Long id, String nom, String description, Long ownerId) {
         this.id = id;
         this.nom = nom;
         this.description = description;
-        this.ownerPseudo = ownerPseudo;
+        this.ownerId = ownerId;
     }
 
     // Getters et setters
@@ -41,11 +41,11 @@ public class GammeDTO {
         this.description = description;
     }
 
-    public String getOwnerPseudo() {
-        return ownerPseudo;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwnerPseudo(String ownerPseudo) {
-        this.ownerPseudo = ownerPseudo;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 }

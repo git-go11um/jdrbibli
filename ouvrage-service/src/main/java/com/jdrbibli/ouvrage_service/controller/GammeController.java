@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/ouvrage/gammes") // Route /api/ouvrage/gammes pour respecter la configuration du gateway
+@RequestMapping("/api/ouvrage/gammes")
 public class GammeController {
 
     private final GammeService gammeService;
@@ -25,23 +25,21 @@ public class GammeController {
         this.gammeMapper = gammeMapper;
     }
 
-    /** Récupérer toutes les gammes appartenant à l’utilisateur */
     @GetMapping
-    public ResponseEntity<List<GammeDTO>> getAll(@RequestHeader("X-User-Pseudo") String ownerPseudo) {
-        List<Gamme> gammes = gammeService.findByOwnerPseudo(ownerPseudo);
+    public ResponseEntity<List<GammeDTO>> getAll(@RequestHeader("X-User-Id") Long ownerId) {
+        List<Gamme> gammes = gammeService.findByOwnerId(ownerId);
         List<GammeDTO> gammesDTO = gammes.stream()
                 .map(gammeMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(gammesDTO);
     }
 
-    /** Récupérer une gamme par son ID (si propriétaire) */
     @GetMapping("/{id}")
-    public ResponseEntity<GammeDTO> getById(@PathVariable Long id, @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+    public ResponseEntity<GammeDTO> getById(@PathVariable Long id, @RequestHeader("X-User-Id") Long ownerId) {
         Optional<Gamme> gammeOpt = gammeService.findById(id);
         if (gammeOpt.isPresent()) {
             Gamme gamme = gammeOpt.get();
-            if (!ownerPseudo.equals(gamme.getOwnerPseudo())) {
+            if (!ownerId.equals(gamme.getOwnerId())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
             return ResponseEntity.ok(gammeMapper.toDTO(gamme));
@@ -49,30 +47,26 @@ public class GammeController {
         return ResponseEntity.notFound().build();
     }
 
-    /** Créer une nouvelle gamme pour l’utilisateur connecté */
     @PostMapping
     public ResponseEntity<GammeDTO> create(@RequestBody GammeDTO gammeDTO,
-            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
-        gammeDTO.setOwnerPseudo(ownerPseudo); // force l’ownerPseudo
+            @RequestHeader("X-User-Id") Long ownerId) {
+        gammeDTO.setOwnerId(ownerId);
         Gamme gamme = gammeMapper.toEntity(gammeDTO);
         Gamme saved = gammeService.save(gamme);
         return ResponseEntity.status(HttpStatus.CREATED).body(gammeMapper.toDTO(saved));
     }
 
-    /** Mettre à jour une gamme existante (si propriétaire) */
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody GammeDTO gammeDTO,
-            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+            @RequestHeader("X-User-Id") Long ownerId) {
         Optional<Gamme> existingOpt = gammeService.findById(id);
-        if (existingOpt.isEmpty()) {
+        if (existingOpt.isEmpty())
             return ResponseEntity.notFound().build();
-        }
-        Gamme existing = existingOpt.get();
-        if (!ownerPseudo.equals(existing.getOwnerPseudo())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
-        // Mise à jour des champs modifiables
+        Gamme existing = existingOpt.get();
+        if (!ownerId.equals(existing.getOwnerId()))
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
         existing.setNom(gammeDTO.getNom());
         existing.setDescription(gammeDTO.getDescription());
 
@@ -80,19 +74,18 @@ public class GammeController {
         return ResponseEntity.ok(gammeMapper.toDTO(saved));
     }
 
-    /** Supprimer une gamme (si propriétaire) */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id,
             @RequestParam(defaultValue = "false") boolean force,
-            @RequestHeader("X-User-Pseudo") String ownerPseudo) {
+            @RequestHeader("X-User-Id") Long ownerId) {
         Optional<Gamme> existingOpt = gammeService.findById(id);
-        if (existingOpt.isEmpty()) {
+        if (existingOpt.isEmpty())
             return ResponseEntity.notFound().build();
-        }
+
         Gamme existing = existingOpt.get();
-        if (!ownerPseudo.equals(existing.getOwnerPseudo())) {
+        if (!ownerId.equals(existing.getOwnerId()))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+
         try {
             gammeService.deleteById(id, force);
             return ResponseEntity.noContent().build();

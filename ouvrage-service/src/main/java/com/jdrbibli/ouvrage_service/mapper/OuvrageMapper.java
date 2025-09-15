@@ -2,16 +2,15 @@ package com.jdrbibli.ouvrage_service.mapper;
 
 import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
 import com.jdrbibli.ouvrage_service.entity.Ouvrage;
-import com.jdrbibli.ouvrage_service.entity.Gamme;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OuvrageMapper {
 
     public OuvrageDTO toDTO(Ouvrage entity) {
-        if (entity == null) {
+        if (entity == null)
             return null;
-        }
+
         OuvrageDTO dto = new OuvrageDTO();
         dto.setId(entity.getId());
         dto.setTitre(entity.getTitre());
@@ -31,20 +30,18 @@ public class OuvrageMapper {
         dto.setNotes(entity.getNotes());
         dto.setScenariosContenus(entity.getScenariosContenus());
         dto.setAutresOuvragesGamme(entity.getAutresOuvragesGamme());
-
-        // Ajout des liens médias
         dto.setLiensMedias(entity.getLiensMedias());
 
-        //  Ajout du ownerPseudo
-        dto.setOwnerPseudo(entity.getOwnerPseudo());
+        // <-- on passe à ownerId
+        dto.setOwnerId(entity.getOwnerId());
 
         return dto;
     }
 
     public Ouvrage toEntity(OuvrageDTO dto) {
-        if (dto == null) {
+        if (dto == null)
             return null;
-        }
+
         Ouvrage entity = new Ouvrage();
         entity.setId(dto.getId());
         entity.setTitre(dto.getTitre());
@@ -63,12 +60,10 @@ public class OuvrageMapper {
         entity.setNotes(dto.getNotes());
         entity.setScenariosContenus(dto.getScenariosContenus());
         entity.setAutresOuvragesGamme(dto.getAutresOuvragesGamme());
-
-        // Ajout des liens médias
         entity.setLiensMedias(dto.getLiensMedias());
 
-        //  Ajout du ownerPseudo
-        entity.setOwnerPseudo(dto.getOwnerPseudo());
+        // <-- on passe à ownerId
+        entity.setOwnerId(dto.getOwnerId());
 
         return entity;
     }

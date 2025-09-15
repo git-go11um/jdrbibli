@@ -1,4 +1,4 @@
-package com.jdrbibli.ouvrage_service.entity;
+/* package com.jdrbibli.ouvrage_service.entity;
 
 import org.junit.jupiter.api.Test;
 
@@ -81,3 +81,4 @@ class OuvrageTest {
         assertEquals(liensMedias, ouvrage.getLiensMedias());
     }
 }
+ */

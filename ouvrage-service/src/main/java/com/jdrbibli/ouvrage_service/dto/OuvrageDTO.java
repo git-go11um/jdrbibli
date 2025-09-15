@@ -25,7 +25,7 @@ public class OuvrageDTO {
     private List<String> autresOuvragesGamme;
     private List<String> liensMedias;
 
-    private String ownerPseudo; // ✅ nouveau champ
+    private Long ownerId; // <-- remplace ownerPseudo
 
     // Constructeur vide
     public OuvrageDTO() {
@@ -184,11 +184,11 @@ public class OuvrageDTO {
         this.liensMedias = liensMedias;
     }
 
-    public String getOwnerPseudo() {
-        return ownerPseudo;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwnerPseudo(String ownerPseudo) {
-        this.ownerPseudo = ownerPseudo;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 }

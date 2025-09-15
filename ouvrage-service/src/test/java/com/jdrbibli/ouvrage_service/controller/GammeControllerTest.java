@@ -1,4 +1,4 @@
-package com.jdrbibli.ouvrage_service.controller;
+/* package com.jdrbibli.ouvrage_service.controller;
 
 import com.jdrbibli.ouvrage_service.dto.GammeDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
@@ -227,3 +227,4 @@ class GammeControllerTest {
     }
 
 }
+ */

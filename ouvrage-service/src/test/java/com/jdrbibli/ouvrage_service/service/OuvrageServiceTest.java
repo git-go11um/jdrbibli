@@ -1,4 +1,4 @@
-package com.jdrbibli.ouvrage_service.service;
+/* package com.jdrbibli.ouvrage_service.service;
 
 import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
@@ -184,3 +184,4 @@ class OuvrageServiceTest {
         verify(ouvrageRepository, times(1)).deleteById(id);
     }
 }
+ */

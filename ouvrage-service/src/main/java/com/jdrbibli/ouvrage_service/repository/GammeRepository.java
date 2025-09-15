@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface GammeRepository extends JpaRepository<Gamme, Long> {
 
-    //  Récupérer toutes les gammes d'un utilisateur
-    List<Gamme> findByOwnerPseudo(String ownerPseudo);
+    // Récupérer toutes les gammes d'un utilisateur par ownerId
+    List<Gamme> findByOwnerId(Long ownerId);
 }

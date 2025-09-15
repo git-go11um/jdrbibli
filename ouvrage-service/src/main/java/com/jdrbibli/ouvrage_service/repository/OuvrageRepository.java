@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface OuvrageRepository extends JpaRepository<Ouvrage, Long> {
+
     long countByGammeId(Long gammeId);
 
     @Modifying
@@ -16,11 +17,11 @@ public interface OuvrageRepository extends JpaRepository<Ouvrage, Long> {
     void deleteByGammeId(Long gammeId);
 
     // Récupérer tous les ouvrages d’un utilisateur
-    List<Ouvrage> findByOwnerPseudo(String ownerPseudo);
+    List<Ouvrage> findByOwnerId(Long ownerId);
 
     // Récupérer tous les ouvrages d’une gamme ET appartenant à un owner
-    List<Ouvrage> findByGammeIdAndOwnerPseudo(Long gammeId, String ownerPseudo);
+    List<Ouvrage> findByGammeIdAndOwnerId(Long gammeId, Long ownerId);
 
+    // Récupérer tous les ouvrages d’une gamme sauf un ID spécifique
     List<Ouvrage> findByGammeIdAndIdNot(Long gammeId, Long excludeId);
-
 }

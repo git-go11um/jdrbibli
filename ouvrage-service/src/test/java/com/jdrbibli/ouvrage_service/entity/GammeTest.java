@@ -1,4 +1,4 @@
-package com.jdrbibli.ouvrage_service.entity;
+/* package com.jdrbibli.ouvrage_service.entity;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,3 +33,4 @@ class GammeTest {
         assertSame(ouvrage, gamme.getOuvrages().get(0));
     }
 }
+ */

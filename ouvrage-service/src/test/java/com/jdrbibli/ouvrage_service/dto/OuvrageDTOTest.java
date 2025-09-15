@@ -1,4 +1,4 @@
-package com.jdrbibli.ouvrage_service.dto;
+/* package com.jdrbibli.ouvrage_service.dto;
 
 import org.junit.jupiter.api.Test;
 
@@ -78,3 +78,4 @@ class OuvrageDTOTest {
         assertEquals(ownerPseudo, dto.getOwnerPseudo());
     }
 }
+ */

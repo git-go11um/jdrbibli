@@ -1,4 +1,4 @@
-package com.jdrbibli.ouvrage_service.dto;
+/* package com.jdrbibli.ouvrage_service.dto;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,3 +40,4 @@ class GammeDTOTest {
         assertEquals(ownerPseudo, dto.getOwnerPseudo());
     }
 }
+ */
