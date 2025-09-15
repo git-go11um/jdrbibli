@@ -14,7 +14,7 @@ export class ProfilUtilisateur implements OnInit {
   pseudo: string = '';
   email: string = '';
   motDePasse: string = '**********';
-  avatarUrl: string = 'https://www.w3schools.com/howto/img_avatar.png';
+  avatarUrl: string | null = null;
   selectedFile: File | null = null;
 
   constructor(public authService: AuthService, private router: Router) { }
@@ -31,7 +31,7 @@ export class ProfilUtilisateur implements OnInit {
         this.email = data.email;
         this.avatarUrl = data.avatarUrl
           ? `http://localhost:8084${data.avatarUrl}?t=${new Date().getTime()}`
-          : 'https://www.w3schools.com/howto/img_avatar.png';
+          : null;
       },
       error: (error) => {
         console.error('Erreur lors du chargement des informations utilisateur', error);

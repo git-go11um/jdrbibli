@@ -108,13 +108,39 @@ button:hover {
 }
 
 .avatar-section {
-    position: relative;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-start; /* tu peux changer à center ou flex-end */
     gap: 10px;
+    position: relative;
+}
 
-     /* .avatar-circle {
+.avatar-container {
+    display: flex;
+    justify-content: flex-end; /* pousse le cercle vers la droite */
+    width: 100%; /* prend toute la largeur disponible */
+}
+
+.avatar-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 3px solid #06668C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    
+    .avatar-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;            /* image remplie le rond */
+    }
+    
+    .avatar-placeholder {
         width: 150px;
         height: 150px;
         border-radius: 50%;
@@ -123,19 +149,11 @@ button:hover {
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
-        position: absolute;
-        top: -150px;
-        right: 0;
+        font-size: 50px;
+        color: #999;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
-
-    img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
- */
+    
     .avatar-actions-inline {
         display: flex;
         align-items: center; /* <-- aligne verticalement le Browse et le bouton */

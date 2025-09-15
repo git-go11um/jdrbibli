@@ -19,22 +19,26 @@
             <div class="info-item">
                 <label>Avatar:</label>
                 <div class="avatar-section">
-                    <!-- Image ou message si pas d'avatar -->
-                    <div *ngIf="avatarUrl; else noAvatar">
-                        <img [src]="avatarUrl" alt="Avatar utilisateur" class="avatar-circle" width="150">
-                    </div>
-                    <ng-template #noAvatar>
-                        <p>Aucun avatar uploadé</p>
-                    </ng-template>
+    <div class="avatar-container">
+        <img *ngIf="avatarUrl; else noAvatar" [src]="avatarUrl" alt="Avatar utilisateur" class="avatar-circle">
+        <ng-template #noAvatar>
+            <div class="avatar-circle"></div>
+        </ng-template>
+    </div>
+    
+    <div class="avatar-actions-inline">
+        <input type="file" (change)="onFileSelected($event)" accept="image/*">
+        <button (click)="uploadAvatar()" [disabled]="!selectedFile">Envoyer l’avatar</button>
+    </div>
+</div>
+
+
 
                     <!-- Input fichier et bouton upload -->
-                    <div class="avatar-actions-inline">
-                        <input type="file" (change)="onFileSelected($event)" accept="image/*">
-                        <button (click)="uploadAvatar()" [disabled]="!selectedFile">Envoyer l’avatar</button>
-                    </div>
+                    
                 </div>
             </div>
-        </div>
+        
 
         <!-- Boutons actions -->
         <div class="action-buttons">

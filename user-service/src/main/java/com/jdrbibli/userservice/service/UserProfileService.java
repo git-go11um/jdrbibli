@@ -85,10 +85,10 @@ public class UserProfileService {
     }
 
     /** Supprime un profil par pseudo */
-    public void deleteUserByPseudo(String pseudo) {
-        UserProfile profile = userProfileRepository.findByPseudo(pseudo)
-                .orElseThrow(() -> new RuntimeException("Profil non trouvé avec le pseudo: " + pseudo));
-        userProfileRepository.delete(profile);
+    public String deleteUserByPseudo(String pseudo) {
+        userProfileRepository.findByPseudo(pseudo)
+                .ifPresent(profile -> userProfileRepository.delete(profile));
+        return "Utilisateur supprimé avec succès";
     }
 
     /** Récupère les ouvrages d’un utilisateur via ouvrage-service */
