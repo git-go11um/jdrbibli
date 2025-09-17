@@ -1,11 +1,8 @@
-// src/app/interceptors/auth.interceptor.ts
 import { HttpInterceptorFn } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
-
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
-    // Endpoints publics où on ne met pas le JWT
     const excludedUrls = [
         'http://localhost:8084/api/auth/login',
         'http://localhost:8084/api/auth/register',
@@ -17,26 +14,43 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
         'http://localhost:8084/api/auth/reset-password'
     ];
 
-    // Vérifie si l'URL contient un endpoint public
     const isExcluded = excludedUrls.some(url => req.url.includes(url));
 
     if (!isExcluded) {
+        let headers = req.headers;
+
+        // JWT
         const token = localStorage.getItem('jwt');
         if (token) {
-            const authReq = req.clone({
-                headers: req.headers.set('Authorization', `Bearer ${token}`)
-            });
-            return next(authReq).pipe(
-                catchError(err => {
-                    if (err.status === 401) {
-                        localStorage.removeItem('jwt');
-                        window.location.href = '/login'; // simple redirection
-                    }
-                    return throwError(() => err);
-                })
-            );
-
+            headers = headers.set('Authorization', `Bearer ${token}`);
         }
+
+        // User ID
+        const userId = (() => {
+            if (!token) return null;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                return payload?.id ?? null;
+            } catch {
+                return null;
+            }
+        })();
+
+        if (userId) {
+            headers = headers.set('X-User-Id', userId.toString());
+        }
+
+        const authReq = req.clone({ headers });
+
+        return next(authReq).pipe(
+            catchError(err => {
+                if (err.status === 401) {
+                    localStorage.removeItem('jwt');
+                    window.location.href = '/login';
+                }
+                return throwError(() => err);
+            })
+        );
     }
 
     return next(req);

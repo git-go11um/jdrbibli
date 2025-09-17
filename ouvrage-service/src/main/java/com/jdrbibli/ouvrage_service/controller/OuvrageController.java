@@ -48,9 +48,8 @@ public class OuvrageController {
     }
 
     @GetMapping("/gammes/{gammeId}")
-    public ResponseEntity<List<OuvrageDTO>> getByGamme(@PathVariable Long gammeId,
-            @RequestHeader("X-User-Id") Long ownerId) {
-        List<Ouvrage> ouvrages = ouvrageService.findByGammeIdAndOwnerId(gammeId, ownerId);
+    public ResponseEntity<List<OuvrageDTO>> getByGamme(@PathVariable Long gammeId) {
+        List<Ouvrage> ouvrages = ouvrageService.findByGammeId(gammeId); // version publique, sans ownerId
         List<OuvrageDTO> dtos = ouvrages.stream()
                 .map(ouvrageMapper::toDTO)
                 .collect(Collectors.toList());
@@ -60,7 +59,7 @@ public class OuvrageController {
     @PostMapping
     public ResponseEntity<OuvrageDTO> create(@RequestBody OuvrageDTO dto,
             @RequestHeader("X-User-Id") Long ownerId) {
-        dto.setOwnerId(ownerId);
+        dto.setOwnerId(ownerId); // obligatoire
         Ouvrage created = ouvrageService.createFromDTO(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ouvrageMapper.toDTO(created));
     }

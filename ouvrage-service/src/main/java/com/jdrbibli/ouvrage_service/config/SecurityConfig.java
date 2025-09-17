@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/ouvrage/ouvrages/**").permitAll()
+                        .requestMatchers("/api/ouvrage/gammes/**").permitAll()
                         .anyRequest().permitAll())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, authenticationManager),
                         UsernamePasswordAuthenticationFilter.class);

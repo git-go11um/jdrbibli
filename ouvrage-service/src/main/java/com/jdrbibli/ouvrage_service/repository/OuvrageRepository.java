@@ -24,4 +24,7 @@ public interface OuvrageRepository extends JpaRepository<Ouvrage, Long> {
 
     // Récupérer tous les ouvrages d’une gamme sauf un ID spécifique
     List<Ouvrage> findByGammeIdAndIdNot(Long gammeId, Long excludeId);
+
+    List<Ouvrage> findByGammeId(Long gammeId);
+
 }

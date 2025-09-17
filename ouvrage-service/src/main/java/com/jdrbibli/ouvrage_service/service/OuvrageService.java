@@ -85,4 +85,9 @@ public class OuvrageService {
                 .map(ouvrageMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    public List<Ouvrage> findByGammeId(Long gammeId) {
+        return ouvrageRepository.findByGammeId(gammeId);
+    }
+
 }

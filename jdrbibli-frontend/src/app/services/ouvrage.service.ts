@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from './auth.service';
 
 export interface OuvrageDTO {
     id?: number;
@@ -31,56 +30,39 @@ export interface OuvrageDTO {
 })
 export class OuvrageService {
 
-    // URL de base exposée par le gateway (comme tu l'as configurée)
     private apiUrl = 'http://localhost:8084/api/ouvrage/ouvrages';
 
-    constructor(private http: HttpClient, private authService: AuthService) { }
-
-    private createHeaders(): HttpHeaders {
-        const pseudo = this.authService.getUserPseudo() ?? '';
-        return new HttpHeaders({ 'X-User-Pseudo': pseudo });
-    }
+    constructor(private http: HttpClient) { }
 
     getAll(): Observable<OuvrageDTO[]> {
-        const headers = this.createHeaders();
-        return this.http.get<OuvrageDTO[]>(this.apiUrl, { headers });
+        return this.http.get<OuvrageDTO[]>(this.apiUrl);
     }
 
     getById(id: number): Observable<OuvrageDTO> {
-        const headers = this.createHeaders();
-        return this.http.get<OuvrageDTO>(`http://localhost:8084/api/ouvrage/ouvrages/${id}`, { headers });
+        return this.http.get<OuvrageDTO>(`${this.apiUrl}/${id}`);
     }
 
     getByGamme(gammeId: number): Observable<OuvrageDTO[]> {
-        const headers = this.createHeaders();
-        return this.http.get<OuvrageDTO[]>(`http://localhost:8084/api/ouvrage/ouvrages/gammes/${gammeId}`, { headers });
+        return this.http.get<OuvrageDTO[]>(`${this.apiUrl}/gammes/${gammeId}`);
     }
 
     create(ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
-        const headers = this.createHeaders();
-        return this.http.post<OuvrageDTO>(this.apiUrl, ouvrage, { headers });
+        return this.http.post<OuvrageDTO>(this.apiUrl, ouvrage);
     }
 
     update(id: number, ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
-        const headers = this.createHeaders();
-        return this.http.put<OuvrageDTO>(`http://localhost:8084/api/ouvrage/ouvrages/${id}`, ouvrage, { headers });
+        return this.http.put<OuvrageDTO>(`${this.apiUrl}/${id}`, ouvrage);
     }
 
     delete(id: number): Observable<void> {
-        const headers = this.createHeaders();
-        return this.http.delete<void>(`http://localhost:8084/api/ouvrage/ouvrages/${id}`, { headers });
+        return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 
     getOuvragesByGammeId(gammeId: number): Observable<OuvrageDTO[]> {
-        const headers = this.createHeaders();
-        return this.http.get<OuvrageDTO[]>(`http://localhost:8084/api/ouvrage/ouvrages/gammes/${gammeId}`, { headers });
+        return this.http.get<OuvrageDTO[]>(`${this.apiUrl}/gammes/${gammeId}`);
     }
 
     getOtherOuvragesInGamme(gammeId: number, excludeId: number): Observable<OuvrageDTO[]> {
-        const headers = this.createHeaders();
-        return this.http.get<OuvrageDTO[]>(`http://localhost:8084/api/ouvrage/ouvrages/gammes/${gammeId}/exclude/${excludeId}`, { headers });
+        return this.http.get<OuvrageDTO[]>(`${this.apiUrl}/gammes/${gammeId}/exclude/${excludeId}`);
     }
-
-
-
 }

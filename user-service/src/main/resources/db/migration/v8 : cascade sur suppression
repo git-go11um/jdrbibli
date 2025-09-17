@@ -1,0 +1,21 @@
+-- ===============================
+-- Script v8 : cascade sur suppression
+-- ===============================
+
+-- 1️⃣ Gammes → Users (owner_id)
+ALTER TABLE gammes
+DROP FOREIGN KEY IF EXISTS fk_gammes_owner_id;
+
+ALTER TABLE gammes
+ADD CONSTRAINT fk_gammes_owner_id
+FOREIGN KEY (owner_id) REFERENCES users(id)
+ON DELETE CASCADE;
+
+-- 2️⃣ Ouvrages → Gammes (gamme_id)
+ALTER TABLE ouvrages
+DROP FOREIGN KEY IF EXISTS fk_ouvrages_gammes;
+
+ALTER TABLE ouvrages
+ADD CONSTRAINT fk_ouvrages_gammes
+FOREIGN KEY (gamme_id) REFERENCES gammes(id)
+ON DELETE CASCADE;

@@ -27,6 +27,8 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
+
+
     <!-- Spring Data JPA -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -109,18 +111,19 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-            <mainClass>com.jdrbibli.userservice.UserServiceApplication</mainClass> <!-- Vérifie que cette classe est correcte -->
+          <mainClass>com.jdrbibli.userservice.UserServiceApplication</mainClass> <!-- Vérifie que
+          cette classe est correcte -->
         </configuration>
         <version>3.2.6</version>
         <executions>
-            <execution>
-                <goals>
-                    <goal>repackage</goal>
-                </goals>
-            </execution>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
         </executions>
-    </plugin>
-    
+      </plugin>
+
 
       <!-- Plugin Jacoco -->
       <plugin>
