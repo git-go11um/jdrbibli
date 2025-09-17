@@ -13,7 +13,7 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.2.6</version> <!-- bonne version -->
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <properties>
@@ -46,8 +46,12 @@
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
+          <configuration>
+            <mainClass>com.jdrbibli.ouvrage_service.OuvrageServiceApplication</mainClass>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
+
 </project>

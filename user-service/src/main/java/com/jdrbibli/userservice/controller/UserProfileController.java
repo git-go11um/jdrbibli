@@ -184,9 +184,19 @@ public class UserProfileController {
                         : "");
 
         // ✅ avatarUrl = URL publique
-        
 
         return ResponseEntity.ok(dto);
+    }
+
+    /** Supprimer un utilisateur par ID */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        boolean deleted = userProfileService.deleteUserById(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build(); // Retourne 204 No Content si la suppression a réussi
+        } else {
+            return ResponseEntity.notFound().build(); // Retourne 404 Not Found si l'utilisateur n'existe pas
+        }
     }
 
 }

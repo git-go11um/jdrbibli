@@ -108,7 +108,19 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
+        <configuration>
+            <mainClass>com.jdrbibli.userservice.UserServiceApplication</mainClass> <!-- Vérifie que cette classe est correcte -->
+        </configuration>
+        <version>3.2.6</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>repackage</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    
 
       <!-- Plugin Jacoco -->
       <plugin>

@@ -29,9 +29,11 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    // Suppression en cascade pour les ludothèques
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserLudotheque> ludotheque;
 
+    // Suppression en cascade pour les demandes d'amis envoyées et reçues
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FriendRequest> sentFriendRequests;
 
@@ -118,5 +120,17 @@ public class User {
 
     public void setReceivedFriendRequests(Set<FriendRequest> receivedFriendRequests) {
         this.receivedFriendRequests = receivedFriendRequests;
+    }
+
+    // Ajout d'une relation avec Gamme en cascade
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Gamme> gammes;
+
+    public Set<Gamme> getGammes() {
+        return gammes;
+    }
+
+    public void setGammes(Set<Gamme> gammes) {
+        this.gammes = gammes;
     }
 }

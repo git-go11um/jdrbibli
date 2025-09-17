@@ -168,4 +168,13 @@ public class UserProfileService {
         });
     }
 
+    /** Supprimer un utilisateur par ID */
+    public boolean deleteUserById(Long id) {
+        if (userProfileRepository.existsById(id)) {
+            userProfileRepository.deleteById(id);
+            return true; // L'utilisateur a été supprimé avec succès
+        }
+        return false; // L'utilisateur n'existe pas
+    }
+
 }
