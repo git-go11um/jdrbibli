@@ -166,7 +166,7 @@ export class GammePage implements OnInit {
   }
 
   modifierOuvrage(ouvrageId: number): void {
-    this.ouvrirFormulaireEdition(ouvrageId);
+    this.router.navigate(['/creation-edition', ouvrageId]);
   }
 
   toggleFormulaireAjout(): void {
@@ -184,8 +184,12 @@ export class GammePage implements OnInit {
   }
 
   ouvrirPageOuvrage(ouvrageId: number): void {
-  this.router.navigate(['/ouvrage-detail', ouvrageId]);
-}
+    this.router.navigate(['/ouvrage-detail', ouvrageId]);
+  }
+
+  allerCreationEdition() {
+    this.router.navigate(['/creation-edition'], { queryParams: { gammeId: this.gamme?.id } });
+  }
 
 
 }

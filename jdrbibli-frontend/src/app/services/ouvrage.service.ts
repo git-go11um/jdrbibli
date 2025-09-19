@@ -20,9 +20,10 @@ export interface OuvrageDTO {
     notes: string;
     scenariosContenus: string[];
     autresOuvragesGamme: string[];
-    gammeId: number;
+    gammeId?: number | null;
     liensMedias: string[];
     ownerPseudo?: string;
+    ownerId?: number;
 }
 
 @Injectable({

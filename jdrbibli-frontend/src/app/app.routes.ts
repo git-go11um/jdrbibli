@@ -13,6 +13,7 @@ import { ProfilUtilisateur } from './pages/profil-utilisateur/profil-utilisateur
 import { ProfileEditComponent } from './pages/profil-utilisateur/profile-edit.component';
 import { GammePage } from './pages/gamme-page/gamme-page';
 import { OuvragePage } from './pages/ouvrage-page/ouvrage-page';  // Importation du composant de consultation de l'ouvrage
+import { CreationEditionPage } from './pages/creation-edition-page/creation-edition-page';
 import { OuvrageDetailPage } from './pages/ouvrage-detail-page/ouvrage-detail-page';  // Ajout de l'import
 
 export const routes: Routes = [
@@ -37,9 +38,11 @@ export const routes: Routes = [
   { path: 'gamme/:id', component: GammePage },
   { path: 'ouvrage/:id', component: OuvragePage },  // La route pour afficher un ouvrage en lecture seule
   { path: 'ouvrage-detail/:id', component: OuvrageDetailPage },  // Route vers la page de détail
+  { path: 'creation-edition/:id', component: CreationEditionPage, canActivate: [AuthGuard] },
+  { path: 'creation-edition', component: CreationEditionPage, canActivate: [AuthGuard] },
   {
-  path: 'reset-profil-password',
-  loadComponent: () => import('./pages/auth/reset-profil-password-page/reset-profil-password-page').then(m => m.ResetProfilPasswordPage)
+    path: 'reset-profil-password',
+    loadComponent: () => import('./pages/auth/reset-profil-password-page/reset-profil-password-page').then(m => m.ResetProfilPasswordPage)
   },
   { path: '**', redirectTo: 'login' }
 

@@ -1,121 +1,37 @@
 <div class="page-container" *ngIf="ouvrage">
-  <!-- Colonne gauche : informations de l'ouvrage -->
-  <div class="left-column">
-    <h2>{{ ouvrage.titre }}</h2>
-    <button (click)="goToGamme()" class="gamme-button">{{ gamme?.nom }}</button>
 
+  <h2>{{ ouvrage.titre }}</h2>
+  <p><strong>Version :</strong> {{ ouvrage.version }}</p>
+  <p><strong>Type :</strong> {{ ouvrage.typeOuvrage }}</p>
+  <p><strong>Date de publication :</strong> {{ ouvrage.datePublication }}</p>
+  <p><strong>Langue :</strong> {{ ouvrage.langue }}</p>
+  <p><strong>Éditeur :</strong> {{ ouvrage.editeur }}</p>
+  <p><strong>État :</strong> {{ ouvrage.etat }}</p>
+  <p><strong>ISBN :</strong> {{ ouvrage.isbn }}</p>
+  <p><strong>Ouvrage lié :</strong> {{ ouvrage.ouvrageLie }}</p>
+  <p><strong>Scénario lié :</strong> {{ ouvrage.scenarioLie }}</p>
+  <p><strong>Prêt :</strong> {{ ouvrage.pret ? 'Oui' : 'Non' }}</p>
+  <p><strong>Errata :</strong> {{ ouvrage.errata }}</p>
+  <p><strong>Notes :</strong> {{ ouvrage.notes }}</p>
 
-    <div class="field">
-      <label>Version :</label>
-      <input [(ngModel)]="ouvrage.version" type="text" />
-    </div>
-
-    <div class="field">
-      <label>Type d'ouvrage :</label>
-      <select [(ngModel)]="ouvrage.typeOuvrage">
-        <option *ngFor="let option of typeOptions" [value]="option">{{ option }}</option>
-      </select>
-      <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.typeOuvrage" />
-    </div>
-
-    <div class="field">
-      <label>Date de publication :</label>
-      <input type="month" [(ngModel)]="ouvrage.datePublication" />
-    </div>
-
-    <div class="field">
-      <label>Langue :</label>
-      <select [(ngModel)]="ouvrage.langue">
-        <option *ngFor="let option of langueOptions" [value]="option">{{ option }}</option>
-      </select>
-      <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.langue" />
-    </div>
-
-    <div class="field">
-      <label>Éditeur :</label>
-      <input type="text" [(ngModel)]="ouvrage.editeur" />
-    </div>
-
-    <div class="field">
-      <label>État de l'ouvrage :</label>
-      <select [(ngModel)]="ouvrage.etat">
-        <option *ngFor="let option of etatOptions" [value]="option">{{ option }}</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label>EAN/ISBN :</label>
-      <input type="text" [(ngModel)]="ouvrage.isbn" />
-    </div>
-
-    <div class="field">
-      <label>Lié à un autre ouvrage :</label>
-      <input type="text" [(ngModel)]="ouvrage.ouvrageLie" placeholder="Ensemble de la gamme" />
-    </div>
-
-    <div class="field">
-      <label>Scénario lié :</label>
-      <input type="text" [(ngModel)]="ouvrage.scenarioLie" placeholder="Non" />
-    </div>
-
-    <div class="field">
-      <label>Prêt :</label>
-      <input type="checkbox" [(ngModel)]="ouvrage.pret" />
-    </div>
-
-    <div class="field">
-      <label>Errata :</label>
-      <input type="text" [(ngModel)]="ouvrage.errata" placeholder="Lien ou texte" />
-    </div>
-    <div class="field">
-      <label>Notes personnelles :</label>
-      <textarea [(ngModel)]="ouvrage.notes" placeholder="Prenez vos notes ici..."></textarea>
-    </div>
-
-    <div class="field">
-      <label>Scénarios contenus (séparés par des virgules) :</label>
-      <textarea [(ngModel)]="scenariosContenusString"
-        placeholder="Listez ici les scénarios contenus, séparés par des virgules..."></textarea>
-    </div>
-
-    <button (click)="sauvegarderOuvrage()" [disabled]="isSaving">
-      {{ isSaving ? 'Sauvegarde en cours...' : 'Sauvegarder les modifications' }}
-    </button>
-
-  </div>
-
-  <!-- Colonne centrale -->
-  <div class="center-column">
-    <div class="card">
-      <h3>Couverture</h3>
-      <div class="cover-placeholder">
-        <!-- Placeholder pour l'image -->
-        <span>Image à venir</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Liens vers d'autres médias :</h3>
-      <div class="field" *ngFor="let lien of ouvrage.liensMedias; let i = index">
-        <input type="url" [(ngModel)]="ouvrage.liensMedias[i]" placeholder="https://..." />
-      </div>
-      <button (click)="ajouterLien()">Ajouter un lien</button>
-    </div>
-  </div>
-
-  <!-- Colonne droite : autres ouvrages dans la gamme -->
-  <div class="right-column">
-    <h3>Autres ouvrages dans la gamme</h3>
+  <div *ngIf="ouvrage.scenariosContenus?.length">
+    <strong>Scénarios contenus :</strong>
     <ul>
-      <li *ngFor="let autre of autresOuvrages">
-        <a *ngIf="autre.id !== undefined" (click)="goToOuvrage(autre.id)">
-          {{ autre.titre }}
-        </a>
-        <span *ngIf="autre.id === undefined">
-          {{ autre.titre }}
-        </span>
+      <li *ngFor="let sc of ouvrage.scenariosContenus">{{ sc }}</li>
+    </ul>
+  </div>
+
+  <div *ngIf="ouvrage.liensMedias?.length">
+    <strong>Liens médias :</strong>
+    <ul>
+      <li *ngFor="let lien of ouvrage.liensMedias">
+        <a [href]="lien" target="_blank">{{ lien }}</a>
       </li>
     </ul>
+  </div>
+
+  <div class="actions">
+    <button (click)="editerOuvrage()">Modifier</button>
   </div>
 
 </div>
