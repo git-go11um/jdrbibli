@@ -93,4 +93,11 @@ public class GammeController {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
     }
+
+    @DeleteMapping("/by-owner/{ownerId}")
+    public ResponseEntity<Void> deleteGammesByOwner(@PathVariable Long ownerId) {
+        gammeService.deleteByOwnerId(ownerId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

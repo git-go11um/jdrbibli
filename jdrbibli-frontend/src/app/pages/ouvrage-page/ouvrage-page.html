@@ -21,15 +21,6 @@
     </ul>
   </div>
 
-  <div *ngIf="ouvrage.liensMedias?.length">
-    <strong>Liens médias :</strong>
-    <ul>
-      <li *ngFor="let lien of ouvrage.liensMedias">
-        <a [href]="lien" target="_blank">{{ lien }}</a>
-      </li>
-    </ul>
-  </div>
-
   <div class="actions">
     <button (click)="editerOuvrage()">Modifier</button>
   </div>

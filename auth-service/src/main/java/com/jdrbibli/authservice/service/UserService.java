@@ -38,8 +38,9 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RestTemplate restTemplate = new RestTemplate();
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+
+    private final RestTemplate restTemplate;
 
     @Value("${app.user-service-url}")
     private String userServiceUrl;
@@ -56,6 +57,7 @@ public class UserService implements IUserService {
         this.mailSender = mailSender;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.restTemplate = new RestTemplate();
     }
 
     @PostConstruct
@@ -91,23 +93,49 @@ public class UserService implements IUserService {
         return user;
     }
 
+
+    /** Supprime un utilisateur côté auth-service et côté user-service (cascade gammes/ouvrages) */
+    public boolean deleteUserWithCascade(Long userId) {
+        // 1️⃣ Supprime côté user-service
+        String url = userServiceUrl + "/" + userId + "/cascade"; //-- vérifie que l'endpoint existe côté user-service
+        try {
+            restTemplate.delete(url);
+            System.out.println("✅ Suppression cascade réussie dans user-service pour id=" + userId);
+        } catch (HttpClientErrorException.NotFound e) {
+            System.err.println("Profil utilisateur " + userId + " inexistant côté user-service.");
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la suppression dans user-service (id=" + userId + ") : " + e.getMessage());
+            return false;
+        }
+
+        // 2️⃣ Supprime côté auth-service
+        if (userRepository.existsById(userId)) {
+            userRepository.deleteById(userId);
+            System.out.println("✅ Compte utilisateur " + userId + " supprimé côté auth-service.");
+            return true;
+        } else {
+            System.err.println("Compte utilisateur " + userId + " déjà supprimé côté auth-service.");
+            return false;
+        }
+    }
+   
+
     @Override
-    @Transactional
     public void deleteUserById(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec id " + userId + " non trouvé"));
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec l'ID : " + userId));
 
-        deletePasswordResetTokens(userId);
-        userRepository.deleteById(userId);
+        // ✅ Supprime d’abord côté auth_db
+        userRepository.delete(user);
 
+        // ✅ Appel côté user-service par ID en cascade
+        String url = userServiceUrl + "/" + userId + "/cascade";
         try {
-            String url = userServiceUrl + "/by-pseudo/" + user.getPseudo();
             restTemplate.delete(url);
-            System.out.println("✅ Profil user-service supprimé pour pseudo=" + user.getPseudo());
+            System.out.println("✅ Suppression cascade réussie dans user-service pour id=" + userId);
         } catch (Exception e) {
             System.err.println(
-                    "⚠️ Erreur suppression user-service pour pseudo=" + user.getPseudo() + " : " + e.getMessage());
-            e.printStackTrace();
+                    "⚠️ Erreur lors de la suppression dans user-service (id=" + userId + ") : " + e.getMessage());
         }
     }
 
@@ -325,4 +353,11 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec id " + id + " non trouvé"));
+    }
+
 }

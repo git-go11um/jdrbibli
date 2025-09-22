@@ -1,10 +1,10 @@
 package com.jdrbibli.userservice.mapper;
 
 import com.jdrbibli.userservice.dto.FriendDTO;
-import com.jdrbibli.userservice.entity.User;
+import com.jdrbibli.userservice.entity.UserProfile;
 
 public class FriendMapper {
-    public static FriendDTO toDTO(User user) {
+    public static FriendDTO toDTO(UserProfile user) {
         if (user == null) return null;
         
         FriendDTO dto = new FriendDTO();

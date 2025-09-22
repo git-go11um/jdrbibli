@@ -88,4 +88,24 @@
       }
     }
   }
+  .ouvrage-image {
+    text-align: left;
+    margin-bottom: 1rem;
+  
+    img {
+      max-width: 300px; // limite la largeur sur grands écrans
+      width: 100%;      // l'image s'adapte au conteneur si plus petite
+      height: auto;     // conserve le ratio
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      object-fit: contain; // ne déforme pas l'image
+    }
+  
+    @media (max-width: 600px) {
+      img {
+        max-width: 80%; // plus petit sur mobile
+      }
+    }
+  }
+  
   

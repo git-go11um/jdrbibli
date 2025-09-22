@@ -22,7 +22,7 @@ public class Gamme {
     @OneToMany(mappedBy = "gamme", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ouvrage> ouvrages;
 
-    // Getters
+    // ----- Getters & Setters -----
     public Long getId() {
         return id;
     }
@@ -43,7 +43,6 @@ public class Gamme {
         return ouvrages;
     }
 
-    // Setters
     public void setId(Long id) {
         this.id = id;
     }

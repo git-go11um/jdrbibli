@@ -3,7 +3,7 @@ package com.jdrbibli.userservice.mapper;
 import com.jdrbibli.userservice.dto.FriendDTO;
 import com.jdrbibli.userservice.dto.FriendRequestDTO;
 import com.jdrbibli.userservice.entity.FriendRequest;
-import com.jdrbibli.userservice.entity.User;
+import com.jdrbibli.userservice.entity.UserProfile;
 
 public class FriendRequestMapper {
 
@@ -18,7 +18,7 @@ public class FriendRequestMapper {
         return dto;
     }
 
-    public static FriendDTO toDTO(User user) {
+    public static FriendDTO toDTO(UserProfile user) {
         FriendDTO dto = new FriendDTO();
         dto.setId(user.getId());
         dto.setPseudo(user.getPseudo());

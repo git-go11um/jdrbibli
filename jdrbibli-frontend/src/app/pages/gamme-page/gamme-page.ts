@@ -6,7 +6,6 @@ import { OuvrageService, OuvrageDTO } from '../../services/ouvrage.service';
 import { GammeService, GammeDTO } from '../../services/gamme.service';
 import { FormsModule } from '@angular/forms';
 
-
 @Component({
   standalone: true,
   selector: 'app-gamme-page',
@@ -75,8 +74,7 @@ export class GammePage implements OnInit {
       errata: '',
       notes: '',
       scenariosContenusString: '',
-      autresOuvragesGammeString: '',
-      liensMediasString: ''
+      autresOuvragesGammeString: ''
     };
   }
 
@@ -95,9 +93,7 @@ export class GammePage implements OnInit {
         this.currentOuvrage = {
           ...data,
           scenariosContenusString: data.scenariosContenus?.join(', ') || '',
-          autresOuvragesGammeString: data.autresOuvragesGamme?.join(', ') || '',
-          liensMediasString: data.liensMedias?.join(', ') || '',
-          datePublication: data.datePublication ? data.datePublication.substring(0, 10) : '' // si date ISO string
+          autresOuvragesGammeString: data.autresOuvragesGamme?.join(', ') || ''
         };
         this.afficherFormulaireAjout = true;
       },
@@ -125,8 +121,7 @@ export class GammePage implements OnInit {
       errata: this.currentOuvrage.errata,
       notes: this.currentOuvrage.notes,
       scenariosContenus: this.splitStringToArray(this.currentOuvrage.scenariosContenusString),
-      autresOuvragesGamme: this.splitStringToArray(this.currentOuvrage.autresOuvragesGammeString),
-      liensMedias: this.splitStringToArray(this.currentOuvrage.liensMediasString),
+      autresOuvragesGamme: this.splitStringToArray(this.currentOuvrage.autresOuvragesGammeString)
     };
 
     if (this.enEdition && dto.id != null) {
@@ -190,6 +185,4 @@ export class GammePage implements OnInit {
   allerCreationEdition() {
     this.router.navigate(['/creation-edition'], { queryParams: { gammeId: this.gamme?.id } });
   }
-
-
 }

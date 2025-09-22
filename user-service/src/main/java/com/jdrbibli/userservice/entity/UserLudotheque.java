@@ -12,7 +12,7 @@ public class UserLudotheque {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UserProfile user;
 
     @ManyToOne
     @JoinColumn(name = "ouvrage_id", nullable = false)

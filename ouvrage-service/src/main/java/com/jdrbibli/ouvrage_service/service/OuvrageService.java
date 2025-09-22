@@ -9,6 +9,7 @@ import com.jdrbibli.ouvrage_service.repository.OuvrageRepository;
 import com.jdrbibli.ouvrage_service.repository.GammeRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,6 +45,13 @@ public class OuvrageService {
         Ouvrage ouvrage = ouvrageMapper.toEntity(dto);
         ouvrage.setGamme(gamme);
 
+        if (ouvrage.getScenariosContenusList() == null) {
+            ouvrage.setScenariosContenusList(new ArrayList<>());
+        }
+        if (ouvrage.getAutresOuvragesGamme() == null) {
+            ouvrage.setAutresOuvragesGamme(new ArrayList<>());
+        }
+
         if (dto.getOwnerId() == null) {
             throw new IllegalArgumentException("OwnerId must be set");
         }
@@ -59,14 +67,29 @@ public class OuvrageService {
         Gamme gamme = gammeRepository.findById(dto.getGammeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Gamme not found with id " + dto.getGammeId()));
 
-        // Conserver ownerId existant
-        dto.setOwnerId(existing.getOwnerId());
+        existing.setTitre(dto.getTitre());
+        existing.setDescription(dto.getDescription());
+        existing.setVersion(dto.getVersion());
+        existing.setTypeOuvrage(dto.getTypeOuvrage());
+        existing.setDatePublication(dto.getDatePublication());
+        existing.setLangue(dto.getLangue());
+        existing.setEditeur(dto.getEditeur());
+        existing.setEtat(dto.getEtat());
+        existing.setIsbn(dto.getIsbn());
+        existing.setOuvrageLie(dto.getOuvrageLie());
+        existing.setScenarioLie(dto.getScenarioLie());
+        existing.setPret(dto.getPret());
+        existing.setErrata(dto.getErrata());
+        existing.setNotes(dto.getNotes());
+        existing.setImageUrl(dto.getImageUrl());
+        existing.setGamme(gamme);
 
-        Ouvrage updated = ouvrageMapper.toEntity(dto);
-        updated.setId(id);
-        updated.setGamme(gamme);
+        existing.setScenariosContenusList(
+                dto.getScenariosContenus() != null ? dto.getScenariosContenus() : new ArrayList<>());
+        existing.setAutresOuvragesGamme(
+                dto.getAutresOuvragesGamme() != null ? dto.getAutresOuvragesGamme() : new ArrayList<>());
 
-        return ouvrageRepository.save(updated);
+        return ouvrageRepository.save(existing);
     }
 
     /** Supprimer un ouvrage */
@@ -89,5 +112,4 @@ public class OuvrageService {
     public List<Ouvrage> findByGammeId(Long gammeId) {
         return ouvrageRepository.findByGammeId(gammeId);
     }
-
 }

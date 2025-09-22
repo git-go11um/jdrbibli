@@ -21,20 +21,23 @@ export interface OuvrageDTO {
     scenariosContenus: string[];
     autresOuvragesGamme: string[];
     gammeId?: number | null;
-    liensMedias: string[];
     ownerPseudo?: string;
     ownerId?: number;
+    imageUrl?: string;
+    gammeNom?: string;
 }
+
 
 @Injectable({
     providedIn: 'root'
 })
 export class OuvrageService {
 
-    private apiUrl = 'http://localhost:8084/api/ouvrage/ouvrages';
+    private apiUrl = 'http://localhost:8084/api/ouvrage/ouvrages'; // ton API principale
 
     constructor(private http: HttpClient) { }
 
+    // CRUD classique
     getAll(): Observable<OuvrageDTO[]> {
         return this.http.get<OuvrageDTO[]>(this.apiUrl);
     }
@@ -51,6 +54,7 @@ export class OuvrageService {
         return this.http.post<OuvrageDTO>(this.apiUrl, ouvrage);
     }
 
+
     update(id: number, ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
         return this.http.put<OuvrageDTO>(`${this.apiUrl}/${id}`, ouvrage);
     }
@@ -66,4 +70,17 @@ export class OuvrageService {
     getOtherOuvragesInGamme(gammeId: number, excludeId: number): Observable<OuvrageDTO[]> {
         return this.http.get<OuvrageDTO[]>(`${this.apiUrl}/gammes/${gammeId}/exclude/${excludeId}`);
     }
+
+    // Upload d'image
+    uploadImage(file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        return this.http.post(
+            'http://localhost:8083/api/ouvrage/ouvrages/upload-image',
+            formData,
+            { responseType: 'text' }  // ← important !
+        );
+    }
 }
+

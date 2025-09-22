@@ -44,4 +44,36 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYWEiLCJpYXQiOjE3NTc5NDA3M
 X-User-Pseudo: aaa
 Accept: application/json
 
+#########
+### Récupérer un ouvrage par son ID
+GET http://localhost:8083/api/ouvrage/ouvrages/78
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTk2LCJzdWIiOiJiY2QiLCJpYXQiOjE3NTgzMDc4MzYsImV4cCI6MTc1ODMxMTQzNn0.QknjyEiRYV5wGeeHCxCSo06D78nLqPjL_Qa1Wme0_pU
+X-User-Id: 196
+
+### Créer un nouvel ouvrage avec liens médias
+POST http://localhost:8083/api/ouvrage/ouvrages
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MTk2LCJzdWIiOiJiY2QiLCJpYXQiOjE3NTgzMDc4MzYsImV4cCI6MTc1ODMxMTQzNn0.QknjyEiRYV5wGeeHCxCSo06D78nLqPjL_Qa1Wme0_pU
+X-User-Id: 196
+
+{
+  "titre": "ouvrageTestMedia",
+  "description": "Test sauvegarde liens médias",
+  "gammeId": 75,
+  "version": "1.0",
+  "typeOuvrage": "Livre papier",
+  "datePublication": "2025-09-19",
+  "langue": "Français",
+  "editeur": "ÉditeurTest",
+  "etat": "Bon",
+  "isbn": "1234567890",
+  "pret": true,
+
+  "scenariosContenus": ["Scenario1", "Scenario2"],
+  "autresOuvragesGamme": [],
+  "imageUrl": "/uploads/images/test.jpg"
+}
+
+
 

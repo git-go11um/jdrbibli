@@ -24,10 +24,12 @@ export class OuvragePage implements OnInit {
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
-    const id = idParam ? Number(idParam) : null;
+    const id = idParam ? Number(idParam) : undefined;
 
-    if (id && id > 0) {
+    if (id) {
       this.loadOuvrage(id);
+    } else {
+      console.error('ID d\'ouvrage invalide ou manquant');
     }
   }
 
@@ -48,6 +50,8 @@ export class OuvragePage implements OnInit {
   editerOuvrage(): void {
     if (this.ouvrage?.id) {
       this.router.navigate(['/creation-edition', this.ouvrage.id]);
+    } else {
+      console.error('Ouvrage non trouvé ou ID manquant');
     }
   }
 }

@@ -23,9 +23,9 @@ public class OuvrageDTO {
     private String notes;
     private List<String> scenariosContenus;
     private List<String> autresOuvragesGamme;
-    private List<String> liensMedias;
-
+    private String imageUrl;
     private Long ownerId; // <-- remplace ownerPseudo
+    private String gammeNom;
 
     // Constructeur vide
     public OuvrageDTO() {
@@ -176,14 +176,6 @@ public class OuvrageDTO {
         this.autresOuvragesGamme = autresOuvragesGamme;
     }
 
-    public List<String> getLiensMedias() {
-        return liensMedias;
-    }
-
-    public void setLiensMedias(List<String> liensMedias) {
-        this.liensMedias = liensMedias;
-    }
-
     public Long getOwnerId() {
         return ownerId;
     }
@@ -191,4 +183,21 @@ public class OuvrageDTO {
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getGammeNom() {
+        return gammeNom;
+    }
+
+    public void setGammeNom(String gammeNom) {
+        this.gammeNom = gammeNom;
+    }
+
 }

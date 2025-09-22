@@ -19,6 +19,8 @@ public interface IUserService {
 
     User getUserByPseudo(String pseudo);
 
+    User getUserById(Long id); 
+
     void changePassword(String userEmail, ChangePasswordRequest request);
 
     boolean validateResetCode(String pseudo, String code);

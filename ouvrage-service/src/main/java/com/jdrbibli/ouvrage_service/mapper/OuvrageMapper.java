@@ -2,6 +2,10 @@ package com.jdrbibli.ouvrage_service.mapper;
 
 import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
 import com.jdrbibli.ouvrage_service.entity.Ouvrage;
+
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +20,7 @@ public class OuvrageMapper {
         dto.setTitre(entity.getTitre());
         dto.setDescription(entity.getDescription());
         dto.setGammeId(entity.getGamme() != null ? entity.getGamme().getId() : null);
+        dto.setGammeNom(entity.getGamme() != null ? entity.getGamme().getNom() : null);
         dto.setVersion(entity.getVersion());
         dto.setTypeOuvrage(entity.getTypeOuvrage());
         dto.setDatePublication(entity.getDatePublication());
@@ -28,11 +33,12 @@ public class OuvrageMapper {
         dto.setPret(entity.getPret());
         dto.setErrata(entity.getErrata());
         dto.setNotes(entity.getNotes());
-        dto.setScenariosContenus(entity.getScenariosContenus());
-        dto.setAutresOuvragesGamme(entity.getAutresOuvragesGamme());
-        dto.setLiensMedias(entity.getLiensMedias());
 
-        // <-- on passe à ownerId
+        // Conversion String → List<String>
+        dto.setScenariosContenus(entity.getScenariosContenusList());
+        dto.setAutresOuvragesGamme(entity.getAutresOuvragesGamme());
+
+        dto.setImageUrl(entity.getImageUrl());
         dto.setOwnerId(entity.getOwnerId());
 
         return dto;
@@ -58,11 +64,12 @@ public class OuvrageMapper {
         entity.setPret(dto.getPret());
         entity.setErrata(dto.getErrata());
         entity.setNotes(dto.getNotes());
-        entity.setScenariosContenus(dto.getScenariosContenus());
-        entity.setAutresOuvragesGamme(dto.getAutresOuvragesGamme());
-        entity.setLiensMedias(dto.getLiensMedias());
 
-        // <-- on passe à ownerId
+        // Conversion List<String> → String
+        entity.setScenariosContenusList(dto.getScenariosContenus());
+        entity.setAutresOuvragesGamme(dto.getAutresOuvragesGamme());
+
+        entity.setImageUrl(dto.getImageUrl());
         entity.setOwnerId(dto.getOwnerId());
 
         return entity;

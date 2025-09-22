@@ -7,9 +7,16 @@ import com.jdrbibli.ouvrage_service.service.OuvrageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -102,4 +109,31 @@ public class OuvrageController {
         List<OuvrageDTO> ouvrages = ouvrageService.getOuvragesByGamme(gammeId, id);
         return ResponseEntity.ok(ouvrages);
     }
+
+    @PostMapping("/upload-image")
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("Fichier vide");
+            }
+
+            // Générer un nom unique pour éviter les collisions
+            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path uploadPath = Paths.get("uploads/images"); // dossier où stocker les images
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Path filePath = uploadPath.resolve(filename);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // Retourner l’URL ou chemin relatif
+            String imageUrl = "/uploads/images/" + filename;
+            return ResponseEntity.ok(imageUrl);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur serveur");
+        }
+    }
+
 }

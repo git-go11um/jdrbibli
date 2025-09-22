@@ -43,6 +43,9 @@ public class UserProfile {
     @JoinTable(name = "user_friends", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "friend_id"))
     private List<UserProfile> friends;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Gamme> gammes;
+
     // Getters et setters
 
     public Long getId() {
@@ -107,5 +110,13 @@ public class UserProfile {
 
     public void setAvatarPath(String avatarPath) {
         this.avatarPath = avatarPath;
+    }
+
+    public List<Gamme> getGammes() {
+        return gammes;
+    }
+
+    public void setGammes(List<Gamme> gammes) {
+        this.gammes = gammes;
     }
 }

@@ -4,7 +4,6 @@ import com.jdrbibli.userservice.config.StorageProperties;
 import com.jdrbibli.userservice.dto.FriendDTO;
 import com.jdrbibli.userservice.dto.OuvrageDTO;
 import com.jdrbibli.userservice.dto.UserProfileDTO;
-import com.jdrbibli.userservice.entity.User;
 import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.mapper.FriendMapper;
 import com.jdrbibli.userservice.repository.UserProfileRepository;
@@ -12,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class UserProfileService {
     private final StorageProperties storageProperties;
     private final FriendRequestService friendRequestService;
     private final UserProfileRepository userProfileRepository;
+    private static final Logger log = LoggerFactory.getLogger(UserProfileService.class);
 
     @Autowired
     public UserProfileService(UserProfileRepository userProfileRepository,
@@ -106,7 +108,7 @@ public class UserProfileService {
         UserProfile profile = userProfileRepository.findByPseudo(pseudo)
                 .orElseThrow(() -> new RuntimeException("Profil non trouvé: " + pseudo));
 
-        List<User> friends = friendRequestService.listFriends(profile.getId());
+        List<UserProfile> friends = friendRequestService.listFriends(profile.getId());
         return friends.stream()
                 .map(FriendMapper::toDTO)
                 .collect(Collectors.toList());
@@ -175,6 +177,28 @@ public class UserProfileService {
             return true; // L'utilisateur a été supprimé avec succès
         }
         return false; // L'utilisateur n'existe pas
+    }
+
+    /** Supprime un utilisateur et cascade sur ses gammes/ouvrages */
+    /** Supprime un utilisateur et cascade sur ses gammes/ouvrages */
+    public boolean deleteUserByIdWithCascade(Long id) {
+        Optional<UserProfile> optionalProfile = userProfileRepository.findById(id);
+        if (optionalProfile.isEmpty()) {
+            log.warn("Tentative de suppression d'un profil utilisateur inexistant : {}", id);
+            return false;
+        }
+
+        UserProfile profile = optionalProfile.get();
+
+        try {
+            userProfileRepository.delete(profile); // supprime le profil et toutes les gammes liées
+            log.info("Profil utilisateur {} et ses gammes supprimés avec succès.", id);
+        } catch (Exception e) {
+            log.error("Erreur lors de la suppression du profil utilisateur {}", id, e);
+            return false;
+        }
+
+        return true;
     }
 
 }

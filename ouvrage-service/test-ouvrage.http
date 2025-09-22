@@ -13,3 +13,19 @@ X-User-Pseudo: vincent
 ### 🧩 Récupérer les autres ouvrages dans la même gamme (par ex. gammeId=5, excludeId=23)
 GET http://localhost:8084/api/ouvrage/ouvrages/gammes/23/exclude/30
 X-User-Pseudo: vincent
+
+
+###
+DELETE http://localhost:8082/api/users/207/cascade
+Accept: application/json
+
+###
+GET http://localhost:8082/api/users/207
+Accept: application/json
+
+###
+GET http://localhost:8082/api/users/207/cascade
+
+###
+DELETE http://localhost:8083/api/gammes/by-owner/207
+Accept: application/json

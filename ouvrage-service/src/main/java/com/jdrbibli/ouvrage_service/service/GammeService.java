@@ -5,6 +5,7 @@ import com.jdrbibli.ouvrage_service.exception.ResourceNotFoundException;
 import com.jdrbibli.ouvrage_service.mapper.GammeMapper;
 import com.jdrbibli.ouvrage_service.repository.GammeRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,8 +38,26 @@ public class GammeService {
         return gammeRepository.save(gamme);
     }
 
+    @Transactional
     public void deleteById(Long id, boolean force) {
-        // TODO: gérer la suppression avec contrainte si nécessaire
-        gammeRepository.deleteById(id);
+        Gamme gamme = gammeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Gamme non trouvée : " + id));
+
+        if (!force && gamme.getOuvrages() != null && !gamme.getOuvrages().isEmpty()) {
+            throw new RuntimeException("La gamme contient des ouvrages. Utilisez force=true pour supprimer.");
+        }
+
+        // Suppression en cascade via JPA
+        gammeRepository.delete(gamme);
     }
+
+    @Transactional
+    public void deleteByOwnerId(Long ownerId) {
+        List<Gamme> gammes = gammeRepository.findByOwnerId(ownerId);
+        for (Gamme gamme : gammes) {
+            // Suppression en cascade via JPA, pas besoin de force ici
+            gammeRepository.delete(gamme);
+        }
+    }
+
 }

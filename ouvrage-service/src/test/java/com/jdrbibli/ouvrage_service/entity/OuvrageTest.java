@@ -34,7 +34,7 @@ class OuvrageTest {
 
         List<String> scenariosContenus = List.of("Scénario 1", "Scénario 2");
         List<String> autresOuvragesGamme = List.of("Ouvrage 2", "Ouvrage 3");
-        List<String> liensMedias = List.of("http://lien1.com", "http://lien2.com");
+
 
         // Set values
         ouvrage.setId(id);
@@ -56,7 +56,7 @@ class OuvrageTest {
         ouvrage.setOwnerPseudo(ownerPseudo);
         ouvrage.setScenariosContenus(scenariosContenus);
         ouvrage.setAutresOuvragesGamme(autresOuvragesGamme);
-        ouvrage.setLiensMedias(liensMedias);
+
 
         // Assertions
         assertEquals(id, ouvrage.getId());
@@ -78,7 +78,7 @@ class OuvrageTest {
         assertEquals(ownerPseudo, ouvrage.getOwnerPseudo());
         assertEquals(scenariosContenus, ouvrage.getScenariosContenus());
         assertEquals(autresOuvragesGamme, ouvrage.getAutresOuvragesGamme());
-        assertEquals(liensMedias, ouvrage.getLiensMedias());
+
     }
 }
  */

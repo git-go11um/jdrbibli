@@ -1,4 +1,4 @@
-CREATE TABLE gammes (
+/* CREATE TABLE gammes (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   nom VARCHAR(255) NOT NULL,
   description VARCHAR(255)
@@ -23,3 +23,4 @@ CREATE TABLE ouvrages (
   gamme_id BIGINT,
   FOREIGN KEY (gamme_id) REFERENCES gammes(id)
 );
+ */

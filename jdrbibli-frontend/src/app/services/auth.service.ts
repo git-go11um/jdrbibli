@@ -87,17 +87,18 @@ export class AuthService {
       .pipe(catchError(this.handleError));
   }
 
-  deleteUser(): Observable<any> {  // <-- retourne un Observable
-    const pseudo = this.getUserPseudo();
-    if (!pseudo) return throwError(() => new Error('Pseudo utilisateur manquant'));
+  deleteUser(): Observable<any> {
+    const userId = this.getUserIdFromToken();
+    if (!userId) return throwError(() => new Error('ID utilisateur manquant'));
 
     const headers = this.authHeaders();
-    return this.http.delete<any>(`${this.apiAuthUrl}/${pseudo}`, { headers })  // <-- appelle AuthController
+    return this.http.delete<any>(`${this.apiAuthUrl}/${userId}`, { headers })
       .pipe(
         tap(res => console.log('deleteUser response:', res)),
         catchError(this.handleError)
       );
   }
+
 
   // ---------------- AVATAR ----------------
   uploadAvatar(fileData: FormData): Observable<string> {

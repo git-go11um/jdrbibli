@@ -17,7 +17,7 @@ public class Gamme {
     // Référence à l'utilisateur qui possède la gamme (relation ManyToOne)
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
-    private User user;
+    private UserProfile user;
 
     // Liste des ouvrages associés à cette gamme
     @OneToMany(mappedBy = "gamme", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -47,11 +47,11 @@ public class Gamme {
         this.description = description;
     }
 
-    public User getUser() {
+    public UserProfile getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserProfile user) {
         this.user = user;
     }
 
@@ -62,7 +62,5 @@ public class Gamme {
     public void setOuvrages(List<Ouvrage> ouvrages) {
         this.ouvrages = ouvrages;
     }
-
-    // Getters et Setters
 
 }

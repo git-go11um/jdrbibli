@@ -32,7 +32,7 @@ class OuvrageDTOTest {
         String notes = "Quelques notes";
         List<String> scenariosContenus = new ArrayList<>(List.of("Scénario 1", "Scénario 2"));
         List<String> autresOuvragesGamme = new ArrayList<>(List.of("Ouvrage A", "Ouvrage B"));
-        List<String> liensMedias = new ArrayList<>(List.of("http://media1.com", "http://media2.com"));
+       
         String ownerPseudo = "userTest";
 
         dto.setId(id);
@@ -53,7 +53,7 @@ class OuvrageDTOTest {
         dto.setNotes(notes);
         dto.setScenariosContenus(scenariosContenus);
         dto.setAutresOuvragesGamme(autresOuvragesGamme);
-        dto.setLiensMedias(liensMedias);
+       
         dto.setOwnerPseudo(ownerPseudo);
 
         assertEquals(id, dto.getId());
@@ -74,7 +74,7 @@ class OuvrageDTOTest {
         assertEquals(notes, dto.getNotes());
         assertEquals(scenariosContenus, dto.getScenariosContenus());
         assertEquals(autresOuvragesGamme, dto.getAutresOuvragesGamme());
-        assertEquals(liensMedias, dto.getLiensMedias());
+       
         assertEquals(ownerPseudo, dto.getOwnerPseudo());
     }
 }

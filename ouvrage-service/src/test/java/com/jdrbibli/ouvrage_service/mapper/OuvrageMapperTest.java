@@ -38,7 +38,7 @@ class OuvrageMapperTest {
         entity.setNotes("Notes test");
         entity.setScenariosContenus(List.of("Scenario1", "Scenario2"));
         entity.setAutresOuvragesGamme(List.of("Ouvrage1"));
-        entity.setLiensMedias(List.of("http://media1.com"));
+
         entity.setOwnerPseudo("ownerUser");
 
         OuvrageDTO dto = mapper.toDTO(entity);
@@ -62,7 +62,7 @@ class OuvrageMapperTest {
         assertEquals(entity.getNotes(), dto.getNotes());
         assertEquals(entity.getScenariosContenus(), dto.getScenariosContenus());
         assertEquals(entity.getAutresOuvragesGamme(), dto.getAutresOuvragesGamme());
-        assertEquals(entity.getLiensMedias(), dto.getLiensMedias());
+
         assertEquals(entity.getOwnerPseudo(), dto.getOwnerPseudo());
 
         // Maintenant test inverse toEntity
@@ -87,7 +87,7 @@ class OuvrageMapperTest {
         assertEquals(dto.getNotes(), entityFromDto.getNotes());
         assertEquals(dto.getScenariosContenus(), entityFromDto.getScenariosContenus());
         assertEquals(dto.getAutresOuvragesGamme(), entityFromDto.getAutresOuvragesGamme());
-        assertEquals(dto.getLiensMedias(), entityFromDto.getLiensMedias());
+
         assertEquals(dto.getOwnerPseudo(), entityFromDto.getOwnerPseudo());
     }
 

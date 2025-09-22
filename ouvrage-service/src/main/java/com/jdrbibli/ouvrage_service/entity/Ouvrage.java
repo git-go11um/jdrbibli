@@ -3,6 +3,10 @@ package com.jdrbibli.ouvrage_service.entity;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -47,20 +51,41 @@ public class Ouvrage {
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
 
-    @ElementCollection
-    @CollectionTable(name = "ouvrage_scenarios_contenus", joinColumns = @JoinColumn(name = "ouvrage_id"))
-    @Column(name = "scenario")
-    private List<String> scenariosContenus = new ArrayList<>();
+    @Column(name = "scenarios_contenus", columnDefinition = "TEXT")
+    private String scenariosContenus;
+
+    @Transient
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    public List<String> getScenariosContenusList() {
+        if (scenariosContenus == null || scenariosContenus.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            return mapper.readValue(scenariosContenus, new TypeReference<List<String>>() {
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public void setScenariosContenusList(List<String> scenarios) {
+        try {
+            this.scenariosContenus = mapper.writeValueAsString(scenarios);
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.scenariosContenus = "[]";
+        }
+    }
 
     @ElementCollection
     @CollectionTable(name = "ouvrage_autres_ouvrages_gamme", joinColumns = @JoinColumn(name = "ouvrage_id"))
     @Column(name = "ouvrage")
     private List<String> autresOuvragesGamme = new ArrayList<>();
 
-    @ElementCollection
-    @CollectionTable(name = "ouvrage_liens_medias", joinColumns = @JoinColumn(name = "ouvrage_id"))
-    @Column(name = "lien")
-    private List<String> liensMedias = new ArrayList<>();
+    @Column(name = "image_url")
+    private String imageUrl;
 
     // Getters & Setters
     public Long getId() {
@@ -199,14 +224,6 @@ public class Ouvrage {
         this.ownerId = ownerId;
     }
 
-    public List<String> getScenariosContenus() {
-        return scenariosContenus;
-    }
-
-    public void setScenariosContenus(List<String> scenariosContenus) {
-        this.scenariosContenus = scenariosContenus;
-    }
-
     public List<String> getAutresOuvragesGamme() {
         return autresOuvragesGamme;
     }
@@ -215,11 +232,20 @@ public class Ouvrage {
         this.autresOuvragesGamme = autresOuvragesGamme;
     }
 
-    public List<String> getLiensMedias() {
-        return liensMedias;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setLiensMedias(List<String> liensMedias) {
-        this.liensMedias = liensMedias;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
+
+    public String getScenariosContenus() {
+        return scenariosContenus;
+    }
+
+    public void setScenariosContenus(String scenariosContenus) {
+        this.scenariosContenus = scenariosContenus;
+    }
+
 }

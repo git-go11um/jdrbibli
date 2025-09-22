@@ -42,7 +42,7 @@ export class ProfilUtilisateur implements OnInit {
   deleteUser(): void {
     if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;
 
-    this.authService.deleteUser().subscribe({  // <-- plus besoin de passer pseudo
+    this.authService.deleteUser().subscribe({  // <-- utilise maintenant l’ID JWT
       next: () => {
         console.log('Compte supprimé');
         this.authService.logout();

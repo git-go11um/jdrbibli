@@ -199,4 +199,20 @@ public class UserProfileController {
         }
     }
 
+    // Supprimer un utilisateur et ses gammes associées
+    @DeleteMapping("/{id}/cascade")
+    public ResponseEntity<Void> deleteUserWithCascade(@PathVariable Long id) {
+        boolean deleted = userProfileService.deleteUserByIdWithCascade(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build(); // Retourne 204 No Content si la suppression a réussi
+        } else {
+            return ResponseEntity.notFound().build(); // Retourne 404 Not Found si l'utilisateur n'existe pas
+        }
+    }
+
+    @GetMapping("/{id}/cascade")
+public ResponseEntity<String> testCascade(@PathVariable Long id) {
+    return ResponseEntity.ok("OK cascade " + id);
+}
+
 }

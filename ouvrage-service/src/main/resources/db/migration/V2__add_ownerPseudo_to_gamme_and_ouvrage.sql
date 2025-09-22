@@ -1,5 +1,5 @@
-ALTER TABLE gammes
+/* ALTER TABLE gammes
 ADD COLUMN owner_pseudo VARCHAR(255) NOT NULL DEFAULT 'admin';
 
 ALTER TABLE ouvrages
-ADD COLUMN owner_pseudo VARCHAR(255) NOT NULL DEFAULT 'admin';
+ADD COLUMN owner_pseudo VARCHAR(255) NOT NULL DEFAULT 'admin'; */

@@ -2,7 +2,7 @@ package com.jdrbibli.userservice.service;
 
 import com.jdrbibli.userservice.entity.FriendRequest;
 import com.jdrbibli.userservice.entity.FriendRequest.Status;
-import com.jdrbibli.userservice.entity.User;
+import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.repository.FriendRequestRepository;
 import com.jdrbibli.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +35,9 @@ public class FriendRequestService {
             throw new IllegalArgumentException("Vous ne pouvez pas vous envoyer une demande à vous-même.");
         }
 
-        User sender = userRepository.findById(senderId)
+        UserProfile sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new RuntimeException("Expéditeur non trouvé"));
-        User receiver = userRepository.findById(receiverId)
+                UserProfile receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new RuntimeException("Destinataire non trouvé"));
 
         Optional<FriendRequest> existing = friendRequestRepository.findExistingRequestBetweenUsers(sender, receiver);
@@ -75,9 +75,9 @@ public class FriendRequestService {
      * Supprime une amitié (dans les deux sens).
      */
     public void removeFriend(Long userId, Long friendId) {
-        User user = userRepository.findById(userId)
+        UserProfile user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-        User friend = userRepository.findById(friendId)
+                UserProfile friend = userRepository.findById(friendId)
                 .orElseThrow(() -> new RuntimeException("Ami non trouvé"));
 
         Optional<FriendRequest> friendship = friendRequestRepository.findAcceptedFriendshipBetweenUsers(user, friend);
@@ -92,8 +92,8 @@ public class FriendRequestService {
     /**
      * Retourne la liste des amis d'un utilisateur.
      */
-    public List<User> listFriends(Long userId) {
-        User user = userRepository.findById(userId)
+    public List<UserProfile> listFriends(Long userId) {
+        UserProfile user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
         List<FriendRequest> requests = friendRequestRepository.findAcceptedFriendshipsOfUser(user);
@@ -107,7 +107,7 @@ public class FriendRequestService {
      * Liste toutes les demandes d'amis reçues en attente.
      */
     public List<FriendRequest> listReceivedRequests(Long userId) {
-        User user = userRepository.findById(userId)
+        UserProfile user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
         return friendRequestRepository.findByReceiverAndStatus(user, Status.PENDING);
     }

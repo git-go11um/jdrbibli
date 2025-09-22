@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.http.HttpMethod;
 
 import java.security.Principal;
@@ -253,41 +254,35 @@ public class AuthController {
     }
 
     // ------------------- SUPPRESSION UTILISATEUR -------------------
-    @DeleteMapping("/{pseudo}")
-    public ResponseEntity<?> deleteUser(@PathVariable String pseudo, @RequestHeader("Authorization") String token) {
+    // Remplacer @DeleteMapping("/{pseudo}") par @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         try {
-            // Vérifie que le token correspond bien au pseudo
+            // Vérifie que le token correspond bien à l'utilisateur qui fait la requête
             if (token == null || !token.startsWith("Bearer ")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("message", "Token manquant ou mal formé"));
             }
 
             String tokenPseudo = jwtService.extractPseudo(token.substring(7));
-            if (!tokenPseudo.equals(pseudo)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("message", "Vous ne pouvez supprimer que votre propre compte."));
-            }
+            User user = userService.getUserById(id); // Recherche par id et non pseudo
 
-            // Récupère l'utilisateur dans auth-service
-            User user = userService.getUserByPseudo(pseudo);
+            // Vérifie que l'utilisateur existe
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "Utilisateur non trouvé."));
+                        .body(Map.of("message", "Utilisateur non trouvé"));
+            }
+
+            // Vérifie que le token correspond bien à l'utilisateur qu'on tente de supprimer
+            if (!tokenPseudo.equals(user.getPseudo())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Vous ne pouvez supprimer que votre propre compte."));
             }
 
             // 1️⃣ Supprime dans auth_db.users
             userService.deleteUserById(user.getId());
 
-            // 2️⃣ Supprime dans user-service (user_profiles)
-            HttpEntity<?> entity = new HttpEntity<>(createHeaders(token)); // réutilise le token JWT
-            restTemplate.exchange(
-                    "http://localhost:8082/api/users/by-pseudo/" + pseudo,
-                    HttpMethod.DELETE,
-                    entity,
-                    Void.class);
-
-            return ResponseEntity.ok(Map.of("message", "Utilisateur supprimé avec succès des deux services."));
-
+            return ResponseEntity.ok(Map.of("message", "Utilisateur supprimé avec succès dans les deux services"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

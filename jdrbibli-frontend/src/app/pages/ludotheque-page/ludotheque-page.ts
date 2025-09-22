@@ -56,7 +56,7 @@ export class LudothequePage implements OnInit {
 
   /** Supprime une gamme */
   supprimerGamme(gammeId: number): void {
-    this.gammeService.delete(gammeId).subscribe({
+    this.gammeService.delete(gammeId, true).subscribe({
       next: () => {
         this.loadGammes(); // Recharge la liste des gammes
       },
@@ -65,6 +65,7 @@ export class LudothequePage implements OnInit {
       }
     });
   }
+
 
   /** Modifie le nom d'une gamme (fonctionnalité à ajouter après) */
   modifierNomGamme(gammeId: number): void {
