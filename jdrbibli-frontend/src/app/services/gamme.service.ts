@@ -35,4 +35,9 @@ export class GammeService {
     delete(id: number, force: boolean = false): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${id}?force=${force}`);
     }
+
+    /** Récupère les gammes d’un utilisateur ami */
+    getFriendGammes(friendId: number): Observable<GammeDTO[]> {
+        return this.http.get<GammeDTO[]>(`${this.baseUrl}/friend/${friendId}`);
+    }
 }

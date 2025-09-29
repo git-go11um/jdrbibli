@@ -3,7 +3,9 @@ package com.jdrbibli.userservice.entity;
 import com.jdrbibli.userservice.dto.OuvrageDTO;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "user_profiles")
@@ -44,7 +46,7 @@ public class UserProfile {
     private List<UserProfile> friends;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Gamme> gammes;
+    private Set<Gamme> gammes = new HashSet<>();
 
     // Getters et setters
 
@@ -112,11 +114,11 @@ public class UserProfile {
         this.avatarPath = avatarPath;
     }
 
-    public List<Gamme> getGammes() {
+    public Set<Gamme> getGammes() {
         return gammes;
     }
 
-    public void setGammes(List<Gamme> gammes) {
+    public void setGammes(Set<Gamme> gammes) {
         this.gammes = gammes;
     }
 }

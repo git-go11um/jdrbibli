@@ -9,7 +9,6 @@ public class Ouvrage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String title;
     private String description;
     private String imageUrl;
@@ -18,5 +17,44 @@ public class Ouvrage {
     @JoinColumn(name = "gamme_id")
     private Gamme gamme; // si tu veux aussi gérer la table gammes
 
-    // getters et setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Gamme getGamme() {
+        return gamme;
+    }
+
+    public void setGamme(Gamme gamme) {
+        this.gamme = gamme;
+    }
+
 }

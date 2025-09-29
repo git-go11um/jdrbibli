@@ -1,0 +1,15 @@
+<div class="ludotheque-ami-page">
+  <h2>Gammes de votre ami</h2>
+  
+
+  <div *ngIf="loading" class="loading">Chargement en cours...</div>
+  <div *ngIf="!loading && errorMessage" class="error">{{ errorMessage }}</div>
+
+  <div *ngIf="!loading && gammes.length > 0" class="gammes-list">
+    <div *ngFor="let gamme of gammes" class="gamme-card">
+      <h3>{{ gamme.nom }}</h3>
+      <p>{{ gamme.description || 'Pas de description' }}</p>
+      <button (click)="ouvrirPageGamme(gamme.id!)">Voir les ouvrages</button>
+    </div>
+  </div>
+</div>

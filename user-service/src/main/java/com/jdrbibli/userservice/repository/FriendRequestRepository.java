@@ -20,6 +20,11 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, Lo
 
         Optional<FriendRequest> findBySenderAndReceiver(UserProfile sender, UserProfile receiver);
 
+        // Pour récupérer toutes les demandes reçues
+        List<FriendRequest> findByReceiverId(Long receiverId);
+
+        List<FriendRequest> findByReceiverIdAndStatus(Long receiverId, FriendRequest.Status status);
+
         /**
          * Vérifie si une demande existe déjà entre deux utilisateurs,
          * dans un sens ou dans l'autre.

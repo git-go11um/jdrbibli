@@ -11,13 +11,20 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  clearAuth(): void {
+    localStorage.removeItem('jwt');   // supprime le token
+    localStorage.removeItem('user');  // supprime les infos utilisateur
+    this.currentUser = null;          // réinitialise la variable interne
+  }
+
+
   setUserInfo(user: any) {
     this.currentUser = user;
     localStorage.setItem('user', JSON.stringify(user));
   }
 
   setToken(token: string) {
-    localStorage.setItem('token', token);
+    localStorage.setItem('jwt', token);  // <-- unifie sur "jwt"
   }
 
   // ---------------- LOGIN ----------------
@@ -38,7 +45,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('jwt');
+    this.clearAuth();
   }
 
   // ---------------- REGISTER ----------------
@@ -115,17 +122,32 @@ export class AuthService {
     return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
   }
 
+  public getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('jwt');
+    const userId = this.getUserIdFromToken();
+    let headers = new HttpHeaders();
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
+    if (userId) headers = headers.set('X-User-Id', userId.toString());
+    return headers;
+  }
+
+
   getUserIdFromToken(): number | null {
     const token = localStorage.getItem('jwt');
-    if (!token) return null;
+    if (!token) {
+      console.warn('[AuthService] Aucun token trouvé dans le localStorage.');
+      return null;
+    }
     try {
       const payload = this.decodeJwt(token);
+      console.log('[AuthService] Payload décodé du JWT:', payload);
       return payload?.id ?? null;
     } catch (e) {
-      console.error('Erreur décodage JWT pour id:', e);
+      console.error('[AuthService] Erreur décodage JWT pour id:', e);
       return null;
     }
   }
+
 
   getUserPseudo(): string | null {
     const token = localStorage.getItem('jwt');

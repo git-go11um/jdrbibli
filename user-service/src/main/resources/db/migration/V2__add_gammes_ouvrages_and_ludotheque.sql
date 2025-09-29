@@ -1,4 +1,4 @@
-CREATE TABLE gammes (
+/* CREATE TABLE gammes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT
@@ -20,3 +20,4 @@ CREATE TABLE user_ludotheque (
     FOREIGN KEY (user_id) REFERENCES user_profiles(id),
     FOREIGN KEY (ouvrage_id) REFERENCES ouvrages(id)
 );
+ */

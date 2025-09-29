@@ -2,13 +2,16 @@ package com.jdrbibli.userservice.controller;
 
 import com.jdrbibli.userservice.dto.FriendDTO;
 import com.jdrbibli.userservice.dto.FriendRequestDTO;
+import com.jdrbibli.userservice.dto.OuvrageDTO;
 import com.jdrbibli.userservice.entity.FriendRequest;
 import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.mapper.FriendMapper;
 import com.jdrbibli.userservice.mapper.FriendRequestMapper;
 import com.jdrbibli.userservice.service.FriendRequestService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,4 +82,20 @@ public class FriendRequestController {
                 .map(FriendRequestMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    @GetMapping("/{friendId}/ouvrages")
+    public List<OuvrageDTO> getFriendOuvrages(
+            @PathVariable Long friendId,
+            @RequestHeader("X-User-Id") Long userId) {
+
+        // Vérifie que userId et friendId sont amis
+        boolean areFriends = friendRequestService.areFriends(userId, friendId);
+        if (!areFriends) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pas ami avec cet utilisateur");
+        }
+
+        // Récupère les ouvrages du friendId
+        return friendRequestService.listFriendOuvrages(friendId);
+    }
+
 }

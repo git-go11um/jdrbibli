@@ -112,4 +112,9 @@ public class OuvrageService {
     public List<Ouvrage> findByGammeId(Long gammeId) {
         return ouvrageRepository.findByGammeId(gammeId);
     }
+
+    public Optional<Ouvrage> findByIdAndOwnerId(Long ouvrageId, Long ownerId) {
+        return ouvrageRepository.findByIdAndOwnerId(ouvrageId, ownerId);
+    }
+
 }

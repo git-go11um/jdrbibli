@@ -100,4 +100,20 @@ public class GammeController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/public/owner/{ownerId}")
+    public ResponseEntity<List<GammeDTO>> getGammesByOwner(@PathVariable Long ownerId) {
+        List<Gamme> gammes = gammeService.findByOwnerId(ownerId);
+        List<GammeDTO> gammesDTO = gammes.stream().map(gammeMapper::toDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(gammesDTO);
+    }
+
+    @GetMapping("/friend/{friendId}")
+    public ResponseEntity<List<GammeDTO>> getGammesByFriend(@PathVariable Long friendId) {
+        List<Gamme> gammes = gammeService.findByOwnerId(friendId);
+        List<GammeDTO> gammesDTO = gammes.stream()
+                .map(gammeMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(gammesDTO);
+    }
+
 }

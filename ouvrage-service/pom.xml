@@ -114,6 +114,12 @@
       <version>3.1.0</version> <!-- Choisis la version qui correspond à ta version de Spring Boot -->
     </dependency>
 
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+    </dependency>
+
+
   </dependencies>
 
   <build>

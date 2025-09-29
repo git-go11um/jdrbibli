@@ -23,6 +23,13 @@ public class UserProfileDTO {
         this.avatarUrl = avatarUrl;
     }
 
+    public UserProfileDTO(Long id, String pseudo, String email, String avatarUrl) {
+        this.id = id;
+        this.pseudo = pseudo;
+        this.email = email;
+        this.avatarUrl = avatarUrl;
+    }
+
     // Getters / Setters
 
     public Long getId() {

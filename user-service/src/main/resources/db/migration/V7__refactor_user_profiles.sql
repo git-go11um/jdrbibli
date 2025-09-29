@@ -1,4 +1,4 @@
--- V7__refactor_user_tables.sql
+/* -- V7__refactor_user_tables.sql
 -- Nettoyage et refonte de la gestion des utilisateurs
 
 -- 1. Supprimer les tables qui dépendent de user_profiles (si elles existent)
@@ -69,3 +69,4 @@ CREATE TABLE user_friends (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
 );
+ */

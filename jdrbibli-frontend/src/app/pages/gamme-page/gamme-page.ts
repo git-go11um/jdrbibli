@@ -43,17 +43,18 @@ export class GammePage implements OnInit {
 
   loadGamme(gammeId: number): void {
     this.gammeService.getById(gammeId).subscribe({
-      next: (data) => this.gamme = data,
-      error: (err) => console.error('Erreur lors du chargement de la gamme:', err)
+      next: (data: GammeDTO) => this.gamme = data,
+      error: (err: any) => console.error('Erreur lors du chargement de la gamme:', err)
     });
   }
 
   loadOuvrages(gammeId: number): void {
-    this.ouvrageService.getByGamme(gammeId).subscribe({
-      next: (data) => this.ouvrages = data,
-      error: (err) => console.error('Erreur lors du chargement des ouvrages:', err)
+    this.ouvrageService.getByGammeId(gammeId).subscribe({
+      next: (data: OuvrageDTO[]) => this.ouvrages = data,
+      error: (err: any) => console.error('Erreur lors du chargement des ouvrages', err)
     });
   }
+
 
   // Crée un objet vierge pour le formulaire
   private getEmptyOuvrage() {

@@ -1,9 +1,13 @@
 package com.jdrbibli.userservice.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "friend_requests")
+@Table(name = "friend_requests", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "sender_id", "receiver_id" })
+})
 public class FriendRequest {
 
     @Id
@@ -11,12 +15,12 @@ public class FriendRequest {
     private Long id;
 
     // L'utilisateur qui envoie la demande
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
     private UserProfile sender;
 
     // L'utilisateur qui reçoit la demande
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "receiver_id", nullable = false)
     private UserProfile receiver;
 
@@ -29,6 +33,12 @@ public class FriendRequest {
         ACCEPTED,
         REJECTED
     }
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime respondedAt;
 
     // Constructeurs
     public FriendRequest() {
@@ -44,6 +54,19 @@ public class FriendRequest {
         this.sender = sender;
         this.receiver = receiver;
         this.status = status;
+    }
+
+    // Hooks JPA
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        if (this.status == Status.ACCEPTED || this.status == Status.REJECTED) {
+            this.respondedAt = LocalDateTime.now();
+        }
     }
 
     // Getters & Setters
@@ -89,5 +112,29 @@ public class FriendRequest {
 
     public boolean isRejected() {
         return status == Status.REJECTED;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getRespondedAt() {
+        return respondedAt;
+    }
+
+    public void setRespondedAt(LocalDateTime respondedAt) {
+        this.respondedAt = respondedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "FriendRequest{" +
+                "id=" + id +
+                ", sender=" + (sender != null ? sender.getId() : null) +
+                ", receiver=" + (receiver != null ? receiver.getId() : null) +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", respondedAt=" + respondedAt +
+                '}';
     }
 }

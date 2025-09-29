@@ -4,10 +4,12 @@ import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
 import com.jdrbibli.ouvrage_service.entity.Ouvrage;
 import com.jdrbibli.ouvrage_service.mapper.OuvrageMapper;
 import com.jdrbibli.ouvrage_service.service.OuvrageService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -134,6 +136,90 @@ public class OuvrageController {
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur serveur");
         }
+    }
+
+    @GetMapping("/friends/{friendId}/ouvrages")
+    public ResponseEntity<List<OuvrageDTO>> getFriendLibrary(
+            @PathVariable Long friendId,
+            @RequestHeader("X-User-Id") Long currentUserId) {
+
+        System.out.println(
+                "[DEBUG] getFriendLibrary appelé avec friendId=" + friendId + ", currentUserId=" + currentUserId);
+
+        boolean friends;
+        System.out.println("[DEBUG] Appel user-service : http://localhost:8082/api/users/are-friends?userId="
+                + currentUserId + "&friendId=" + friendId);
+        try {
+            friends = WebClient.create("http://localhost:8082") // URL du user-service
+                    .get()
+                    .uri("/api/users/are-friends?userId={userId}&friendId={friendId}", currentUserId, friendId)
+                    .retrieve()
+                    .bodyToMono(Boolean.class)
+                    .block();
+
+            System.out.println("[DEBUG] Résultat vérification amitié: " + friends);
+        } catch (Exception e) {
+            System.err.println("[ERROR] Erreur lors de l'appel user-service : " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        if (!friends) {
+            System.out.println("[DEBUG] Les utilisateurs ne sont pas amis, renvoi 403");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<Ouvrage> ouvrages;
+        try {
+            ouvrages = ouvrageService.findByOwnerId(friendId);
+            System.out.println("[DEBUG] Nombre d'ouvrages trouvés: " + ouvrages.size());
+        } catch (Exception e) {
+            System.err.println("[ERROR] Erreur lors de la récupération des ouvrages : " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        List<OuvrageDTO> dtos;
+        try {
+            dtos = ouvrages.stream()
+                    .map(ouvrageMapper::toDTO)
+                    .peek(dto -> System.out.println("[DEBUG] OuvrageDTO créé: " + dto))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("[ERROR] Erreur lors du mapping Ouvrage→DTO : " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        System.out.println("[DEBUG] Renvoi " + dtos.size() + " DTOs");
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/friend/{friendId}/gamme/{gammeId}")
+    public ResponseEntity<List<OuvrageDTO>> getOuvragesByFriendAndGamme(
+            @PathVariable Long friendId,
+            @PathVariable Long gammeId) {
+
+        List<Ouvrage> ouvrages = ouvrageService.findByGammeIdAndOwnerId(gammeId, friendId);
+        List<OuvrageDTO> ouvragesDTO = ouvrages.stream()
+                .map(ouvrageMapper::toDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(ouvragesDTO);
+    }
+
+    @GetMapping("/friend/{friendId}/{ouvrageId}")
+    public ResponseEntity<OuvrageDTO> getOuvrageFriend(
+            @PathVariable Long friendId,
+            @PathVariable Long ouvrageId) {
+
+        Optional<Ouvrage> ouvrageOpt = ouvrageService.findByIdAndOwnerId(ouvrageId, friendId);
+        if (ouvrageOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Ouvrage ouvrage = ouvrageOpt.get();
+        return ResponseEntity.ok(ouvrageMapper.toDTO(ouvrage));
     }
 
 }

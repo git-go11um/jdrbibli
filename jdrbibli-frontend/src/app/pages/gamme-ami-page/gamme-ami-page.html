@@ -1,0 +1,24 @@
+<div class="gamme-ami-page">
+
+    <h2>Gammes de votre ami</h2>
+
+    <div *ngIf="loading" class="loading">Chargement en cours...</div>
+
+    <div *ngIf="!loading && errorMessage" class="error">{{ errorMessage }}</div>
+
+    <div *ngIf="!loading && !errorMessage && gammes.length > 0" class="gammes-list">
+        <ul>
+            <li *ngFor="let gamme of gammes">
+                <button class="gamme-btn" (click)="ouvrirGamme(gamme.id!)">
+                    {{ gamme.nom || 'Nom non renseigné' }}
+                </button>
+                <p *ngIf="gamme.description">{{ gamme.description }}</p>
+            </li>
+        </ul>
+    </div>
+
+    <div *ngIf="!loading && !errorMessage && gammes.length === 0" class="no-gammes">
+        Cet ami ne possède encore aucune gamme.
+    </div>
+
+</div>

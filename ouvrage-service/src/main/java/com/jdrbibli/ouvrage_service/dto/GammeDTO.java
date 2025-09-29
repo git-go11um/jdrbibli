@@ -1,10 +1,14 @@
 package com.jdrbibli.ouvrage_service.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GammeDTO {
     private Long id;
     private String nom;
     private String description;
     private Long ownerId; // <-- remplace ownerPseudo
+    private List<OuvrageDTO> ouvrages = new ArrayList<>();
 
     public GammeDTO() {
     }
@@ -47,5 +51,13 @@ public class GammeDTO {
 
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public List<OuvrageDTO> getOuvrages() {
+        return ouvrages;
+    }
+
+    public void setOuvrages(List<OuvrageDTO> ouvrages) {
+        this.ouvrages = ouvrages;
     }
 }

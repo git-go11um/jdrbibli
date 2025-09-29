@@ -1,4 +1,8 @@
 
+GET http://localhost:8082/api/friends/requests/received?userId=218
+
+#####
+
 PUT http://localhost:8084/api/auth/profile
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYWEiLCJpYXQiOjE3NTc0MTI4MzUsImV4cCI6MTc1NzQxNjQzNX0.oH_9mHgqawfl8PBsAygj7aVyhN4ITgRRi1V99JcBzds
@@ -37,18 +41,18 @@ Content-Type: application/json
 
 ### 2️⃣ UTILISATEUR CONNECTÉ - Vérifier le token
 GET http://localhost:8084/api/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZGQiLCJpYXQiOjE3NTczMjkwNzMsImV4cCI6MTc1NzMzMjY3M30.pnnJCW6Le3iNjlR-n7QmW6DL5jUgDE8pm8hkUFBIGA0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE3LCJzdWIiOiJhYWEiLCJpYXQiOjE3NTg3MjIzODcsImV4cCI6MTc1ODcyNTk4N30.BkVm9qZZdAqPnBPYiZF5vwT_eg3jGB7OhISa40JCexA
 
 ###
 
 ### 3️⃣ MISE À JOUR DU PROFIL
-PUT http://localhost:8084/api/users/131
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZGQiLCJpYXQiOjE3NTczMjkwNzMsImV4cCI6MTc1NzMzMjY3M30.pnnJCW6Le3iNjlR-n7QmW6DL5jUgDE8pm8hkUFBIGA0
+PUT http://localhost:8084/api/users/217
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE3LCJzdWIiOiJhYWEiLCJpYXQiOjE3NTg3MjIzODcsImV4cCI6MTc1ODcyNTk4N30.BkVm9qZZdAqPnBPYiZF5vwT_eg3jGB7OhISa40JCexA
 Content-Type: application/json
 
 {
-  "pseudo": "ddd2",
-  "email": "ddd2@gg.com"
+  "pseudo": "aaa",
+  "email": "aaa@gg.com"
 }
 
 ###
@@ -58,7 +62,7 @@ GET http://localhost:8082/api/users/search?pseudo=ggg
 
 ### 4️⃣ CHANGEMENT DE MOT DE PASSE
 PUT http://localhost:8084/api/auth/profile/password
-Authorization: Bearer {{TOKEN}}
+Authorization: Bearer 
 Content-Type: application/json
 
 {
@@ -71,5 +75,60 @@ Content-Type: application/json
 
 ### 5️⃣ SUPPRESSION DU COMPTE
 DELETE http://localhost:8084/api/auth/alice2
-Authorization: Bearer {{TOKEN}}
+Authorization: Bearer 
 
+######
+
+### 1️⃣ Vérifier le login (auth)
+POST http://localhost:8084/api/auth/login
+Content-Type: application/json
+
+{
+  "pseudo": "aaa",
+  "password": "T@u123456789"
+}
+
+### 2️⃣ Vérifier le profil de l’utilisateur courant
+GET http://localhost:8084/api/users/profile/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE3LCJzdWIiOiJhYWEiLCJpYXQiOjE3NTg3MjI1NTMsImV4cCI6MTc1ODcyNjE1M30.wgv1C0cUR5_QAtbaUHblbc138MN8jZlIuZCrqwPoHWM
+X-User-Id: 217
+
+### 3️⃣ Lister les amis de l’utilisateur courant
+GET http://localhost:8084/api/friends?userId=217
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE3LCJzdWIiOiJhYWEiLCJpYXQiOjE3NTg3ODY3OTgsImV4cCI6MTc1ODc5MDM5OH0.VYRpGz4W8f1_ahMvNn-J1-DYAEyy732HUs2-oo2HnCk
+X-User-Id: 217
+
+### 4️⃣ Lister les demandes reçues
+GET http://localhost:8084/api/friends/requests/received?userId=218
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE4LCJzdWIiOiJiYmIiLCJpYXQiOjE3NTg3MjI2MTQsImV4cCI6MTc1ODcyNjIxNH0.xhbu5iIo-Xn4lEJmspr_06gGq7Ka6CoVqAKTBXsxB0E
+X-User-Id: 218
+
+### 5️⃣ Vérifier la ludothèque d’un ami#############################################
+GET http://localhost:8084/api/ouvrage/ouvrages/friends/218/ouvrages
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE3LCJzdWIiOiJhYWEiLCJpYXQiOjE3NTg4NzI4NTksImV4cCI6MTc1ODg3NjQ1OX0.8JZx_U23KSBOEX9RmNOz8xkTGuxBEUVM30fQ8CCnnMM
+X-User-Id: 217
+
+##########
+GET http://localhost:8084/api/friends/218/ouvrages
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE3LCJzdWIiOiJhYWEiLCJpYXQiOjE3NTg4Mjk3NTksImV4cCI6MTc1ODgzMzM1OX0.MO9EyUKWpVYl01ZBLLZF42IpvLN1l2OrSzEwouzS4CI
+X-User-Id: 217
+
+### 6️⃣ Envoyer une demande d’ami
+POST http://localhost:8084/api/friends/123/request
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE4LCJzdWIiOiJiYmIiLCJpYXQiOjE3NTg3MjMwMzgsImV4cCI6MTc1ODcyNjYzOH0.waHNY0lPrCjgXcVQ2eYcNXs4MCU-T0uqlu0pY5GJaPc
+X-User-Id: 217
+Content-Type: application/json
+
+{
+  "message": "Salut !"
+}
+
+### 7️⃣ Accepter une demande d’ami
+POST http://localhost:8084/api/friends/requests/456/accept
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE4LCJzdWIiOiJiYmIiLCJpYXQiOjE3NTg3MjMwMzgsImV4cCI6MTc1ODcyNjYzOH0.waHNY0lPrCjgXcVQ2eYcNXs4MCU-T0uqlu0pY5GJaPc
+X-User-Id: 217
+
+### 8️⃣ Supprimer un ami
+DELETE http://localhost:8084/api/friends/123
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MjE4LCJzdWIiOiJiYmIiLCJpYXQiOjE3NTg3MjMwMzgsImV4cCI6MTc1ODcyNjYzOH0.waHNY0lPrCjgXcVQ2eYcNXs4MCU-T0uqlu0pY5GJaPc
+X-User-Id: 217

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public interface OuvrageRepository extends JpaRepository<Ouvrage, Long> {
 
@@ -26,5 +27,7 @@ public interface OuvrageRepository extends JpaRepository<Ouvrage, Long> {
     List<Ouvrage> findByGammeIdAndIdNot(Long gammeId, Long excludeId);
 
     List<Ouvrage> findByGammeId(Long gammeId);
+
+    Optional<Ouvrage> findByIdAndOwnerId(Long id, Long ownerId);
 
 }

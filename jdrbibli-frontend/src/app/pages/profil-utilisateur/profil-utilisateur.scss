@@ -16,15 +16,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Partie droite - Amis */
-.right-column {
-    width: 30%;
-    background-color: #A4BD01;
-    /* Fond vert clair pastel */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+
 
 /* Séparation entre les deux colonnes (ligne fine) */
 .profil-utilisateur .left-column {
@@ -110,15 +102,18 @@ button:hover {
 .avatar-section {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* tu peux changer à center ou flex-end */
+    align-items: flex-start;
+    /* tu peux changer à center ou flex-end */
     gap: 10px;
     position: relative;
 }
 
 .avatar-container {
     display: flex;
-    justify-content: flex-end; /* pousse le cercle vers la droite */
-    width: 100%; /* prend toute la largeur disponible */
+    justify-content: flex-end;
+    /* pousse le cercle vers la droite */
+    width: 100%;
+    /* prend toute la largeur disponible */
 }
 
 .avatar-circle {
@@ -133,13 +128,14 @@ button:hover {
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
-    
+
     .avatar-circle img {
         width: 100%;
         height: 100%;
-        object-fit: cover;            /* image remplie le rond */
+        object-fit: cover;
+        /* image remplie le rond */
     }
-    
+
     .avatar-placeholder {
         width: 150px;
         height: 150px;
@@ -153,12 +149,14 @@ button:hover {
         color: #999;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
-    
+
     .avatar-actions-inline {
         display: flex;
-        align-items: center; /* <-- aligne verticalement le Browse et le bouton */
+        align-items: center;
+        /* <-- aligne verticalement le Browse et le bouton */
         gap: 10px;
-        margin-top: 160px; /* garde juste pour éviter le chevauchement avec le cercle */
+        margin-top: 160px;
+        /* garde juste pour éviter le chevauchement avec le cercle */
 
         input[type="file"] {
             cursor: pointer;
@@ -166,9 +164,11 @@ button:hover {
         }
 
         button {
-            padding: 6px 12px; /* même hauteur que l'input */
+            padding: 6px 12px;
+            /* même hauteur que l'input */
             font-size: 14px;
-            height: auto; /* suit la hauteur de l'input */
+            height: auto;
+            /* suit la hauteur de l'input */
             background-color: #06668C;
             color: #fff;
             border: none;
@@ -181,4 +181,101 @@ button:hover {
             background-color: #679436;
         }
     }
+}
+
+/* Partie droite - Amis */
+.right-column {
+    width: 30%;
+    background-color: #A4BD01;
+    /* Fond vert clair pastel */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Titres */
+.right-column h2,
+.right-column h3 {
+    font-size: 20px;
+    color: #06668C;
+    /* Bleu foncé pour les titres */
+    margin-bottom: 10px;
+}
+
+/* Liste d'amis */
+.friend-item,
+.friend-request-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.friend-item:hover,
+.friend-request-item:hover {
+    background-color: rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+}
+
+/* Boutons dans la colonne amis */
+.friend-item button,
+.friend-request-item button {
+    padding: 4px 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Bouton Supprimer ami (rouge) */
+.friend-item button {
+    background-color: #FF4C4C;
+    color: #fff;
+}
+
+.friend-item button:hover {
+    background-color: #FF1A1A;
+}
+
+/* Boutons Accepter et Refuser demande (vert et rouge) */
+.friend-request-item button:first-child {
+    background-color: #679436;
+    /* Accepter */
+    color: #fff;
+    margin-right: 5px;
+}
+
+.friend-request-item button:first-child:hover {
+    background-color: #5A8A2D;
+}
+
+.friend-request-item button:last-child {
+    background-color: #FF4C4C;
+    /* Refuser */
+    color: #fff;
+}
+
+.friend-request-item button:last-child:hover {
+    background-color: #FF1A1A;
+}
+
+.friend-item a {
+    color: #007bff; // bleu type lien
+    text-decoration: none; // pas de soulignement par défaut
+    cursor: pointer; // curseur main au survol
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.friend-item a:hover {
+    text-decoration: underline; // souligne au survol
+    color: #0056b3; // couleur légèrement plus foncée au survol
 }

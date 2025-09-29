@@ -1,0 +1,64 @@
+.gamme-ami-page {
+    padding: 1rem;
+
+    h2 {
+        text-align: center;
+        color: #1a73e8;
+        margin-bottom: 1rem;
+    }
+
+    .loading,
+    .error,
+    .no-gammes {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 1.2rem;
+        color: #555;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .gammes-list {
+        ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+
+            li {
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                padding: 1rem;
+                width: 250px;
+                background-color: #f9f9f9;
+
+                .gamme-btn {
+                    width: 100%;
+                    padding: 0.6rem 1rem;
+                    background-color: #1a73e8;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin-bottom: 0.5rem;
+                    transition: background-color 0.25s ease;
+
+                    &:hover {
+                        background-color: #155db2;
+                    }
+                }
+
+                p {
+                    font-size: 0.9rem;
+                    margin: 0.25rem 0 0 0;
+                    color: #333;
+                }
+            }
+        }
+    }
+}

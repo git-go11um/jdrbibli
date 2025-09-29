@@ -8,17 +8,62 @@ import com.jdrbibli.userservice.entity.UserProfile;
 public class FriendRequestMapper {
 
     public static FriendRequestDTO toDTO(FriendRequest request) {
+        if (request == null)
+            return null;
+
         FriendRequestDTO dto = new FriendRequestDTO();
         dto.setId(request.getId());
-        dto.setSenderId(request.getSender().getId());
-        dto.setSenderPseudo(request.getSender().getPseudo());
-        dto.setReceiverId(request.getReceiver().getId());
-        dto.setReceiverPseudo(request.getReceiver().getPseudo());
-        dto.setStatus(request.getStatus().name());
+        dto.setStatus(request.getStatus() != null ? request.getStatus().name() : null);
+
+        // Dates : on essaye de les prendre, mais on protège contre d'éventuelles
+        // exceptions
+        try {
+            dto.setCreatedAt(request.getCreatedAt());
+        } catch (Exception e) {
+            dto.setCreatedAt(null);
+        }
+        try {
+            dto.setRespondedAt(request.getRespondedAt());
+        } catch (Exception e) {
+            dto.setRespondedAt(null);
+        }
+
+        // Sender
+        try {
+            UserProfile sender = request.getSender();
+            if (sender != null) {
+                dto.setSenderId(sender.getId());
+                try {
+                    dto.setSenderPseudo(sender.getPseudo());
+                } catch (Exception e) {
+                    dto.setSenderPseudo(null);
+                }
+            }
+        } catch (Exception ignored) {
+            // protège contre LazyInitializationException si la session est fermée
+        }
+
+        // Receiver
+        try {
+            UserProfile receiver = request.getReceiver();
+            if (receiver != null) {
+                dto.setReceiverId(receiver.getId());
+                try {
+                    dto.setReceiverPseudo(receiver.getPseudo());
+                } catch (Exception e) {
+                    dto.setReceiverPseudo(null);
+                }
+            }
+        } catch (Exception ignored) {
+            // protège contre LazyInitializationException si la session est fermée
+        }
+
         return dto;
     }
 
     public static FriendDTO toDTO(UserProfile user) {
+        if (user == null)
+            return null;
         FriendDTO dto = new FriendDTO();
         dto.setId(user.getId());
         dto.setPseudo(user.getPseudo());

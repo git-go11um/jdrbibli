@@ -68,10 +68,19 @@ public class UserProfileController {
     }
 
     /** Rechercher un utilisateur par pseudo */
+    /** Rechercher un utilisateur par pseudo */
     @GetMapping("/search")
     public ResponseEntity<UserProfileDTO> searchUserByPseudo(@RequestParam String pseudo) {
         return userProfileService.findByPseudo(pseudo)
-                .map(user -> ResponseEntity.ok(new UserProfileDTO(user.getPseudo(), user.getEmail(), "")))
+                .map(user -> new UserProfileDTO(
+                        user.getId(), // ✅ ajoute l’ID
+                        user.getPseudo(),
+                        user.getEmail(),
+                        (user.getAvatarPath() != null && !user.getAvatarPath().isBlank())
+                                ? "/api/users/profile/avatar/" + user.getId()
+                                : "" // avatarUrl
+                ))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -211,8 +220,16 @@ public class UserProfileController {
     }
 
     @GetMapping("/{id}/cascade")
-public ResponseEntity<String> testCascade(@PathVariable Long id) {
-    return ResponseEntity.ok("OK cascade " + id);
-}
+    public ResponseEntity<String> testCascade(@PathVariable Long id) {
+        return ResponseEntity.ok("OK cascade " + id);
+    }
+
+    @GetMapping("/are-friends")
+    public ResponseEntity<Boolean> areFriends(
+            @RequestParam Long userId,
+            @RequestParam Long friendId) {
+        boolean result = userProfileService.areFriends(userId, friendId);
+        return ResponseEntity.ok(result);
+    }
 
 }

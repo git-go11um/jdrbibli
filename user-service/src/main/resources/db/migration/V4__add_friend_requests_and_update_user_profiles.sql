@@ -1,4 +1,4 @@
--- V4__add_friend_requests_and_update_user_profiles.sql
+/* -- V4__add_friend_requests_and_update_user_profiles.sql
 
 -- 1. Mise à jour table user_profiles
 
@@ -26,4 +26,4 @@ CREATE TABLE IF NOT EXISTS friend_requests (
     CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES user_profiles (id) ON DELETE CASCADE,
     CONSTRAINT fk_receiver FOREIGN KEY (receiver_id) REFERENCES user_profiles (id) ON DELETE CASCADE,
     CONSTRAINT uc_sender_receiver UNIQUE (sender_id, receiver_id)
-);
+); */

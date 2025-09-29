@@ -1,7 +1,10 @@
 package com.jdrbibli.userservice.entity;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "gammes")
@@ -21,7 +24,7 @@ public class Gamme {
 
     // Liste des ouvrages associés à cette gamme
     @OneToMany(mappedBy = "gamme", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ouvrage> ouvrages;
+    private Set<Ouvrage> ouvrages = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -55,11 +58,11 @@ public class Gamme {
         this.user = user;
     }
 
-    public List<Ouvrage> getOuvrages() {
+    public Set<Ouvrage> getOuvrages() {
         return ouvrages;
     }
 
-    public void setOuvrages(List<Ouvrage> ouvrages) {
+    public void setOuvrages(Set<Ouvrage> ouvrages) {
         this.ouvrages = ouvrages;
     }
 

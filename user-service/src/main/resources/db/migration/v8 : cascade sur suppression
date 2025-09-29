@@ -1,4 +1,4 @@
--- ===============================
+/* -- ===============================
 -- Script v8 : cascade sur suppression
 -- ===============================
 
@@ -19,3 +19,4 @@ ALTER TABLE ouvrages
 ADD CONSTRAINT fk_ouvrages_gammes
 FOREIGN KEY (gamme_id) REFERENCES gammes(id)
 ON DELETE CASCADE;
+ */

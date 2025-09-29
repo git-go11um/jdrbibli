@@ -9,6 +9,8 @@ import com.jdrbibli.userservice.mapper.FriendMapper;
 import com.jdrbibli.userservice.repository.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.slf4j.Logger;
@@ -199,6 +201,11 @@ public class UserProfileService {
         }
 
         return true;
+    }
+
+    public boolean areFriends(Long userId, Long friendId) {
+        List<UserProfile> friends = friendRequestService.listFriends(userId);
+        return friends.stream().anyMatch(f -> f.getId().equals(friendId));
     }
 
 }
