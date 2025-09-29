@@ -61,9 +61,9 @@ export class LudothequeAmiPageComponent implements OnInit {
         });
     }
 
-    ouvrirPageGamme(_gammeId: number): void {
-        // Navigation "en dur" vers la gamme 100 de l'ami
-        this.router.navigate(['/ouvrage-ami', this.friendId, 'gamme', 100]);
+    ouvrirPageGamme(gammeId: number): void {
+        this.router.navigate(['/ouvrage-ami', this.friendId, 'gamme', gammeId]);
     }
-    
+
+
 }

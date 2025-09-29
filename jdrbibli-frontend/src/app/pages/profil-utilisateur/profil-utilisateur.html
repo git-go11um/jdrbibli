@@ -53,15 +53,27 @@
     <div class="right-column">
         <h2>Amis</h2>
 
-        <!-- Formulaire de recherche d'ami -->
+        <!-- Formulaire recherche ami -->
         <div class="friend-search">
             <input type="text" placeholder="Chercher un ami par pseudo" [(ngModel)]="searchPseudo">
             <button (click)="searchFriend()" [disabled]="!searchPseudo">Rechercher</button>
         </div>
 
-        <!-- Résultat de la recherche -->
-        <div *ngIf="searchedUser">
-            <p>Pseudo trouvé : {{ searchedUser.pseudo }}</p>
+        <!-- Résultat recherche ami -->
+        <div *ngIf="searchedUser" class="searched-user">
+            <div class="searched-user-info">
+                <!-- Avatar ami -->
+                <div class="friend-avatar-container">
+                    <img *ngIf="searchedUserAvatarUrl; else noAvatarFriend" [src]="searchedUserAvatarUrl"
+                        alt="Avatar ami" class="friend-avatar">
+                    <ng-template #noAvatarFriend>
+                        <div class="friend-avatar empty-avatar"></div>
+                    </ng-template>
+                </div>
+
+                <span class="friend-pseudo">{{ searchedUser.pseudo }}</span>
+            </div>
+
             <button [disabled]="!searchedUser || requestSent" (click)="sendFriendRequest(searchedUser.id)">
                 Envoyer la demande
             </button>
@@ -69,16 +81,23 @@
             <span *ngIf="requestSent" class="request-sent-msg">Demande envoyée !</span>
         </div>
 
-        <hr>
-
         <!-- Liste des amis -->
         <div *ngIf="friends.length; else noFriends">
             <div *ngFor="let friend of friends" class="friend-item">
-                <!-- Lien vers la ludothèque de l'ami -->
+                <div class="friend-avatar-container">
+                    <img *ngIf="getFriendAvatarUrl(friend); else noAvatarFriendList" [src]="getFriendAvatarUrl(friend)"
+                        alt="Avatar ami" class="friend-avatar">
+                    <ng-template #noAvatarFriendList>
+                        <div class="friend-avatar empty-avatar"></div>
+                    </ng-template>
+                </div>
+
                 <a [routerLink]="['/ludotheque-ami', friend.id]">{{ friend.pseudo }}</a>
                 <button (click)="removeFriend(friend.id)">Supprimer</button>
             </div>
         </div>
+
+
         <ng-template #noFriends>
             <p>Vous n'avez pas encore d'amis.</p>
         </ng-template>

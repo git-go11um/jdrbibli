@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { FriendService } from '../../services/friend.service';
 import { RouterModule, Router } from '@angular/router';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-profil-utilisateur',
@@ -22,15 +22,17 @@ export class ProfilUtilisateur implements OnInit {
 
   searchPseudo: string = '';
   searchedUser: any = null;
+  searchedUserAvatarUrl: string = '';
   requestSent: boolean = false;
   friends: any[] = [];
+  friendsAvatarUrls: { [key: number]: string } = {};
   receivedRequests: any[] = [];
 
   constructor(
     public authService: AuthService,
     private friendService: FriendService,
     private router: Router,
-    private http: HttpClient // <-- injecté pour les recherches
+    private http: HttpClient
   ) { }
 
   ngOnInit(): void {
@@ -42,7 +44,6 @@ export class ProfilUtilisateur implements OnInit {
   loadUserInfo(): void {
     this.authService.getUserInfo().subscribe({
       next: (data: any) => {
-        console.log('Avatar URL reçu du backend:', data.avatarUrl);
         this.pseudo = data.pseudo;
         this.email = data.email;
         this.avatarUrl = data.avatarUrl
@@ -60,22 +61,16 @@ export class ProfilUtilisateur implements OnInit {
 
     this.authService.deleteUser().subscribe({
       next: () => {
-        console.log('Compte supprimé');
         this.authService.logout();
         this.router.navigate(['/home-public']);
       },
-      error: (err: any) => {
-        console.error('Erreur lors de la suppression du compte:', err);
-        alert('Une erreur est survenue lors de la suppression du compte.');
-      }
+      error: (err: any) => alert('Une erreur est survenue lors de la suppression du compte.')
     });
   }
 
   onFileSelected(event: Event): void {
     const fileInput = event.target as HTMLInputElement;
-    if (fileInput.files && fileInput.files.length > 0) {
-      this.selectedFile = fileInput.files[0];
-    }
+    if (fileInput.files && fileInput.files.length > 0) this.selectedFile = fileInput.files[0];
   }
 
   uploadAvatar(): void {
@@ -83,7 +78,6 @@ export class ProfilUtilisateur implements OnInit {
       alert('Veuillez sélectionner un fichier avant d’uploader.');
       return;
     }
-
     const formData = new FormData();
     formData.append('file', this.selectedFile);
     this.selectedFile = null;
@@ -103,7 +97,15 @@ export class ProfilUtilisateur implements OnInit {
     const userId = this.authService.getUserIdFromToken();
     if (!userId) return;
     this.friendService.listFriends(userId).subscribe({
-      next: (data: any) => this.friends = data,
+      next: (data: any) => {
+        this.friends = data;
+        // Génération des URL avatars amis
+        this.friends.forEach(friend => {
+          this.friendsAvatarUrls[friend.id] = friend.avatarUrl
+            ? `http://localhost:8084${friend.avatarUrl}?t=${new Date().getTime()}`
+            : '';
+        });
+      },
       error: (err: any) => console.error('Erreur chargement amis', err)
     });
   }
@@ -147,30 +149,33 @@ export class ProfilUtilisateur implements OnInit {
   searchFriend(): void {
     if (!this.searchPseudo) return;
 
+    if (this.searchPseudo === this.pseudo) {
+      alert('Vous ne pouvez vous ajouter en tant qu’ami sur ce site, mais soyez ami avec vous-même s’il vous plaît ;P');
+      return;
+    }
+
     this.http.get<any>(
       `http://localhost:8084/api/users/search?pseudo=${this.searchPseudo}`,
-      { headers: this.authService.getAuthHeaders() } // <-- utiliser la méthode publique
-    )
-      .subscribe({
-        next: (user: any) => {
-          console.log('Utilisateur trouvé:', user); // <--- ajout du log
-          this.searchedUser = user;
-          this.requestSent = false;
-        },
-        error: (err: any) => {
-          console.error('Utilisateur non trouvé', err);
-          this.searchedUser = null;
-        }
-      });
+      { headers: this.authService.getAuthHeaders() }
+    ).subscribe({
+      next: (user: any) => {
+        this.searchedUser = user;
+        this.searchedUserAvatarUrl = user.avatarUrl
+          ? `http://localhost:8084${user.avatarUrl}?t=${new Date().getTime()}`
+          : '';
+        this.requestSent = false;
+      },
+      error: (err: any) => {
+        console.error('Utilisateur non trouvé', err);
+        this.searchedUser = null;
+        alert('Pseudo inconnu');
+      }
+    });
   }
-
 
   sendFriendRequest(userId: number | null | undefined): void {
     const senderId = this.authService.getUserIdFromToken();
-    if (!senderId || !userId) {
-      console.error('Impossible d’envoyer la demande, userId manquant:', userId);
-      return;
-    }
+    if (!senderId || !userId) return;
 
     this.friendService.sendRequest(senderId, userId).subscribe({
       next: () => {
@@ -181,4 +186,7 @@ export class ProfilUtilisateur implements OnInit {
     });
   }
 
+  getFriendAvatarUrl(friend: any): string {
+    return this.friendsAvatarUrls[friend.id] || '';
+  }
 }

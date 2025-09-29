@@ -16,40 +16,47 @@ export class ResetProfilPasswordPage {
   currentPassword: string = '';
   errorMessage: string = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   onSubmit() {
-  this.errorMessage = '';
+    this.errorMessage = '';
 
-  console.log('currentPassword:', this.currentPassword);
-  console.log('newPassword:', this.newPassword);
-  console.log('confirmNewPassword:', this.confirmNewPassword);
+    console.log('currentPassword:', this.currentPassword);
+    console.log('newPassword:', this.newPassword);
+    console.log('confirmNewPassword:', this.confirmNewPassword);
 
-  if (this.newPassword !== this.confirmNewPassword) {
-    this.errorMessage = "Les mots de passe ne correspondent pas.";
-    return;
+    if (this.newPassword !== this.confirmNewPassword) {
+      this.errorMessage = "Les mots de passe ne correspondent pas.";
+      return;
+    }
+
+    const payload = {
+      currentPassword: this.currentPassword,
+      newPassword: this.newPassword,
+      confirmNewPassword: this.confirmNewPassword
+    };
+
+    console.log("Payload envoyé au backend :", payload);
+
+    this.authService.changeProfilePassword(payload).subscribe({
+      next: () => {
+        localStorage.removeItem('userPseudo');
+        alert("Mot de passe modifié avec succès !");
+      },
+      error: (err) => {
+        console.error('Erreur mise à jour mot de passe:', err);
+
+        // Pop-up générique
+        alert('Erreur - veuillez recommencer le processus.');
+
+        // Message visible sur la page
+        this.errorMessage = err.error?.message
+          ? err.error.message
+          : 'Erreur lors de la mise à jour du mot de passe. Veuillez recommencer.';
+      }
+    });
   }
 
-  const payload = {
-    currentPassword: this.currentPassword,
-    newPassword: this.newPassword,
-    confirmNewPassword: this.confirmNewPassword
-  };
-
-  console.log("Payload envoyé au backend :", payload);
-
-  this.authService.changeProfilePassword(
-    payload
-  ).subscribe({
-    next: () => {
-      localStorage.removeItem('userPseudo');
-      alert("Mot de passe modifié avec succès !");
-    },
-    error: (err) => {
-      this.errorMessage = `Erreur lors du changement de mot de passe : ${err.error.message || err.message}`;
-    }
-  });
-}
 
 
   ngOnInit() {

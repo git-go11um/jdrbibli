@@ -279,3 +279,26 @@ button:hover {
     text-decoration: underline; // souligne au survol
     color: #0056b3; // couleur légèrement plus foncée au survol
 }
+
+.friend-avatar-container {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.friend-avatar,
+.empty-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #ccc; // cercle gris si pas d’avatar
+    display: inline-block;
+}
+
+.searched-user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

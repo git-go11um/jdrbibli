@@ -45,23 +45,30 @@ export class ProfileEditComponent implements OnInit {
         this.error = false;
 
         this.authService.updateProfile(this.pseudo, this.email).subscribe({
-            next: (res: any) => { //-- res contient maintenant { message, token }
-                // Mettre à jour le token dans le localStorage pour éviter le 403
+            next: (res: any) => {
                 if (res.token) {
-                    this.authService.setToken(res.token); //-- mise à jour du JWT
+                    this.authService.setToken(res.token);
                 }
 
                 this.message = res.message || 'Profil mis à jour avec succès.';
                 this.error = false;
 
-                // Recharger les infos utilisateur avec le nouveau token
-                this.loadUserInfo(); //-- rafraîchit la page sans devoir se reconnecter
+                this.loadUserInfo();
             },
             error: (err) => {
                 console.error('Erreur mise à jour profil:', err);
-                this.message = `Erreur lors de la mise à jour: ${err.error?.message || err.message || 'serveur inaccessible'}`;
+
+                // Pop-up générique
+                alert('Erreur - veuillez recommencer le processus.');
+
+                // Message visible sur la page
+                this.message = err.error?.message
+                    ? err.error.message
+                    : 'Erreur lors de la mise à jour. Veuillez recommencer.';
                 this.error = true;
             },
         });
     }
+
+
 }
