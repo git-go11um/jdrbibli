@@ -1,0 +1,8 @@
+POST http://localhost:8085/api/audit/logs
+Content-Type: application/json
+
+{
+  "action": "USER_CREATED",
+  "details": "Premier test manuel",
+  "userId": 42
+}

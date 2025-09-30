@@ -1,22 +1,17 @@
 package com.jdrbibli.authservice.service;
 
-import com.jdrbibli.authservice.dto.ChangePasswordProfileRequest;
-import com.jdrbibli.authservice.dto.ChangePasswordRequest;
-import com.jdrbibli.authservice.dto.ReponseProfileChange;
-import com.jdrbibli.authservice.dto.UserProfileDTO;
-import com.jdrbibli.authservice.dto.UserResponseDTO;
+import com.jdrbibli.authservice.client.AuditClient;
+import com.jdrbibli.authservice.dto.*;
 import com.jdrbibli.authservice.entity.Role;
 import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.exception.BadCredentialsException;
 import com.jdrbibli.authservice.exception.UserNotFoundException;
-import com.jdrbibli.authservice.repository.UserRepository;
 import com.jdrbibli.authservice.repository.PasswordResetTokenRepository;
+import com.jdrbibli.authservice.repository.UserRepository;
 import com.jdrbibli.authservice.security.JwtTokenProvider;
 import com.jdrbibli.authservice.util.PasswordValidator;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.internet.MimeMessage;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -39,15 +34,16 @@ public class UserService implements IUserService {
     private final JavaMailSender mailSender;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
-
     private final RestTemplate restTemplate;
 
     @Value("${app.user-service-url}")
     private String userServiceUrl;
 
     @Autowired
-    public UserService(
-            UserRepository userRepository,
+    private AuditClient auditClient;
+
+    @Autowired
+    public UserService(UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JavaMailSender mailSender,
             JwtTokenProvider jwtTokenProvider,
@@ -66,6 +62,7 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public User inscrireNewUser(String pseudo, String email, String password) {
         PasswordValidator.validate(password);
         String hashedPassword = passwordEncoder.encode(password);
@@ -80,6 +77,8 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
 
+        auditClient.logEvent("auth-service", "USER_CREATED",
+                "Utilisateur créé: " + savedUser.getPseudo() + " (id:" + savedUser.getId() + ")");
         return savedUser;
     }
 
@@ -93,42 +92,47 @@ public class UserService implements IUserService {
         return user;
     }
 
+    @Transactional
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+        auditClient.logEvent("auth-service", "USER_DELETED", "Utilisateur supprimé avec id: " + id);
+    }
 
-    /** Supprime un utilisateur côté auth-service et côté user-service (cascade gammes/ouvrages) */
+    @Transactional
     public boolean deleteUserWithCascade(Long userId) {
-        // 1️⃣ Supprime côté user-service
-        String url = userServiceUrl + "/" + userId + "/cascade"; //-- vérifie que l'endpoint existe côté user-service
+        // Suppression côté user-service
+        String url = userServiceUrl + "/" + userId + "/cascade";
         try {
             restTemplate.delete(url);
             System.out.println("✅ Suppression cascade réussie dans user-service pour id=" + userId);
         } catch (HttpClientErrorException.NotFound e) {
             System.err.println("Profil utilisateur " + userId + " inexistant côté user-service.");
         } catch (Exception e) {
-            System.err.println("Erreur lors de la suppression dans user-service (id=" + userId + ") : " + e.getMessage());
+            System.err
+                    .println("Erreur lors de la suppression dans user-service (id=" + userId + ") : " + e.getMessage());
             return false;
         }
 
-        // 2️⃣ Supprime côté auth-service
+        // Suppression côté auth-service
         if (userRepository.existsById(userId)) {
             userRepository.deleteById(userId);
             System.out.println("✅ Compte utilisateur " + userId + " supprimé côté auth-service.");
+            auditClient.logEvent("auth-service", "USER_DELETED", "Utilisateur supprimé avec id: " + userId);
             return true;
         } else {
             System.err.println("Compte utilisateur " + userId + " déjà supprimé côté auth-service.");
             return false;
         }
     }
-   
 
     @Override
+    @Transactional
     public void deleteUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec l'ID : " + userId));
 
-        // ✅ Supprime d’abord côté auth_db
         userRepository.delete(user);
 
-        // ✅ Appel côté user-service par ID en cascade
         String url = userServiceUrl + "/" + userId + "/cascade";
         try {
             restTemplate.delete(url);
@@ -137,6 +141,8 @@ public class UserService implements IUserService {
             System.err.println(
                     "⚠️ Erreur lors de la suppression dans user-service (id=" + userId + ") : " + e.getMessage());
         }
+
+        auditClient.logEvent("auth-service", "USER_DELETED", "Utilisateur supprimé avec id: " + userId);
     }
 
     @Override
@@ -154,8 +160,15 @@ public class UserService implements IUserService {
 
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur avec l'email " + userEmail + " non trouvé"));
+
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+
+        // --- AJOUT DU LOG ---
+        auditClient.logEvent(
+                "auth-service",
+                "PASSWORD_CHANGED",
+                "Mot de passe modifié pour id: " + user.getId() + " | pseudo: " + user.getPseudo());
     }
 
     @Override
@@ -168,8 +181,8 @@ public class UserService implements IUserService {
         user.setResetPasswordCodeExpiration(expirationTime);
         userRepository.save(user);
 
-        System.out.println("Code généré : " + code);
         sendResetPasswordEmail(user.getEmail(), code);
+        auditClient.logEvent("auth-service", "PASSWORD_RESET_REQUESTED", "Réinitialisation demandée pour " + pseudo);
     }
 
     private String generateResetCode(int length) {
@@ -188,15 +201,8 @@ public class UserService implements IUserService {
         String storedCode = user.getResetCode();
         Long expiration = user.getResetPasswordCodeExpiration();
 
-        boolean isValid = storedCode != null
-                && storedCode.equalsIgnoreCase(code)
-                && expiration != null
-                && expiration > System.currentTimeMillis();
-
-        System.out.println("storedCode='" + storedCode + "' | code='" + code + "'");
-        System.out.println("Résultat final validateResetCode=" + isValid);
-
-        return isValid;
+        return storedCode != null && storedCode.equalsIgnoreCase(code)
+                && expiration != null && expiration > System.currentTimeMillis();
     }
 
     @Override
@@ -209,18 +215,16 @@ public class UserService implements IUserService {
 
         PasswordValidator.validate(newPassword);
         user.setPassword(passwordEncoder.encode(newPassword));
-
         user.setResetCode(null);
         user.setResetPasswordCodeExpiration(null);
-
         userRepository.save(user);
-    }
 
-    public UserResponseDTO toDTO(User user) {
-        Set<String> roleNames = user.getRoles().stream()
-                .map(Role::getRoleName)
-                .collect(Collectors.toSet());
-        return new UserResponseDTO(user.getId(), user.getPseudo(), user.getEmail(), roleNames);
+        // log audit spécifique à la réinitialisation
+        auditClient.logEvent(
+                "auth-service",
+                "PASSWORD_RESET",
+                "Mot de passe réinitialisé via 'mot de passe oublié' pour id: " + user.getId() + " | pseudo: "
+                        + user.getPseudo());
     }
 
     private void sendResetPasswordEmail(String email, String code) {
@@ -235,10 +239,9 @@ public class UserService implements IUserService {
             helper.setSubject(subject);
             mimeMessage.setText(message, "utf-8", "plain");
             mailSender.send(mimeMessage);
-            System.out.println("Email envoyé à : " + email);
         } catch (Exception e) {
+            System.err.println("Erreur lors de l'envoi de l'email : " + e.getMessage());
             e.printStackTrace();
-            System.out.println("Erreur lors de l'envoi de l'email : " + e.getMessage());
         }
     }
 
@@ -249,6 +252,7 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
 
         String oldPseudo = user.getPseudo();
+        String oldEmail = user.getEmail();
         boolean pseudoChanged = false;
         boolean emailChanged = false;
 
@@ -257,7 +261,7 @@ public class UserService implements IUserService {
             pseudoChanged = true;
         }
 
-        if (newEmail != null && !newEmail.trim().isEmpty() && !newEmail.equals(user.getEmail())) {
+        if (newEmail != null && !newEmail.trim().isEmpty() && !newEmail.equals(oldEmail)) {
             user.setEmail(newEmail);
             emailChanged = true;
         }
@@ -266,6 +270,7 @@ public class UserService implements IUserService {
             return new ReponseProfileChange("Aucun changement détecté.", null);
         }
 
+        // Sauvegarde côté auth_db
         userRepository.save(user);
         String newToken = jwtTokenProvider.createToken(user.getPseudo());
 
@@ -278,7 +283,6 @@ public class UserService implements IUserService {
             UserProfileDTO body = new UserProfileDTO(user.getId(), user.getPseudo(), user.getEmail());
             HttpEntity<UserProfileDTO> request = new HttpEntity<>(body, headers);
 
-            // PUT direct vers /api/users/{id} sans rechercher l'ancien pseudo
             String updateUrl = userServiceUrl + "/" + user.getId();
             restTemplate.exchange(updateUrl, HttpMethod.PUT, request, Map.class);
 
@@ -287,15 +291,25 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
 
+        // 🔹 Audit log
+        StringBuilder details = new StringBuilder("Modification du profil pour id: " + userId);
+        if (pseudoChanged) {
+            details.append(" | pseudo: '").append(oldPseudo).append("' → '").append(newPseudo).append("'");
+        }
+        if (emailChanged) {
+            details.append(" | email: '").append(oldEmail).append("' → '").append(newEmail).append("'");
+        }
+        auditClient.logEvent("auth-service", "USER_UPDATED", details.toString());
+
         return new ReponseProfileChange("Profil mis à jour avec succès.", newToken);
     }
 
     @Override
     public void changeProfilePassword(String userPseudo, ChangePasswordProfileRequest request) {
+        // validation
         if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
             throw new IllegalArgumentException("Les deux mots de passe ne correspondent pas");
         }
-
         PasswordValidator.validate(request.getNewPassword());
 
         User user = userRepository.findByPseudo(userPseudo)
@@ -308,6 +322,12 @@ public class UserService implements IUserService {
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+
+        // log audit spécifique à la modification manuelle
+        auditClient.logEvent(
+                "auth-service",
+                "PASSWORD_CHANGED",
+                "Mot de passe modifié manuellement pour id: " + user.getId() + " | pseudo: " + user.getPseudo());
     }
 
     private void createUserProfile(Long id, String pseudo, String email) {
@@ -338,26 +358,18 @@ public class UserService implements IUserService {
         passwordResetTokenRepository.deleteByUserId(userId);
     }
 
-    public void testUserServiceConnection() {
-        String url = userServiceUrl;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        String jsonBody = "{ \"pseudo\": \"testHttp\", \"email\": \"testHttp@user.com\" }";
-        HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
-
-        try {
-            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-            System.out.println("Réponse user-service : " + response.getStatusCode() + " | " + response.getBody());
-        } catch (Exception e) {
-            System.err.println("Erreur lors de l'appel à user-service : " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur avec id " + id + " non trouvé"));
+    }
+
+    @Override
+    public UserResponseDTO toDTO(User user) {
+        Set<String> roleNames = user.getRoles().stream()
+                .map(Role::getRoleName)
+                .collect(Collectors.toSet());
+        return new UserResponseDTO(user.getId(), user.getPseudo(), user.getEmail(), roleNames);
     }
 
 }

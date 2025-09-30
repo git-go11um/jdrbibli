@@ -48,3 +48,4 @@ app:
   frontend:
     reset-password-url: "http://localhost:4200/reset-password?token="
   user-service-url: http://localhost:8082/api/users
+  audit-url: http://localhost:8085/api/audit/logs
