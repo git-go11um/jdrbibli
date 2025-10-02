@@ -1,33 +1,30 @@
-<div class="gamme">
-  <header class="gamme__header">
-    <h1 class="gamme__title">{{ gamme?.nom }}</h1>
-    <p class="gamme__description">{{ gamme?.description }}</p>
-  </header>
+<div class="gamme-wrapper">
+  <div class="gamme-container">
+    <header class="gamme__header">
+      <h1 class="gamme__title">{{ gamme?.nom }}</h1>
+      <p class="gamme__description">{{ gamme?.description }}</p>
+    </header>
 
-  <!-- Bouton global Ajouter un ouvrage (visible uniquement si formulaire caché) -->
-  <button class="gamme__button--add" (click)="allerCreationEdition()" *ngIf="!afficherFormulaireAjout">
-    Ajouter un ouvrage
-  </button>
+    <!-- Bouton global Ajouter un ouvrage -->
+    <button class="gamme__button--add" (click)="allerCreationEdition()" *ngIf="!afficherFormulaireAjout">
+      Ajouter un ouvrage
+    </button>
 
+    <!-- Liste des ouvrages -->
+    <section class="gamme__list">
+      <h2>Ouvrages de la gamme</h2>
+      <ul class="gamme__ouvrages">
+        <li *ngFor="let ouvrage of ouvrages" class="gamme__ouvrage-item">
+          <button class="gamme__ouvrage-title" (click)="ouvrirPageOuvrage(ouvrage.id!)">
+            {{ ouvrage.titre }}
+          </button>
 
-
-  <!-- Liste des ouvrages -->
-  <section class="gamme__list">
-    <h2>Ouvrages de la gamme</h2>
-    <ul class="gamme__ouvrages">
-      <li *ngFor="let ouvrage of ouvrages" class="gamme__ouvrage-item">
-        <!-- Lien vers la page de consultation de l'ouvrage -->
-        <button class="gamme__ouvrage-title" (click)="ouvrirPageOuvrage(ouvrage.id!)">{{ ouvrage.titre }}</button>
-
-
-
-
-        <div class="gamme__actions">
-          <button (click)="modifierOuvrage(ouvrage.id!)" class="gamme__button gamme__button--edit">Modifier</button>
-          <button (click)="supprimerOuvrage(ouvrage.id!)" class="gamme__button gamme__button--delete">Supprimer</button>
-        </div>
-      </li>
-    </ul>
-  </section>
-
+          <div class="gamme__actions">
+            <button (click)="modifierOuvrage(ouvrage.id!)" class="gamme__button gamme__button--edit">Modifier</button>
+            <button (click)="supprimerOuvrage(ouvrage.id!)" class="gamme__button gamme__button--delete">Supprimer</button>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </div>
 </div>

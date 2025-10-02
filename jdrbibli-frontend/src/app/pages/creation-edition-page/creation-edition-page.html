@@ -1,123 +1,126 @@
-<div class="creation-edition-container" *ngIf="ouvrage">
+<div class="creation-edition-wrapper">
+    <div class="creation-edition-container" *ngIf="ouvrage">
 
-    <h2>{{ ouvrage.titre || 'Nouvel ouvrage' }}</h2>
+        <h2>{{ ouvrage.titre || 'Nouvel ouvrage' }}</h2>
 
-    <!-- Titre -->
-    <div class="field">
-        <label>Titre :</label>
-        <input [(ngModel)]="ouvrage.titre" type="text" placeholder="Nom de l'ouvrage - obligatoire" />
-        <span class="error" *ngIf="!ouvrage.titre && isSavingAttempted">
-            Le titre est obligatoire
-        </span>
-    </div>
-
-    <!-- Description -->
-    <div class="field">
-        <label>Description :</label>
-        <textarea [(ngModel)]="ouvrage.description" placeholder="Décrivez l’ouvrage..."></textarea>
-    </div>
-
-    <!-- Version -->
-    <div class="field">
-        <label>Version :</label>
-        <input [(ngModel)]="ouvrage.version" type="text" />
-    </div>
-
-    <!-- Image de l'ouvrage -->
-    <div class="field">
-        <label>Image de l'ouvrage :</label>
-        <input type="file" (change)="onFileSelected($event)" accept="image/*" />
-        <div *ngIf="imagePreview" class="ouvrage-image">
-            <img [src]="imagePreview" alt="Aperçu de l'image" />
+        <!-- Titre -->
+        <div class="field">
+            <label>Titre :</label>
+            <input [(ngModel)]="ouvrage.titre" type="text" placeholder="Nom de l'ouvrage - obligatoire" />
+            <span class="error" *ngIf="!ouvrage.titre && isSavingAttempted">
+                Le titre est obligatoire
+            </span>
         </div>
-    </div>
 
-    <!-- Type d'ouvrage -->
-    <div class="field">
-        <label>Type d'ouvrage :</label>
-        <select [(ngModel)]="ouvrage.typeOuvrage">
-            <option *ngFor="let option of typeOptions" [value]="option">{{ option }}</option>
-        </select>
-        <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.typeOuvrage" />
-    </div>
+        <!-- Description -->
+        <div class="field">
+            <label>Description :</label>
+            <textarea [(ngModel)]="ouvrage.description" placeholder="Décrivez l’ouvrage..."></textarea>
+        </div>
 
-    <!-- Date de publication -->
-    <div class="field">
-        <label>Date de publication :</label>
-        <input type="date" [(ngModel)]="ouvrage.datePublication" required />
-    </div>
+        <!-- Version -->
+        <div class="field">
+            <label>Version :</label>
+            <input [(ngModel)]="ouvrage.version" type="text" />
+        </div>
 
-    <!-- Langue -->
-    <div class="field">
-        <label>Langue :</label>
-        <select [(ngModel)]="ouvrage.langue">
-            <option *ngFor="let option of langueOptions" [value]="option">{{ option }}</option>
-        </select>
-        <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.langue" />
-    </div>
+        <!-- Image de l'ouvrage -->
+        <div class="field">
+            <label>Image de l'ouvrage :</label>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+            <div *ngIf="imagePreview" class="ouvrage-image">
+                <img [src]="imagePreview" alt="Aperçu de l'image" />
+            </div>
+        </div>
 
-    <!-- Éditeur -->
-    <div class="field">
-        <label>Éditeur :</label>
-        <input type="text" [(ngModel)]="ouvrage.editeur" />
-    </div>
+        <!-- Type d'ouvrage -->
+        <div class="field">
+            <label>Type d'ouvrage :</label>
+            <select [(ngModel)]="ouvrage.typeOuvrage">
+                <option *ngFor="let option of typeOptions" [value]="option">{{ option }}</option>
+            </select>
+            <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.typeOuvrage" />
+        </div>
 
-    <!-- État de l'ouvrage -->
-    <div class="field">
-        <label>État de l'ouvrage :</label>
-        <select [(ngModel)]="ouvrage.etat">
-            <option *ngFor="let option of etatOptions" [value]="option">{{ option }}</option>
-        </select>
-    </div>
+        <!-- Date de publication -->
+        <div class="field">
+            <label>Date de publication :</label>
+            <input type="date" [(ngModel)]="ouvrage.datePublication" required />
+        </div>
 
-    <!-- EAN/ISBN -->
-    <div class="field">
-        <label>EAN/ISBN :</label>
-        <input type="text" [(ngModel)]="ouvrage.isbn" />
-    </div>
+        <!-- Langue -->
+        <div class="field">
+            <label>Langue :</label>
+            <select [(ngModel)]="ouvrage.langue">
+                <option *ngFor="let option of langueOptions" [value]="option">{{ option }}</option>
+            </select>
+            <input placeholder="Autre" type="text" [(ngModel)]="ouvrage.langue" />
+        </div>
 
-    <!-- Lié à un autre ouvrage -->
-    <div class="field">
-        <label>Lié à un autre ouvrage :</label>
-        <input type="text" [(ngModel)]="ouvrage.ouvrageLie" placeholder="Ensemble de la gamme" />
-    </div>
+        <!-- Éditeur -->
+        <div class="field">
+            <label>Éditeur :</label>
+            <input type="text" [(ngModel)]="ouvrage.editeur" />
+        </div>
 
-    <!-- Scénario lié -->
-    <div class="field">
-        <label>Scénario lié :</label>
-        <input type="text" [(ngModel)]="ouvrage.scenarioLie" placeholder="Non" />
-    </div>
+        <!-- État de l'ouvrage -->
+        <div class="field">
+            <label>État de l'ouvrage :</label>
+            <select [(ngModel)]="ouvrage.etat">
+                <option *ngFor="let option of etatOptions" [value]="option">{{ option }}</option>
+            </select>
+        </div>
 
-    <!-- Prêt -->
-    <div class="field">
-        <label>Prêt :</label>
-        <input type="checkbox" [(ngModel)]="ouvrage.pret" />
-    </div>
+        <!-- EAN/ISBN -->
+        <div class="field">
+            <label>EAN/ISBN :</label>
+            <input type="text" [(ngModel)]="ouvrage.isbn" />
+        </div>
 
-    <!-- Errata -->
-    <div class="field">
-        <label>Errata :</label>
-        <input type="text" [(ngModel)]="ouvrage.errata" placeholder="Lien ou texte" />
-    </div>
+        <!-- Lié à un autre ouvrage -->
+        <div class="field">
+            <label>Lié à un autre ouvrage :</label>
+            <input type="text" [(ngModel)]="ouvrage.ouvrageLie" placeholder="Ensemble de la gamme" />
+        </div>
 
-    <!-- Notes personnelles -->
-    <div class="field">
-        <label>Notes personnelles :</label>
-        <textarea [(ngModel)]="ouvrage.notes" placeholder="Prenez vos notes ici..."></textarea>
-    </div>
+        <!-- Scénario lié -->
+        <div class="field">
+            <label>Scénario lié :</label>
+            <input type="text" [(ngModel)]="ouvrage.scenarioLie" placeholder="Non" />
+        </div>
 
-    <!-- Scénarios contenus -->
-    <div class="field">
-        <label>Scénarios contenus (séparés par des virgules) :</label>
-        <textarea [(ngModel)]="scenariosContenusString"
-            placeholder="Listez ici les scénarios contenus, séparés par des virgules..."></textarea>
-    </div>
+        <!-- Prêt -->
+        <div class="field">
+            <label>Prêt :</label>
+            <input type="checkbox" [(ngModel)]="ouvrage.pret" />
+        </div>
 
-    <!-- Sauvegarder -->
-    <div class="field">
-        <button type="button" class="btn-save" [disabled]="!ouvrage.titre || isSaving" (click)="sauvegarderOuvrage()">
-            {{ isSaving ? 'Sauvegarde en cours...' : 'Sauvegarder les modifications' }}
-        </button>
-    </div>
+        <!-- Errata -->
+        <div class="field">
+            <label>Errata :</label>
+            <input type="text" [(ngModel)]="ouvrage.errata" placeholder="Lien ou texte" />
+        </div>
 
+        <!-- Notes personnelles -->
+        <div class="field">
+            <label>Notes personnelles :</label>
+            <textarea [(ngModel)]="ouvrage.notes" placeholder="Prenez vos notes ici..."></textarea>
+        </div>
+
+        <!-- Scénarios contenus -->
+        <div class="field">
+            <label>Scénarios contenus (séparés par des virgules) :</label>
+            <textarea [(ngModel)]="scenariosContenusString"
+                placeholder="Listez ici les scénarios contenus, séparés par des virgules..."></textarea>
+        </div>
+
+        <!-- Sauvegarder -->
+        <div class="field">
+            <button type="button" class="btn-save" [disabled]="!ouvrage.titre || isSaving"
+                (click)="sauvegarderOuvrage()">
+                {{ isSaving ? 'Sauvegarde en cours...' : 'Sauvegarder les modifications' }}
+            </button>
+        </div>
+
+    </div>
 </div>
