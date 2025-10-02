@@ -1,21 +1,23 @@
-<div class="login-page container">
-  <h2>Bienvenue sur JdrBibli</h2>
+<div class="login-wrapper">
+  <div class="login-page">
+    <h2>Bienvenue sur JdrBibli</h2>
 
-  <form (ngSubmit)="onSubmit()">
-    <label for="pseudo">Pseudo</label>
-    <input type="text" id="pseudo" [(ngModel)]="pseudo" name="pseudo" required />
+    <form (ngSubmit)="onSubmit()">
+      <label for="pseudo">Pseudo</label>
+      <input type="text" id="pseudo" [(ngModel)]="pseudo" name="pseudo" required />
 
-    <label for="password">Mot de passe</label>
-    <input type="password" id="password" [(ngModel)]="password" name="password" required />
+      <label for="password">Mot de passe</label>
+      <input type="password" id="password" [(ngModel)]="password" name="password" required />
 
-    <button type="submit" class="btn">Se connecter</button>
+      <button type="submit" class="btn">Se connecter</button>
 
-    <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
-  </form>
+      <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    </form>
 
-  <div class="secondary-links">
-    <a routerLink="/register">Créer un compte</a>
-    <a routerLink="/password-reset">Mot de passe oublié ?</a>
-    
+    <div class="secondary-links">
+      <a routerLink="/register">Créer un compte</a>
+      <a routerLink="/password-reset">Mot de passe oublié ?</a>
+
+    </div>
   </div>
 </div>

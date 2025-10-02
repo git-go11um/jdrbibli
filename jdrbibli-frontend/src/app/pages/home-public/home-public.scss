@@ -1,45 +1,67 @@
+/* Wrapper général */
 .home-public {
-  max-width: 100%;
-  text-align: center;
-  padding: 50px 20px 100px 20px;
-  padding-bottom: 100px; // <-- espace pour éviter que le footer recouvre
-  box-sizing: border-box;
   background-color: #EBF2FA;
   min-height: 100vh;
-  
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 50px 20px 100px 20px; // espace bas pour le footer
+  box-sizing: border-box;
+  text-align: center;
 
-   /* Smartphone */
-  @media (max-width: 600px) {
-    padding: 30px 20px 100px 20px;
+  /* Conteneur principal centré */
+  .home-container {
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
   }
 
-   /* Tablette */
+  /* Breakpoints progressifs */
+  @media (max-width: 600px) {
+    padding: 30px 20px 100px 20px;
+
+    .home-container {
+      max-width: 100%;
+    }
+  }
+
   @media (min-width: 601px) and (max-width: 1024px) {
     padding: 40px 20px 80px 20px; 
     min-height: 110vh;
+
+    .home-container {
+      max-width: 90%;
+    }
   }
 
-  /* PC */
   @media (min-width: 1025px) {
     padding: 60px 20px 60px 20px;
     min-height: 100vh;
-    width: 100%;
+
+    .home-container {
+      max-width: 1000px;
+    }
   }
+
+  /* Bouton */
   .btn {
     display: inline-block;
     padding: 10px 20px;
     background: #007acc;
     color: white;
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 6px; // arrondi cohérent avec les autres pages
     margin-top: 20px;
+    font-weight: 600;
+    transition: background 0.25s ease;
 
     &:hover {
       background: #005a99;
     }
   }
 
-  /* Section de présentation avec ombre */
+  /* Section de présentation */
   .site-presentation-with-shadow {
     margin-top: 30px;
     text-align: center;
@@ -55,16 +77,12 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
-  /* Titre avec ombre */
   .presentation-box h3 {
     color: #06668C;
     font-size: 24px;
     margin-bottom: 15px;
   }
 
-
-
-  /* Texte */
   .presentation-box p {
     color: #333333;
     font-size: 16px;
@@ -72,7 +90,7 @@
     text-align: justify;
   }
 
-  /* Section de bienvenue avec cadre */
+  /* Section bienvenue */
   .welcome-section {
     margin-top: 0px;
     text-align: center;
@@ -81,16 +99,13 @@
   .welcome-box {
     background-color: #FFFFFF;
     border: 2px solid #EBF2FA;
-    /* Bordure légère et discrète */
     border-radius: 8px;
     padding: 25px;
     max-width: 600px;
     margin: 0 auto;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    /* Ombre légère */
   }
 
-  /* Titre sans ombre */
   .welcome-box h3 {
     color: #06668C;
     font-size: 24px;
@@ -100,17 +115,12 @@
   .highlighted-title {
     color: #06668C;
     font-weight: bold;
-    /* Pas d'ombre ici */
   }
 
-  /* Texte */
   .welcome-box p {
     color: #333333;
     font-size: 16px;
     line-height: 1.6;
     text-align: justify;
   }
-
-
-
 }
