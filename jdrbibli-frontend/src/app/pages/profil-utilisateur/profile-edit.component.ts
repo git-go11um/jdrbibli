@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
     standalone: true,
     imports: [CommonModule, FormsModule, RouterModule],
     templateUrl: './profile-edit.component.html',
+    styleUrls: ['./profile-edit.component.scss']
 })
 export class ProfileEditComponent implements OnInit {
     pseudo = '';

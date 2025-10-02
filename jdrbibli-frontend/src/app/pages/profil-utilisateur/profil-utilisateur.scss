@@ -2,408 +2,448 @@
 =            Fond global wrapper        =
 ======================================*/
 .profil-wrapper {
-  background-color: #EBF2FA;   // ton bleu clair
-  min-height: 100vh;          // prend toute la hauteur de l’écran
-  width: 100%;                // pleine largeur
+  background-color: #EBF2FA;
+  min-height: 100vh;
+  width: 100%;
   display: flex;
-  justify-content: center;    // centre horizontalement
-  align-items: flex-start;    // colle en haut
-  padding: 20px;              // marges intérieures
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
   box-sizing: border-box;
 }
-  
-  /*======================================
-  =        Conteneur principal           =
-  ======================================*/
-  .profil-utilisateur {
-    display: flex;
+
+/* Wrapper interne pour max-width progressif */
+.profil-wrapper-inner {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+
+  /* Max-width progressif */
+  max-width: 400px;
+
+  @media (min-width: 601px) {
+    max-width: 700px;
+  }
+
+  @media (min-width: 1025px) {
+    max-width: 1200px;
+  }
+}
+
+/*======================================
+=        Conteneur principal           =
+======================================*/
+.profil-utilisateur {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  padding-bottom: var(--bottom-margin);
+  box-sizing: border-box;
+  gap: 20px;
+  align-items: stretch;
+
+  /* Smartphone */
+  @media (max-width: 600px) {
+    flex-direction: column;
+    padding: 10px;
+    padding-bottom: calc(var(--bottom-margin) / 2);
+    gap: 15px;
+  }
+
+  /* Tablette */
+  @media (min-width: 601px) and (max-width: 1024px) {
     flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    min-height: 100vh;
+    padding: 10px;
+    padding-bottom: 20px;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  /* Desktop */
+  @media (min-width: 1025px) {
+    flex-direction: row;
     padding: 20px;
     padding-bottom: var(--bottom-margin);
-    box-sizing: border-box;
     gap: 20px;
     align-items: stretch;
-  
-    @media (max-width: 600px) {
-      flex-direction: column;
-      padding: 10px;
-      padding-bottom: calc(var(--bottom-margin) / 2);
-      gap: 15px;
-    }
-  
-    @media (min-width: 601px) and (max-width: 1024px) {
-      flex-direction: row;
-      padding: 10px;
-      padding-bottom: 20px;
-      gap: 15px;
-      align-items: flex-start;
+  }
+}
 
-      .left-column, .right-column {
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-        height: 400px; 
-      }
-    
-      .left-column {
-        width: 55%;
-        height: 400px;      // hauteur fixe profil utilisateur
-      }
-    
-      .right-column {
-        width: 45%;
-        height: 400px;      // hauteur fixe boîte amis
-      }
-    }
-  
-    @media (min-width: 1025px) {
-      flex-direction: row;
-      padding: 20px;
-      padding-bottom: var(--bottom-margin);
-      align-items: stretch;
-      gap: 20px;
-    }
-  }
-  
-  /*======================================
-  =        Colonnes gauche/droite        =
-  ======================================*/
-  .left-column, .right-column {
-    display: flex;
-    flex-direction: column;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    padding: 20px;
-    overflow-y: auto;
-    flex: 1; // assure la même hauteur pour les colonnes
-  
-    @media (max-width: 1024px) {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-  }
-  
-  .left-column {
-    background-color: #FFFFFF;
-    border-right: 2px solid #EBF2FA;
-  
-    @media (min-width: 1025px) {
-      width: 60%;
-      border-right: 2px solid #EBF2FA;
-    }
-  }
-  
-  .right-column {
-    background-color: #A4BD01;
-    gap: 20px;
-  
-    @media (min-width: 1025px) {
-      width: 40%;
-    }
-  }
-  
-  /*======================================
-  =            Titres                    =
-  ======================================*/
-  h1, h2 {
-    font-size: 24px;
-    color: #06668C;
-    margin-bottom: 10px;
-  }
-  
-  /*======================================
-  =          Informations utilisateur    =
-  ======================================*/
-  .user-info {
+/*======================================
+=        Colonnes gauche/droite        =
+======================================*/
+.left-column, .right-column {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+
+  @media (max-width: 1024px) {
+    width: 100%;
     margin-bottom: 20px;
   }
-  
-  .info-item {
-    margin-bottom: 15px;
-  }
-  
-  label {
-    font-weight: bold;
-  }
-  
-  span {
-    display: block;
-    margin-top: 5px;
-    color: #333;
-  }
-  
-  /*======================================
-  =            Boutons                   =
-  ======================================*/
-  .action-buttons button {
-    color: #fff;
-    padding: 8px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 10px;
-    margin-top: 10px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-  }
-  
-  .btn-modifier {
-    background-color: #06668C;
-  }
-  
-  .btn-modifier:hover { background-color: #679436; }
-  
-  .btn-supprimer {
-    background-color: #FF4C4C;
-  }
-  
-  .btn-supprimer:hover { background-color: #FF1A1A; }
-  
-  button:not(.btn-modifier):not(.btn-supprimer) {
-    background-color: #679436;
-  }
-  
-  button:hover:not(.btn-modifier):not(.btn-supprimer) {
-    background-color: #5A8A2D;
-  }
-  
-  /*======================================
-  =             Avatar                   =
-  ======================================*/
-  .avatar-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    position: relative;
-  }
-  
-  .avatar-circle {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background-color: #fff;
-    border: 3px solid #06668C;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  }
-  
-  /* Avatar actions */
-  .avatar-actions-inline {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-  
-    input[type="file"] {
-      cursor: pointer;
-      padding: 4px 6px;
-    }
-  
-    button {
-      padding: 6px 20px;
-      font-size: 14px;
-      white-space: nowrap;
-      background-color: #06668C;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-  
-    button:hover {
-      background-color: #679436;
-    }
-  }
-  
-  /*======================================
-  =          Formulaire amis             =
-  ======================================*/
-  .friend-search {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .friend-search input[type="text"] {
-    flex: 1;
-    padding: 6px 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-  }
-  
-  .friend-search button {
-    padding: 6px 12px;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    background-color: #06668C;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .friend-search button:hover { background-color: #679436; }
-  
-  /*======================================
-  =        Liste d'amis                  =
-  ======================================*/
-  .friend-item, .friend-request-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: 6px;
-    background-color: rgba(255,255,255,0.85);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  
-  .friend-item:hover, .friend-request-item:hover {
-    background-color: rgba(255,255,255,1);
-    transform: translateY(-1px);
-  }
-  
-  /* Boutons liste amis */
-  .friend-item button, .friend-request-item button {
-    padding: 4px 10px;
-    font-size: 14px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .friend-item button {
-    background-color: #FF4C4C;
-    color: #fff;
-  }
-  
-  .friend-item button:hover {
-    background-color: #FF1A1A;
-  }
-  
-  .friend-request-item button:first-child {
-    background-color: #679436;
-    color: #fff;
-    margin-right: 5px;
-  }
-  
-  .friend-request-item button:first-child:hover {
-    background-color: #5A8A2D;
-  }
-  
-  .friend-request-item button:last-child {
-    background-color: #FF4C4C;
-    color: #fff;
-  }
-  
-  .friend-request-item button:last-child:hover {
-    background-color: #FF1A1A;
-  }
-  
-  .friend-item a {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-  
-  .friend-item a:hover {
-    text-decoration: underline;
-    color: #0056b3;
-  }
-  
-  .friend-avatar-container {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-    flex-shrink: 0;
-  }
-  
-  .friend-avatar, .empty-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    background-color: #ccc;
-  }
-  
-  /*======================================
-  =           Responsiveness             =
-  ======================================*/
-  
-  /*--------- SMARTPHONE ---------*/
-  @media (max-width: 600px) {
-    .profil-utilisateur {
-      flex-direction: column;
-      padding: 10px;
-      padding-bottom: 40px;
-      gap: 15px;
-    }
-  
-    .left-column, .right-column {
-      width: 100%;
-      overflow: visible;
-    }
-  
-    .avatar-actions-inline {
-      flex-direction: column;
-      margin-top: 10px;
-      input[type="file"], button { width: 100%; }
-    }
-  
-    .friend-search {
-      flex-direction: column;
-      gap: 8px;
-    }
-  
-    .friend-search input, .friend-search button,
-    .action-buttons button {
-      width: 100%;
-      margin-right: 0;
-      margin-top: 10px;
-    }
-  }
-  
-  /*--------- TABLETTE ---------*/
-  @media (min-width: 601px) and (max-width: 1024px) {
-    .profil-utilisateur {
-      flex-direction: row;
-      gap: 15px;
-      padding: 10px;
-      padding-bottom: 20px;
-      align-items: stretch;
-    }
-  
-    .left-column, .right-column {
-      
-      overflow-y: auto;
-    }
-  
-    .left-column {
-         width: 50%;
-         max-height: 100px;
-         }
-    .right-column {
-         width: 50%;
-         max-height: 100px;
-         }
-  }
-  
-  /*--------- LAPTOP ---------*/
+}
+
+.left-column {
+  background-color: #FFFFFF;
+  border-right: 2px solid #EBF2FA;
+
   @media (min-width: 1025px) {
-    .profil-utilisateur { flex-direction: row; gap: 20px; }
-    .left-column { width: 60%; }
-    .right-column { width: 40%; }
+    width: 60%;
   }
+}
+
+.right-column {
+  background-color: #A4BD01;
+  gap: 20px;
+
+  @media (min-width: 1025px) {
+    width: 40%;
+  }
+}
+
+/*======================================
+=            Titres                    =
+======================================*/
+h1, h2 {
+  font-size: 24px;
+  color: #06668C;
+  margin-bottom: 10px;
+}
+
+/*======================================
+=          Informations utilisateur    =
+======================================*/
+.user-info {
+  margin-bottom: 20px;
+}
+
+.info-item {
+  margin-bottom: 15px;
+}
+
+label {
+  font-weight: bold;
+}
+
+span {
+  display: block;
+  margin-top: 5px;
+  color: #333;
+}
+
+/*======================================
+=            Boutons                   =
+======================================*/
+.action-buttons button {
+  color: #fff;
+  padding: 8px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 10px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-modifier {
+  background-color: #06668C;
+}
+
+.btn-modifier:hover { background-color: #679436; }
+
+.btn-supprimer {
+  background-color: #FF4C4C;
+}
+
+.btn-supprimer:hover { background-color: #FF1A1A; }
+
+button:not(.btn-modifier):not(.btn-supprimer) {
+  background-color: #679436;
+}
+
+button:hover:not(.btn-modifier):not(.btn-supprimer) {
+  background-color: #5A8A2D;
+}
+
+/*======================================
+=             Avatar                   =
+======================================*/
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  position: relative;
+}
+
+.avatar-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 3px solid #06668C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+
+  @media (max-width: 1024px) {
+    width: 120px;
+    height: 120px;
+  }
+
+  @media (max-width: 600px) {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Avatar actions */
+.avatar-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+
+  input[type="file"] {
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+
+  button {
+    padding: 6px 20px;
+    font-size: 14px;
+    white-space: nowrap;
+    background-color: #06668C;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #679436;
+  }
+}
+
+/*======================================
+=          Formulaire amis             =
+======================================*/
+.friend-search {
+  display: flex;
+  gap: 10px;
+}
+
+.friend-search input[type="text"] {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.friend-search button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  background-color: #06668C;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.friend-search button:hover { background-color: #679436; }
+
+/*======================================
+=        Liste d'amis                  =
+======================================*/
+.friend-item, .friend-request-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: rgba(255,255,255,0.85);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.friend-item:hover, .friend-request-item:hover {
+  background-color: rgba(255,255,255,1);
+  transform: translateY(-1px);
+}
+
+/* Boutons liste amis */
+.friend-item button, .friend-request-item button {
+  padding: 4px 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.friend-item button {
+  background-color: #FF4C4C;
+  color: #fff;
+}
+
+.friend-item button:hover {
+  background-color: #FF1A1A;
+}
+
+.friend-request-item button:first-child {
+  background-color: #679436;
+  color: #fff;
+  margin-right: 5px;
+}
+
+.friend-request-item button:first-child:hover {
+  background-color: #5A8A2D;
+}
+
+.friend-request-item button:last-child {
+  background-color: #FF4C4C;
+  color: #fff;
+}
+
+.friend-request-item button:last-child:hover {
+  background-color: #FF1A1A;
+}
+
+.friend-item a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.friend-item a:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
+
+.friend-avatar-container {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.friend-avatar, .empty-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #ccc;
+}
+
+/*======================================
+=           Responsiveness             =
+======================================*/
+
+/* Smartphone */
+@media (max-width: 600px) {
+  .profil-utilisateur {
+    flex-direction: column;
+    padding: 0px;
+    padding-bottom: 40px;
+    gap: 15px;
+  }
+
+  .left-column, .right-column {
+    width: 100%;
+    overflow: visible;
+  }
+
+  .avatar-actions-inline {
+    flex-direction: column;
+    margin-top: 10px;
+    input[type="file"], button { width: 100%; }
+  }
+
+  .friend-search {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .friend-search input, .friend-search button,
+  .action-buttons button {
+    width: 100%;
+    margin-right: 0;
+    margin-top: 10px;
+  }
+}
+
+/* Tablette */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .profil-utilisateur {
+    flex-direction: row;
+    gap: 15px;
+    padding: 10px;
+    padding-bottom: 20px;
+    align-items: stretch;
+  }
+
+  .left-column, .right-column {
+    overflow-y: auto;
+  }
+
+  .left-column { width: 50%; max-height: none; }
+  .right-column { width: 50%; max-height: none; }
+}
+
+/* Laptop/Desktop */
+@media (min-width: 1025px) {
+  .profil-utilisateur { flex-direction: row; gap: 20px; }
+  .left-column { width: 60%; }
+  .right-column { width: 40%; }
+}
+
+/* Formulaire recherche ami */
+.friend-search {
+  display: flex;
+  flex-direction: column; /* colonne au lieu de ligne */
+  gap: 10px; /* espace entre input et bouton */
+}
+
+.friend-search input[type="text"] {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.friend-search button {
+  width: 60%; /* bouton plein largeur */
   
+  padding: 6px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  background-color: #06668C;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.friend-search button:hover {
+  background-color: #679436;
+}
+

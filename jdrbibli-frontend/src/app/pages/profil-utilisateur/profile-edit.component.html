@@ -1,14 +1,21 @@
-<div>
-    <h2>Modifier mon profil</h2>
-    <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
+<div class="wrapper">
+    <div class="form-box">
+      <h2>Modifier mon profil</h2>
+      <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
         <label>Pseudo :</label>
         <input [(ngModel)]="pseudo" name="pseudo" required />
-
+  
         <label>Email :</label>
         <input type="email" [(ngModel)]="email" name="email" required />
-
-        <button type="submit" [disabled]="profileForm.invalid">Mettre à jour</button>
-    </form>
-
-    <div *ngIf="message" [style.color]="error ? 'red' : 'green'">{{ message }}</div>
-</div>
+  
+        <button type="submit" [disabled]="profileForm.invalid">
+          Mettre à jour
+        </button>
+      </form>
+  
+      <div *ngIf="message" [ngClass]="{ 'error-message': error, 'success-message': !error }">
+        {{ message }}
+      </div>
+    </div>
+  </div>
+  

@@ -1,121 +1,116 @@
 <div class="profil-wrapper">
-<div class="profil-utilisateur">
-    <div class="left-column">
-        <h1>Profil utilisateur</h1>
+    <div class="profil-wrapper-inner">
+        <div class="profil-utilisateur">
+            <div class="left-column">
+                <h1>Profil utilisateur</h1>
 
-        <div class="user-info">
-            <!-- Pseudo -->
-            <div class="info-item">
-                <label>Pseudo:</label>
-                <span>{{ pseudo }}</span>
-            </div>
-
-            <!-- Email -->
-            <div class="info-item">
-                <label>Email:</label>
-                <span>{{ email }}</span>
-            </div>
-
-            <!-- Avatar -->
-            <div class="info-item">
-                <label>Avatar:</label>
-                <div class="avatar-section">
-                    <div class="avatar-container">
-                        <img *ngIf="avatarUrl; else noAvatar" [src]="avatarUrl" alt="Avatar utilisateur"
-                            class="avatar-circle">
-                        <ng-template #noAvatar>
-                            <div class="avatar-circle"></div>
-                        </ng-template>
+                <div class="user-info">
+                    <!-- Pseudo -->
+                    <div class="info-item">
+                        <label>Pseudo:</label>
+                        <span>{{ pseudo }}</span>
                     </div>
 
-                    <div class="avatar-actions-inline">
-                        <input type="file" (change)="onFileSelected($event)" accept="image/*">
-                        <button (click)="uploadAvatar()" [disabled]="!selectedFile">Envoyer l’avatar</button>
+                    <!-- Email -->
+                    <div class="info-item">
+                        <label>Email:</label>
+                        <span>{{ email }}</span>
+                    </div>
+
+                    <!-- Avatar -->
+                    <div class="info-item">
+                        <label>Avatar:</label>
+                        <div class="avatar-section">
+                            <div class="avatar-container">
+                                <img *ngIf="avatarUrl; else noAvatar" [src]="avatarUrl" alt="Avatar utilisateur"
+                                    class="avatar-circle">
+                                <ng-template #noAvatar>
+                                    <div class="avatar-circle"></div>
+                                </ng-template>
+                            </div>
+
+                            <div class="avatar-actions-inline">
+                                <input type="file" (change)="onFileSelected($event)" accept="image/*">
+                                <button (click)="uploadAvatar()" [disabled]="!selectedFile">Envoyer l’avatar</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-
-
-                <!-- Input fichier et bouton upload -->
-
+                <!-- Boutons actions -->
+                <div class="action-buttons">
+                    <button class="btn-modifier" routerLink="/profile-edit">Modifier le compte</button>
+                    <button (click)="goToResetPassword()">Modifier mon mot de passe</button>
+                    <button class="btn-supprimer" (click)="deleteUser()">Supprimer le compte</button>
+                </div>
             </div>
-        </div>
 
+            <!-- Colonne droite pour les amis -->
+            <div class="right-column">
+                <h2>Amis</h2>
 
-        <!-- Boutons actions -->
-        <div class="action-buttons">
-            <button class="btn-modifier" routerLink="/profile-edit">Modifier le compte</button>
-            <button (click)="goToResetPassword()">Modifier mon mot de passe</button>
-            <button class="btn-supprimer" (click)="deleteUser()">Supprimer le compte</button>
-        </div>
-    </div>
-
-    <!-- Colonne droite pour les amis -->
-    <div class="right-column">
-        <h2>Amis</h2>
-
-        <!-- Formulaire recherche ami -->
-        <div class="friend-search">
-            <input type="text" placeholder="Chercher un ami par pseudo" [(ngModel)]="searchPseudo">
-            <button (click)="searchFriend()" [disabled]="!searchPseudo">Rechercher</button>
-        </div>
-
-        <!-- Résultat recherche ami -->
-        <div *ngIf="searchedUser" class="searched-user">
-            <div class="searched-user-info">
-                <!-- Avatar ami -->
-                <div class="friend-avatar-container">
-                    <img *ngIf="searchedUserAvatarUrl; else noAvatarFriend" [src]="searchedUserAvatarUrl"
-                        alt="Avatar ami" class="friend-avatar">
-                    <ng-template #noAvatarFriend>
-                        <div class="friend-avatar empty-avatar"></div>
-                    </ng-template>
+                <!-- Formulaire recherche ami -->
+                <div class="friend-search">
+                    <input type="text" placeholder="Chercher un ami par pseudo" [(ngModel)]="searchPseudo">
+                    <button (click)="searchFriend()" [disabled]="!searchPseudo">Rechercher</button>
                 </div>
 
-                <span class="friend-pseudo">{{ searchedUser.pseudo }}</span>
-            </div>
+                <!-- Résultat recherche ami -->
+                <div *ngIf="searchedUser" class="searched-user">
+                    <div class="searched-user-info">
+                        <!-- Avatar ami -->
+                        <div class="friend-avatar-container">
+                            <img *ngIf="searchedUserAvatarUrl; else noAvatarFriend" [src]="searchedUserAvatarUrl"
+                                alt="Avatar ami" class="friend-avatar">
+                            <ng-template #noAvatarFriend>
+                                <div class="friend-avatar empty-avatar"></div>
+                            </ng-template>
+                        </div>
 
-            <button [disabled]="!searchedUser || requestSent" (click)="sendFriendRequest(searchedUser.id)">
-                Envoyer la demande
-            </button>
+                        <span class="friend-pseudo">{{ searchedUser.pseudo }}</span>
+                    </div>
 
-            <span *ngIf="requestSent" class="request-sent-msg">Demande envoyée !</span>
-        </div>
+                    <button [disabled]="!searchedUser || requestSent" (click)="sendFriendRequest(searchedUser.id)">
+                        Envoyer la demande
+                    </button>
 
-        <!-- Liste des amis -->
-        <div *ngIf="friends.length; else noFriends">
-            <div *ngFor="let friend of friends" class="friend-item">
-                <div class="friend-avatar-container">
-                    <img *ngIf="getFriendAvatarUrl(friend); else noAvatarFriendList" [src]="getFriendAvatarUrl(friend)"
-                        alt="Avatar ami" class="friend-avatar">
-                    <ng-template #noAvatarFriendList>
-                        <div class="friend-avatar empty-avatar"></div>
-                    </ng-template>
+                    <span *ngIf="requestSent" class="request-sent-msg">Demande envoyée !</span>
                 </div>
 
-                <a [routerLink]="['/ludotheque-ami', friend.id]">{{ friend.pseudo }}</a>
-                <button (click)="removeFriend(friend.id)">Supprimer</button>
+                <!-- Liste des amis -->
+                <div *ngIf="friends.length; else noFriends">
+                    <div *ngFor="let friend of friends" class="friend-item">
+                        <div class="friend-avatar-container">
+                            <img *ngIf="getFriendAvatarUrl(friend); else noAvatarFriendList"
+                                [src]="getFriendAvatarUrl(friend)" alt="Avatar ami" class="friend-avatar">
+                            <ng-template #noAvatarFriendList>
+                                <div class="friend-avatar empty-avatar"></div>
+                            </ng-template>
+                        </div>
+
+                        <a [routerLink]="['/ludotheque-ami', friend.id]">{{ friend.pseudo }}</a>
+                        <button (click)="removeFriend(friend.id)">Supprimer</button>
+                    </div>
+                </div>
+
+                <ng-template #noFriends>
+                    <p>Vous n'avez pas encore d'amis.</p>
+                </ng-template>
+
+                <hr>
+
+                <h3>Demandes reçues</h3>
+                <div *ngIf="receivedRequests.length; else noRequests">
+                    <div *ngFor="let req of receivedRequests" class="friend-request-item">
+                        <span>{{ req.senderPseudo }}</span>
+                        <button (click)="acceptFriend(req.id)">Accepter</button>
+                        <button (click)="rejectFriend(req.id)">Refuser</button>
+                    </div>
+                </div>
+                <ng-template #noRequests>
+                    <p>Aucune demande en attente.</p>
+                </ng-template>
             </div>
         </div>
-
-
-        <ng-template #noFriends>
-            <p>Vous n'avez pas encore d'amis.</p>
-        </ng-template>
-
-
-        <hr>
-
-        <h3>Demandes reçues</h3>
-        <div *ngIf="receivedRequests.length; else noRequests">
-            <div *ngFor="let req of receivedRequests" class="friend-request-item">
-                <span>{{ req.senderPseudo }}</span>
-                <button (click)="acceptFriend(req.id)">Accepter</button>
-                <button (click)="rejectFriend(req.id)">Refuser</button>
-            </div>
-        </div>
-        <ng-template #noRequests>
-            <p>Aucune demande en attente.</p>
-        </ng-template>
     </div>
 </div>
