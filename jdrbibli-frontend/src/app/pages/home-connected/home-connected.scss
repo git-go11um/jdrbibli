@@ -1,6 +1,6 @@
-body {
-  background-color: #EBF2FA;
-  /* Fond bleu clair pour l'ensemble de la page */
+html, body {
+  height: 100%;
+  background-color: #EBF2FA; /* fond bleu clair sur tout l'écran */
   font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
@@ -8,65 +8,77 @@ body {
 
 /* Home Connected */
 .home-connected {
-  background-color: #EBF2FA;
-  /* Fond bleu clair */
-  padding: 40px 20px;
+  min-height: 100%; 
+  background-color: #EBF2FA; /* fond bleu clair */
   text-align: center;
-}
+  min-height: 100vh; /* prend toute la hauteur de l'écran */
+  width: 100%;       /* prend toute la largeur */
+  box-sizing: border-box;
+  padding-top: 40px;
+  padding-bottom: 100px; /* espace pour que le footer ne recouvre rien */
 
-/* Modification de la boîte contenant le texte */
-.home-connected .welcome-box {
-    background-color: #FFFFFF; /* Fond blanc pour le bloc de texte */
-    border: 2px solid #EBF2FA;  /* Bordure légère en bleu cassé */
+  @media (max-width: 600px) {
+    min-height: 100%; 
+    padding-top: 30px;
+    padding-bottom: 100px;
+  }
+
+  @media (min-width: 601px) and (max-width: 1024px) {
+    height: 100%; 
+    padding-top: 40px;
+    padding-bottom: 80px;
+  }
+
+  @media (min-width: 1025px) {
+    max-width: 100%;
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+
+  .welcome-box {
+    background-color: #FFFFFF; 
+    border: 2px solid #EBF2FA;
     border-radius: 8px;
     padding: 40px;
     max-width: 600px;
     margin: 0 auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Ombre légère pour effet de profondeur */
-}
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 60vh;
+  }
 
-.home-connected h1 {
-  color: #06668C;
-  /* Couleur titre */
-  font-size: 28px;
-  margin-bottom: 20px;
-}
+  h1 {
+    color: #06668C;
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
 
-.home-connected .highlighted-title {
-  font-weight: bold;
-  color: #06668C;
-  /* Couleur du titre avec JdrBibli */
-}
+  .highlighted-title {
+    font-weight: bold;
+    color: #06668C;
+  }
 
-.home-connected p {
-  color: #333333;
-  font-size: 16px;
-  line-height: 1.6;
-  margin-bottom: 30px;
-}
+  p {
+    color: #333333;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
 
-.logout-btn {
-  background-color: #679436;
-  /* Vert pour le bouton de déconnexion */
-  color: #FFFFFF;
-  padding: 12px 24px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+  .logout-btn {
+    background-color: #679436;
+    color: #FFFFFF;
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 
-.logout-btn:hover {
-  background-color: #5A8A2D;
-  /* Légère variation au survol */
-  transform: scale(1.05);
-}
-
-.container {
-  max-width: 100%;
-    /* Enlever la limite de 1081px */
-  margin: 0 0px;
-  padding: 0 0px;
-  /* Espace latéral pour que le contenu ne touche pas les bords */
-  
+    &:hover {
+      background-color: #5A8A2D;
+      transform: scale(1.05);
+    }
+  }
 }

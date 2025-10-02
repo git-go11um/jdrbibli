@@ -5,9 +5,9 @@ import { Component } from '@angular/core';
   standalone: true,
   template: `
     <footer class="app-footer">
-      <div class="center">© 2025 JdrBibli. Tous droits réservés.</div>
-      <div class="right">Nous contacter : admin&#64;JDRBibli.fr</div>
-      <div class="left"></div> <!-- vide pour équilibrer -->
+      <div class="center">© 2025 JdrBibli</div>
+      <div class="right">admin&#64;JDRBibli.fr</div>
+      <div class="left"></div>
     </footer>
   `,
   styles: [`
@@ -17,8 +17,8 @@ import { Component } from '@angular/core';
       width: 100%;
       background-color: #3f51b5;
       color: white;
-      padding: 0.3rem 1rem;
-      font-size: 0.9rem;
+      padding: 0.2rem 0.5rem;   /* réduit la hauteur */
+      font-size: 0.75rem;        /* texte plus compact */
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -29,12 +29,23 @@ import { Component } from '@angular/core';
       flex: 1;
       text-align: center;
       user-select: none;
+      white-space: nowrap; /* évite les retours à la ligne */
     }
-    .left {
-      text-align: left;
-    }
-    .right {
-      text-align: right;
+    .left { text-align: left; }
+    .right { text-align: right; }
+
+    /* Version mobile : stack vertical */
+    @media (max-width: 600px) {
+      .app-footer {
+        flex-direction: column;
+        text-align: center;
+        font-size: 0.7rem;
+        padding: 0.3rem;
+      }
+      .left, .center, .right {
+        text-align: center;
+        flex: unset;
+      }
     }
   `]
 })

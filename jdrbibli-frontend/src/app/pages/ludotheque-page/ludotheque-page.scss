@@ -1,140 +1,279 @@
-/* Style global de la ludothèque */
+/*======================================
+=            Style global Ludothèque    =
+======================================*/
+.ludotheque-wrapper {
+    background-color: #EBF2FA; /* ton bleu clair */
+    min-height: 100vh;         /* occupe toute la hauteur de l'écran */
+    width: 100%;               /* occupe toute la largeur */
+    display: flex;
+    justify-content: center;   /* centre horizontalement ton container si besoin */
+    align-items: flex-start;   /* colle en haut */
+    padding: 20px;             /* espace intérieur */
+    box-sizing: border-box;
+  }
+
 .ludotheque-container {
     margin: 20px;
     padding: 20px;
-}
-
-/* Espacement pour le titre */
-h1 {
-    font-size: 28px;
-    color: #06668C;  /* Bleu foncé pour le titre */
-    margin-bottom: 20px;
-}
-
-/* Conteneur pour l'ajout de gamme */
-.ajout-gamme-container {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.ajout-gamme-container input {
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 70%;  /* Champ de texte plus large */
-}
-
-.ajout-gamme-container button {
-    padding: 10px 20px;
-    background-color: #679436;  /* Vert pour le bouton Ajouter */
-    color: #FFFFFF;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.ajout-gamme-container button:hover {
-    background-color: #5A8A2D;  /* Variante plus foncée de vert au survol */
-}
-
-/* Liste des gammes */
-.gammes-list {
-    margin-top: 20px;
-}
-
-/* Conteneur pour chaque gamme */
-.gamme-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    padding: 10px;
-    background-color: #EBF2FA;  /* Fond blanc cassé pour chaque gamme */
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    align-items: center;  /* Aligner verticalement les éléments dans chaque ligne */
-}
-/* Titre de la gamme */
-.gamme-item span {
-    flex: 1;
-    font-size: 18px;
-    color: #06668C;
-    margin-right: 20px;  /* Espacement entre le titre et les boutons */
-}
-
-/* Conteneur des boutons */
-.gamme-item .buttons-container {
-    display: flex;
-    gap: 10px;  /* Espacement entre les boutons */
-    justify-content: flex-start;  /* Aligner à gauche */
-}
-
-/* Style des boutons */
-.gamme-item button {
-    padding: 8px 16px;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    width: auto;  /* Taille automatique pour que les boutons s'adaptent */
-}
-
-/* Bouton Voir les ouvrages */
-.gamme-item button:nth-child(2) {
-    background-color: #06668C;
-    color: #FFFFFF;
-}
-
-.gamme-item button:nth-child(2):hover {
-    background-color: #679436;
-}
-
-/* Bouton Modifier le nom */
-.gamme-item button:nth-child(3) {
-    background-color: #679436;
-    color: #FFFFFF;
-}
-
-.gamme-item button:nth-child(3):hover {
-    background-color: #5A8A2D;
-}
-
-/* Bouton Supprimer */
-.gamme-item button:nth-child(4) {
-    background-color: #FF4C4C;
-    color: #FFFFFF;
-}
-
-.gamme-item button:nth-child(4):hover {
-    background-color: #FF1A1A;
-}
-
-.gamme-link {
-  color: #3f51b5;
-  text-decoration: underline;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.gamme-button {
-  background-color: #3f51b5;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  margin-right: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  text-align: center;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #303f9f;
+    background-color: #EBF2FA;
   }
-}
+  
+  /* Espacement pour le titre */
+  h1 {
+    font-size: 27px;
+    color: #06668C; /* Bleu foncé pour le titre */
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  /*--------- SMARTPHONE ---------*/
+  @media (max-width: 600px) {
+    .ajout-gamme-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+  
+      input {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+  
+      button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        background-color: #679436;
+        color: #fff;
+        cursor: pointer;
+      }
+  
+      button:hover {
+        background-color: #5A8A2D;
+      }
+    }
+  
+    .gammes-list {
+      margin-top: 20px;
 
-
+    }
+  
+    .gamme-item {
+      display: flex;
+      flex-direction: column; /* Alignement vertical */
+      gap: 10px;
+      margin-bottom: 15px;
+      padding: 12px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      
+    }
+  
+    .gamme-button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #d2d2d2;
+      color: #030303;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+    }
+  
+    .gamme-button:hover {
+      background-color: #303f9f;
+    }
+  
+    .buttons-container {
+      display: flex;
+      flex-direction: column; /* Boutons sous le nom */
+      gap: 8px;
+  
+      button {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+      }
+  
+      button:nth-child(1) {
+        background-color: #679436;
+        color: #fff;
+      }
+      button:nth-child(1):hover {
+        background-color: #5A8A2D;
+      }
+  
+      button:nth-child(2) {
+        background-color: #FF4C4C;
+        color: #fff;
+      }
+      button:nth-child(2):hover {
+        background-color: #FF1A1A;
+      }
+    }
+  }
+  
+  /*--------- TABLETTE ---------*/
+  @media (min-width: 601px) and (max-width: 1024px) {
+    .ajout-gamme-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+  
+      input {
+        flex: 1;
+        padding: 10px;
+        font-size: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+  
+      button {
+        padding: 10px 18px;
+        font-size: 15px;
+        border-radius: 5px;
+        background-color: #679436;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+  
+      button:hover {
+        background-color: #5A8A2D;
+      }
+    }
+  
+    .gamme-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 15px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  
+      .gamme-button {
+        flex: 1;
+        padding: 10px;
+        font-size: 15px;
+        margin-right: 15px;
+      }
+  
+      .buttons-container {
+        display: flex;
+        gap: 10px;
+  
+        button {
+          padding: 8px 14px;
+          font-size: 14px;
+          border-radius: 5px;
+        }
+  
+        button:nth-child(1) {
+          background-color: #679436;
+          color: #fff;
+        }
+        button:nth-child(1):hover {
+          background-color: #5A8A2D;
+        }
+  
+        button:nth-child(2) {
+          background-color: #FF4C4C;
+          color: #fff;
+        }
+        button:nth-child(2):hover {
+          background-color: #FF1A1A;
+        }
+      }
+    }
+  }
+  
+  /*--------- LAPTOP ---------*/
+  @media (min-width: 1025px) {
+    .ajout-gamme-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+  
+      input {
+        width: 70%;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+  
+      button {
+        padding: 10px 18px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #679436;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+  
+      button:hover {
+        background-color: #5A8A2D;
+      }
+    }
+  
+    .gamme-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 15px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  
+      .gamme-button {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+        margin-right: 15px;
+      }
+  
+      .buttons-container {
+        display: flex;
+        gap: 10px;
+  
+        button {
+          padding: 8px 16px;
+          font-size: 14px;
+          border-radius: 5px;
+        }
+  
+        button:nth-child(1) {
+          background-color: #679436;
+          color: #fff;
+        }
+        button:nth-child(1):hover {
+          background-color: #5A8A2D;
+        }
+  
+        button:nth-child(2) {
+          background-color: #FF4C4C;
+          color: #fff;
+        }
+        button:nth-child(2):hover {
+          background-color: #FF1A1A;
+        }
+      }
+    }
+  }
+  
