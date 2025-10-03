@@ -4,13 +4,9 @@ import com.jdrbibli.authservice.dto.*;
 import com.jdrbibli.authservice.entity.User;
 import com.jdrbibli.authservice.security.JwtService;
 import com.jdrbibli.authservice.service.IUserService;
-
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,12 +15,28 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.http.HttpMethod;
 
-import java.security.Principal;
 import java.util.Map;
 
+/**
+ * Contrôleur principal pour l'authentification et la gestion des utilisateurs.
+ * <p>
+ * Cette classe expose les endpoints REST pour :
+ * <ul>
+ *     <li>Inscription et création de compte</li>
+ *     <li>Authentification / login</li>
+ *     <li>Gestion des tokens JWT (génération et refresh)</li>
+ *     <li>Réinitialisation de mot de passe</li>
+ *     <li>Mise à jour du profil utilisateur</li>
+ *     <li>Suppression du compte utilisateur</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Elle communique avec {@link IUserService} pour la logique métier, {@link JwtService} pour les tokens JWT,
+ * et utilise {@link WebClient} ou {@link RestTemplate} pour interagir avec d'autres microservices
+ * (ex. user-service pour la création de profil).
+ * </p>
+ */
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -40,10 +52,10 @@ public class AuthController {
 
     @Autowired
     public AuthController(IUserService userService,
-            AuthenticationManager authenticationManager,
-            JwtService jwtService,
-            PasswordEncoder passwordEncoder,
-            WebClient webClient) {
+                          AuthenticationManager authenticationManager,
+                          JwtService jwtService,
+                          PasswordEncoder passwordEncoder,
+                          WebClient webClient) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
@@ -51,21 +63,26 @@ public class AuthController {
         this.webClient = webClient;
     }
 
-    // ------------------- INSCRIPTION -------------------
+    /**
+     * Endpoint pour inscrire un nouvel utilisateur.
+     * <p>
+     * Crée l'utilisateur dans auth-service et le profil dans user-service,
+     * puis retourne un token JWT et les informations de l'utilisateur.
+     *
+     * @param request objet {@link InscriptionRequest} contenant pseudo, email et mot de passe
+     * @return {@link ResponseEntity} avec {@link AuthenticationResponse} ou message d'erreur
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody InscriptionRequest request) {
         try {
-            // 1️⃣ Création du User dans auth-service
             User newUser = userService.inscrireNewUser(request.getPseudo(), request.getEmail(), request.getPassword());
 
-            // 2️⃣ Création du UserProfile côté user-service
             UserProfileDTO profileDto = new UserProfileDTO();
-            profileDto.setId(newUser.getId()); // même ID que auth-service
+            profileDto.setId(newUser.getId());
             profileDto.setPseudo(newUser.getPseudo());
             profileDto.setEmail(newUser.getEmail());
 
-            // Appel REST vers user-service (exemple avec WebClient)
-            WebClient.create("http://localhost:8082") // URL du user-service
+            WebClient.create("http://localhost:8082")
                     .post()
                     .uri("/api/users")
                     .bodyValue(profileDto)
@@ -73,10 +90,7 @@ public class AuthController {
                     .bodyToMono(UserProfileDTO.class)
                     .block();
 
-            // 3️⃣ Génération du token JWT
             String token = jwtService.generateToken(newUser.getPseudo(), newUser.getId());
-
-            // 4️⃣ Retour de la réponse avec token et DTO
             return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(newUser)));
 
         } catch (Exception e) {
@@ -86,29 +100,27 @@ public class AuthController {
         }
     }
 
-    // ------------------- LOGIN -------------------
+    /**
+     * Endpoint pour authentifier un utilisateur.
+     *
+     * @param request objet {@link LoginRequest} contenant pseudo et mot de passe
+     * @return {@link ResponseEntity} avec {@link AuthenticationResponse} ou message d'erreur
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            // Authentification Spring Security
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getPseudo(), request.getPassword()));
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            // Récupérer l'utilisateur à partir du pseudo (username)
             User user = userService.getUserByPseudo(userDetails.getUsername());
 
-            // Si l'utilisateur est introuvable
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("message", "Utilisateur non trouvé"));
             }
 
-            // Génération du token avec pseudo et ID de l'utilisateur
             String token = jwtService.generateToken(user.getPseudo(), user.getId());
-
-            // Retourne la réponse avec le token et les informations de l'utilisateur
             return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(user)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,7 +129,12 @@ public class AuthController {
         }
     }
 
-    // ------------------- REFRESH TOKEN -------------------
+    /**
+     * Endpoint pour rafraîchir un token JWT existant.
+     *
+     * @param authHeader header Authorization contenant le token existant
+     * @return {@link ResponseEntity} avec un nouveau token ou message d'erreur
+     */
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -136,7 +153,12 @@ public class AuthController {
         }
     }
 
-    // ------------------- UTILISATEUR CONNECTÉ -------------------
+    /**
+     * Endpoint pour récupérer les informations de l'utilisateur connecté.
+     *
+     * @param authentication objet Spring Security Authentication
+     * @return {@link ResponseEntity} avec les données de l'utilisateur ou message d'erreur
+     */
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         try {
@@ -145,11 +167,8 @@ public class AuthController {
                         .body(Map.of("message", "Utilisateur non authentifié"));
             }
 
-            // Récupérer l'objet User via le pseudo à partir de UserDetails
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             User user = userService.getUserByPseudo(userDetails.getUsername());
-
-            // Retourner les informations de l'utilisateur
             return ResponseEntity.ok(userService.toDTO(user));
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,7 +177,12 @@ public class AuthController {
         }
     }
 
-    // ------------------- MOT DE PASSE -------------------
+    /**
+     * Endpoint pour demander la réinitialisation du mot de passe.
+     *
+     * @param body Map contenant le pseudo de l'utilisateur
+     * @return {@link ResponseEntity} avec message de succès ou erreur
+     */
     @PostMapping("/password-reset/request")
     public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> body) {
         String pseudo = body.get("pseudo");
@@ -176,6 +200,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Endpoint pour valider le code de réinitialisation du mot de passe.
+     *
+     * @param request objet {@link PasswordResetRequest} contenant pseudo et code
+     * @return {@link ResponseEntity} indiquant si le code est valide ou non
+     */
     @PostMapping("/validate-reset-code")
     public ResponseEntity<?> validateResetCode(@RequestBody PasswordResetRequest request) {
         try {
@@ -192,6 +222,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Endpoint pour réinitialiser le mot de passe après validation du code.
+     *
+     * @param request objet {@link PasswordResetRequest} contenant pseudo, code et nouveau mot de passe
+     * @return {@link ResponseEntity} avec message de succès ou erreur
+     */
     @PutMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest request) {
         try {
@@ -204,7 +240,13 @@ public class AuthController {
         }
     }
 
-    // ------------------- PROFIL -------------------
+    /**
+     * Endpoint pour mettre à jour le profil utilisateur (pseudo / email).
+     *
+     * @param request        objet {@link UpdateUserRequest} avec nouvelles valeurs
+     * @param authentication objet Spring Security Authentication
+     * @return {@link ResponseEntity} avec message de succès et nouveau token JWT
+     */
     @PutMapping("/profile")
     public ResponseEntity<?> updateUserProfile(@RequestBody UpdateUserRequest request, Authentication authentication) {
         try {
@@ -214,7 +256,6 @@ public class AuthController {
             ReponseProfileChange response = userService.updateUserProfile(user.getId(), request.getPseudo(),
                     request.getEmail());
 
-            // Génération du token avec pseudo et ID
             String newToken = jwtService.generateToken(request.getPseudo(), user.getId());
             return ResponseEntity.ok(Map.of("message", response.getMessage(), "token", newToken));
         } catch (Exception e) {
@@ -224,25 +265,26 @@ public class AuthController {
         }
     }
 
+    /**
+     * Endpoint pour changer le mot de passe depuis le profil utilisateur.
+     *
+     * @param request        objet {@link ChangePasswordProfileRequest} contenant l'ancien et le nouveau mot de passe
+     * @param authentication objet Spring Security Authentication
+     * @return {@link ResponseEntity} avec message et token mis à jour
+     */
     @PutMapping("/profile/password")
     public ResponseEntity<?> changeProfilePassword(@RequestBody ChangePasswordProfileRequest request,
-            Authentication authentication) {
+                                                   Authentication authentication) {
         try {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            // Récupérer l'utilisateur à partir du pseudo
             User user = userService.getUserByPseudo(userDetails.getUsername());
 
-            // Vérifier si l'utilisateur existe
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("message", "Utilisateur non trouvé"));
             }
 
-            // Appel au service pour changer le mot de passe
             userService.changeProfilePassword(userDetails.getUsername(), request);
-
-            // Génération du token avec le pseudo et l'ID de l'utilisateur
             String newToken = jwtService.generateToken(user.getPseudo(), user.getId());
 
             return ResponseEntity.ok(new ApiResponse("Mot de passe mis à jour avec succès", true, newToken));
@@ -253,35 +295,35 @@ public class AuthController {
         }
     }
 
-    // ------------------- SUPPRESSION UTILISATEUR -------------------
-    // Remplacer @DeleteMapping("/{pseudo}") par @DeleteMapping("/{id}")
+    /**
+     * Endpoint pour supprimer le compte utilisateur.
+     *
+     * @param id    identifiant de l'utilisateur à supprimer
+     * @param token header Authorization contenant le token JWT
+     * @return {@link ResponseEntity} avec message de succès ou erreur
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         try {
-            // Vérifie que le token correspond bien à l'utilisateur qui fait la requête
             if (token == null || !token.startsWith("Bearer ")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("message", "Token manquant ou mal formé"));
             }
 
             String tokenPseudo = jwtService.extractPseudo(token.substring(7));
-            User user = userService.getUserById(id); // Recherche par id et non pseudo
+            User user = userService.getUserById(id);
 
-            // Vérifie que l'utilisateur existe
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("message", "Utilisateur non trouvé"));
             }
 
-            // Vérifie que le token correspond bien à l'utilisateur qu'on tente de supprimer
             if (!tokenPseudo.equals(user.getPseudo())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("message", "Vous ne pouvez supprimer que votre propre compte."));
             }
 
-            // 1️⃣ Supprime dans auth_db.users
             userService.deleteUserById(user.getId());
-
             return ResponseEntity.ok(Map.of("message", "Utilisateur supprimé avec succès dans les deux services"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -290,11 +332,15 @@ public class AuthController {
         }
     }
 
-    // Méthode utilitaire pour passer l'Authorization dans l'appel REST
+    /**
+     * Méthode utilitaire pour créer les headers HTTP avec Authorization.
+     *
+     * @param token token JWT
+     * @return {@link HttpHeaders} avec header Authorization
+     */
     private HttpHeaders createHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", token);
         return headers;
     }
-
 }

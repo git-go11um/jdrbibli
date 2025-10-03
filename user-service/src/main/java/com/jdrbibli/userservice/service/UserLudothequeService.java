@@ -8,6 +8,13 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+/**
+ * Service pour la gestion de la ludothèque d'un utilisateur.
+ * <p>
+ * Permet de récupérer les ouvrages d'un utilisateur via le service Ouvrage
+ * en utilisant WebClient.
+ * </p>
+ */
 @Service
 public class UserLudothequeService {
 
@@ -19,34 +26,32 @@ public class UserLudothequeService {
     }
 
     /**
-     * Récupérer la liste des ouvrages complets depuis ouvrage-service via gateway.
-     * 
-     * @param ouvrageIds Liste des IDs à chercher
-     * @return Liste de OuvrageDTO
+     * Récupère une liste d'ouvrages à partir de leurs identifiants.
+     *
+     * @param ouvrageIds Liste des IDs des ouvrages
+     * @return liste des OuvrageDTO correspondants, ou une liste vide si aucun ID fourni
      */
     public List<OuvrageDTO> getOuvragesByIds(List<Long> ouvrageIds) {
         if (ouvrageIds == null || ouvrageIds.isEmpty()) {
             return List.of();
         }
 
-        // Transforme liste en string "1,2,3"
         String idsParam = String.join(",", ouvrageIds.stream().map(String::valueOf).toList());
 
-        // Appelle via le gateway
         Mono<List<OuvrageDTO>> response = webClient.get()
                 .uri("/ouvrage-service/ouvrages?ids=" + idsParam)
                 .retrieve()
                 .bodyToFlux(OuvrageDTO.class)
                 .collectList();
 
-        return response.block(); // blocage pour simplifier, tu pourras plus tard le rendre async
+        return response.block();
     }
 
     /**
-     * Récupérer un ouvrage unique par son ID via gateway.
-     * 
+     * Récupère un ouvrage à partir de son identifiant.
+     *
      * @param ouvrageId ID de l'ouvrage
-     * @return OuvrageDTO ou null si non trouvé
+     * @return l'OuvrageDTO correspondant, ou null si l'ID est null
      */
     public OuvrageDTO getOuvrageById(Long ouvrageId) {
         if (ouvrageId == null) {
@@ -57,6 +62,6 @@ public class UserLudothequeService {
                 .uri("/ouvrage-service/ouvrages/" + ouvrageId)
                 .retrieve()
                 .bodyToMono(OuvrageDTO.class)
-                .block(); // blocage pour simplifier
+                .block();
     }
 }

@@ -6,22 +6,29 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service de gestion des utilisateurs pour Spring Security.
+ * <p>
+ * Implémente {@link UserDetailsService} pour fournir les informations d'authentification
+ * nécessaires à Spring Security lors du login.
+ * <p>
+ * Cette implémentation est un exemple simple avec un utilisateur "admin" codé en dur.
+ */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    // Ici, tu peux injecter ton repository pour charger les utilisateurs depuis la
-    // base de données
-    // Par exemple : private final UserRepository userRepository;
-
+    /**
+     * Charge les détails d'un utilisateur par son nom d'utilisateur.
+     *
+     * @param username le nom d'utilisateur
+     * @return les détails de l'utilisateur sous forme de {@link UserDetails}
+     * @throws UsernameNotFoundException si l'utilisateur n'est pas trouvé
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Ici, tu récupères l'utilisateur dans la base de données ou ailleurs
-        // Ex : UserEntity user = userRepository.findByUsername(username);
-
-        // Pour l'exemple, on va créer un utilisateur en dur
         if ("admin".equals(username)) {
             return User.withUsername("admin")
-                    .password("{noop}password") // {noop} signifie qu'on n'applique pas de cryptage ici
+                    .password("{noop}password")
                     .roles("USER")
                     .build();
         } else {

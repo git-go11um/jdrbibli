@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Service pour gérer les opérations sur les {@link Ouvrage}.
+ * <p>
+ * Ce service fournit des méthodes pour créer, mettre à jour, supprimer et récupérer des ouvrages,
+ * ainsi que pour récupérer des ouvrages associés à une gamme spécifique.
+ */
 @Service
 public class OuvrageService {
 
@@ -21,24 +27,48 @@ public class OuvrageService {
     private final GammeRepository gammeRepository;
     private final OuvrageMapper ouvrageMapper;
 
+    /**
+     * Constructeur du service.
+     *
+     * @param ouvrageRepository le repository pour accéder aux données des ouvrages
+     * @param gammeRepository   le repository pour accéder aux données des gammes
+     * @param ouvrageMapper     le mapper pour convertir entre {@link Ouvrage} et {@link OuvrageDTO}
+     */
     public OuvrageService(OuvrageRepository ouvrageRepository, GammeRepository gammeRepository,
-            OuvrageMapper ouvrageMapper) {
+                          OuvrageMapper ouvrageMapper) {
         this.ouvrageRepository = ouvrageRepository;
         this.gammeRepository = gammeRepository;
         this.ouvrageMapper = ouvrageMapper;
     }
 
-    /** Récupérer tous les ouvrages d’un utilisateur */
+    /**
+     * Récupère tous les ouvrages appartenant à un utilisateur donné.
+     *
+     * @param ownerId l'identifiant du propriétaire
+     * @return la liste des ouvrages de l'utilisateur
+     */
     public List<Ouvrage> findByOwnerId(Long ownerId) {
         return ouvrageRepository.findByOwnerId(ownerId);
     }
 
-    /** Récupérer un ouvrage par son ID */
+    /**
+     * Recherche un ouvrage par son identifiant.
+     *
+     * @param id l'identifiant de l'ouvrage
+     * @return un {@link Optional} contenant l'ouvrage si trouvé
+     */
     public Optional<Ouvrage> findById(Long id) {
         return ouvrageRepository.findById(id);
     }
 
-    /** Créer un nouvel ouvrage depuis un DTO */
+    /**
+     * Crée un ouvrage à partir d'un {@link OuvrageDTO}.
+     *
+     * @param dto le DTO contenant les informations de l'ouvrage
+     * @return l'ouvrage créé et sauvegardé en base
+     * @throws ResourceNotFoundException si la gamme associée n'existe pas
+     * @throws IllegalArgumentException  si ownerId n'est pas défini
+     */
     public Ouvrage createFromDTO(OuvrageDTO dto) {
         Gamme gamme = gammeRepository.findById(dto.getGammeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Gamme not found with id " + dto.getGammeId()));
@@ -59,7 +89,14 @@ public class OuvrageService {
         return ouvrageRepository.save(ouvrage);
     }
 
-    /** Mettre à jour un ouvrage depuis un DTO */
+    /**
+     * Met à jour un ouvrage existant à partir d'un {@link OuvrageDTO}.
+     *
+     * @param id  l'identifiant de l'ouvrage à mettre à jour
+     * @param dto le DTO contenant les nouvelles informations de l'ouvrage
+     * @return l'ouvrage mis à jour
+     * @throws ResourceNotFoundException si l'ouvrage ou la gamme associée n'existe pas
+     */
     public Ouvrage updateFromDTO(Long id, OuvrageDTO dto) {
         Ouvrage existing = ouvrageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ouvrage not found with id " + id));
@@ -83,7 +120,6 @@ public class OuvrageService {
         existing.setNotes(dto.getNotes());
         existing.setImageUrl(dto.getImageUrl());
         existing.setGamme(gamme);
-
         existing.setScenariosContenusList(
                 dto.getScenariosContenus() != null ? dto.getScenariosContenus() : new ArrayList<>());
         existing.setAutresOuvragesGamme(
@@ -92,27 +128,56 @@ public class OuvrageService {
         return ouvrageRepository.save(existing);
     }
 
-    /** Supprimer un ouvrage */
+    /**
+     * Supprime un ouvrage par son identifiant.
+     *
+     * @param id l'identifiant de l'ouvrage à supprimer
+     */
     public void deleteById(Long id) {
         ouvrageRepository.deleteById(id);
     }
 
-    /** Récupérer tous les ouvrages d’une gamme pour un owner */
+    /**
+     * Récupère tous les ouvrages appartenant à un utilisateur pour une gamme donnée.
+     *
+     * @param gammeId l'identifiant de la gamme
+     * @param ownerId l'identifiant du propriétaire
+     * @return la liste des ouvrages correspondant aux critères
+     */
     public List<Ouvrage> findByGammeIdAndOwnerId(Long gammeId, Long ownerId) {
         return ouvrageRepository.findByGammeIdAndOwnerId(gammeId, ownerId);
     }
 
-    /** Récupérer tous les ouvrages d’une gamme sauf un ID spécifique */
+    /**
+     * Récupère tous les ouvrages d'une gamme, sauf un ouvrage à exclure.
+     *
+     * @param gammeId   l'identifiant de la gamme
+     * @param excludeId l'identifiant de l'ouvrage à exclure
+     * @return la liste des {@link OuvrageDTO} des ouvrages de la gamme
+     */
     public List<OuvrageDTO> getOuvragesByGamme(Long gammeId, Long excludeId) {
         return ouvrageRepository.findByGammeIdAndIdNot(gammeId, excludeId).stream()
                 .map(ouvrageMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Récupère tous les ouvrages d'une gamme.
+     *
+     * @param gammeId l'identifiant de la gamme
+     * @return la liste des ouvrages de la gamme
+     */
     public List<Ouvrage> findByGammeId(Long gammeId) {
         return ouvrageRepository.findByGammeId(gammeId);
     }
 
+    /**
+     * Recherche un ouvrage par son identifiant et celui du propriétaire.
+     *
+     * @param ouvrageId l'identifiant de l'ouvrage
+     * @param ownerId   l'identifiant du propriétaire
+     * @return un {@link Optional} contenant l'ouvrage si trouvé
+     */
     public Optional<Ouvrage> findByIdAndOwnerId(Long ouvrageId, Long ownerId) {
         return ouvrageRepository.findByIdAndOwnerId(ouvrageId, ownerId);
     }

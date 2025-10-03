@@ -6,34 +6,55 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Gestionnaire global des exceptions pour tout le projet AuthService.
+ * <p>
+ * Grâce à l'annotation @RestControllerAdvice, toutes les exceptions
+ * lancées dans les contrôleurs REST sont interceptées ici.
+ * </p>
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Gestion de l'exception UserNotFoundException.
+     * Retourne un statut HTTP 404 avec un message JSON.
+     */
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleUserNotFoundException(UserNotFoundException ex) {
         ErrorResponseDTO error = new ErrorResponseDTO(ex.getMessage(), HttpStatus.NOT_FOUND.value());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Gestion de l'exception BadCredentialsException.
+     * Utilisée lorsque les identifiants fournis sont incorrects.
+     * Retourne un statut HTTP 401 Unauthorized.
+     */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDTO> handleBadCredentialsException(BadCredentialsException ex) {
         ErrorResponseDTO error = new ErrorResponseDTO(ex.getMessage(), HttpStatus.UNAUTHORIZED.value());
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
-    // Ajout pour les erreurs de validation (mot de passe trop faible, etc.)
+    /**
+     * Gestion des IllegalArgumentException.
+     * Retourne un statut HTTP 400 Bad Request avec un message explicatif.
+     */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
-        // Passer le code d'état HTTP 400 (Bad Request) en plus du message
         ErrorResponseDTO error = new ErrorResponseDTO(ex.getMessage(), HttpStatus.BAD_REQUEST.value());
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST) // 400
-                .body(error);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    /**
+     * Gestion générique de toutes les autres exceptions non prévues.
+     * Retourne un statut HTTP 500 Internal Server Error.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex) {
-        ErrorResponseDTO error = new ErrorResponseDTO("Erreur interne du serveur", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        ErrorResponseDTO error = new ErrorResponseDTO("Erreur interne du serveur",
+                HttpStatus.INTERNAL_SERVER_ERROR.value());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

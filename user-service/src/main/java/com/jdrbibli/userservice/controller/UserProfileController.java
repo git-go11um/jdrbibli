@@ -23,6 +23,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * Contrôleur REST pour la gestion des profils utilisateurs.
+ * <p>
+ * Permet de créer, lire, mettre à jour et supprimer des utilisateurs,
+ * gérer les avatars, rechercher par pseudo, et vérifier les relations d'amitié.
+ */
 @RestController
 @RequestMapping({ "/api/users", "/user" })
 public class UserProfileController {
@@ -30,33 +36,53 @@ public class UserProfileController {
     private static final Logger log = LoggerFactory.getLogger(UserProfileController.class);
 
     private final UserProfileService userProfileService;
-
+    /**
+     * Constructeur du contrôleur.
+     *
+     * @param userProfileService service pour gérer les profils utilisateurs
+     */
     public UserProfileController(UserProfileService userProfileService) {
         this.userProfileService = userProfileService;
     }
-
-    /** Récupérer tous les utilisateurs */
+    /**
+     * Récupère tous les utilisateurs.
+     *
+     * @return liste de tous les profils utilisateurs
+     */
     @GetMapping
     public List<UserProfile> getAllUsers() {
         return userProfileService.getAllUsers();
     }
-
-    /** Récupérer un utilisateur par ID */
+    /**
+     * Récupère un utilisateur par son ID.
+     *
+     * @param id ID de l'utilisateur
+     * @return ResponseEntity contenant le profil ou NOT_FOUND
+     */
     @GetMapping("/{id}")
     public ResponseEntity<UserProfile> getUserById(@PathVariable Long id) {
         return userProfileService.getUserById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    /** Supprimer un utilisateur par pseudo */
+    /**
+     * Supprime un utilisateur par son pseudo.
+     *
+     * @param pseudo pseudo de l'utilisateur
+     * @return ResponseEntity avec statut noContent
+     */
     @DeleteMapping("/by-pseudo/{pseudo}")
     public ResponseEntity<Void> deleteUserByPseudo(@PathVariable String pseudo) {
         userProfileService.deleteUserByPseudo(pseudo);
         return ResponseEntity.noContent().build();
     }
-
-    /** Mettre à jour un utilisateur existant par ID */
+    /**
+     * Met à jour un utilisateur à partir d'un DTO.
+     *
+     * @param id  ID de l'utilisateur
+     * @param dto données à mettre à jour
+     * @return ResponseEntity contenant le DTO mis à jour ou NOT_FOUND
+     */
     @PutMapping("/{id}")
     public ResponseEntity<UserProfileDTO> updateUser(
             @PathVariable Long id,
@@ -66,32 +92,45 @@ public class UserProfileController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    /** Rechercher un utilisateur par pseudo */
-    /** Rechercher un utilisateur par pseudo */
+    /**
+     * Recherche un utilisateur par pseudo.
+     *
+     * @param pseudo pseudo à rechercher
+     * @return ResponseEntity contenant le DTO ou NOT_FOUND
+     */
     @GetMapping("/search")
     public ResponseEntity<UserProfileDTO> searchUserByPseudo(@RequestParam String pseudo) {
         return userProfileService.findByPseudo(pseudo)
                 .map(user -> new UserProfileDTO(
-                        user.getId(), // ✅ ajoute l’ID
+                        user.getId(),
                         user.getPseudo(),
                         user.getEmail(),
                         (user.getAvatarPath() != null && !user.getAvatarPath().isBlank())
                                 ? "/api/users/profile/avatar/" + user.getId()
-                                : "" // avatarUrl
+                                : ""
                 ))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /** Récupérer la liste des amis d’un utilisateur */
+    /**
+     * Récupère les amis d'un utilisateur.
+     *
+     * @param pseudo pseudo de l'utilisateur
+     * @return liste des amis sous forme de DTO
+     */
     @GetMapping("/friends/{pseudo}")
     public ResponseEntity<List<FriendDTO>> getFriends(@PathVariable String pseudo) {
         List<FriendDTO> friends = userProfileService.getFriends(pseudo);
         return ResponseEntity.ok(friends);
     }
-
-    /** Upload de l’avatar */
+    /**
+     * Upload ou remplacement de l'avatar de l'utilisateur authentifié.
+     *
+     * @param file           fichier image à uploader
+     * @param authentication objet d'authentification Spring Security
+     * @return ResponseEntity avec statut CREATED ou OK, ou erreur
+     */
     @PutMapping(value = "/profile/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadAvatar(
             @RequestParam("file") MultipartFile file,
@@ -111,7 +150,6 @@ public class UserProfileController {
 
         Object principal = authentication.getPrincipal();
         if (principal instanceof String) {
-            // JWT principal is a String
             pseudo = (String) principal;
         } else if (principal instanceof UserDetails) {
             pseudo = ((UserDetails) principal).getUsername();
@@ -132,8 +170,12 @@ public class UserProfileController {
                     .body("Erreur upload avatar: " + e.getMessage());
         }
     }
-
-    /** Récupérer l’avatar d’un utilisateur par son ID */
+    /**
+     * Récupère l'avatar d'un utilisateur par son ID.
+     *
+     * @param id ID de l'utilisateur
+     * @return ResponseEntity contenant l'image ou NOT_FOUND
+     */
     @GetMapping("/profile/avatar/{id}")
     public ResponseEntity<byte[]> getAvatar(@PathVariable Long id) {
         try {
@@ -147,7 +189,6 @@ public class UserProfileController {
             Path path = Paths.get(avatarPath);
             byte[] image = Files.readAllBytes(path);
 
-            // Détecte le type MIME réel
             String mimeType = Files.probeContentType(path);
             MediaType mediaType = (mimeType != null) ? MediaType.parseMediaType(mimeType)
                     : MediaType.APPLICATION_OCTET_STREAM;
@@ -159,13 +200,23 @@ public class UserProfileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    /**
+     * Crée un nouvel utilisateur.
+     *
+     * @param dto données de l'utilisateur à créer
+     * @return ResponseEntity contenant le DTO créé
+     */
     @PostMapping
     public ResponseEntity<UserProfileDTO> createUser(@RequestBody UserProfileDTO dto) {
         UserProfileDTO created = userProfileService.createUser(dto);
         return ResponseEntity.ok(created);
     }
-
+    /**
+     * Récupère le profil de l'utilisateur authentifié.
+     *
+     * @param authentication objet d'authentification Spring Security
+     * @return ResponseEntity contenant le DTO du profil ou UNAUTHORIZED
+     */
     @GetMapping("/profile/me")
     public ResponseEntity<UserProfileDTO> getMyProfile(Authentication authentication) {
         if (authentication == null || authentication.getPrincipal() == null) {
@@ -192,38 +243,55 @@ public class UserProfileController {
                         ? "/api/users/profile/avatar/" + profile.getId()
                         : "");
 
-        // ✅ avatarUrl = URL publique
-
         return ResponseEntity.ok(dto);
     }
-
-    /** Supprimer un utilisateur par ID */
+    /**
+     * Supprime un utilisateur par son ID.
+     *
+     * @param id ID de l'utilisateur
+     * @return ResponseEntity avec noContent ou NOT_FOUND
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         boolean deleted = userProfileService.deleteUserById(id);
         if (deleted) {
-            return ResponseEntity.noContent().build(); // Retourne 204 No Content si la suppression a réussi
+            return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build(); // Retourne 404 Not Found si l'utilisateur n'existe pas
+            return ResponseEntity.notFound().build();
         }
     }
-
-    // Supprimer un utilisateur et ses gammes associées
+    /**
+     * Supprime un utilisateur par son ID avec cascade sur ses gammes et ludothèque.
+     *
+     * @param id ID de l'utilisateur
+     * @return ResponseEntity avec noContent ou NOT_FOUND
+     */
     @DeleteMapping("/{id}/cascade")
     public ResponseEntity<Void> deleteUserWithCascade(@PathVariable Long id) {
         boolean deleted = userProfileService.deleteUserByIdWithCascade(id);
         if (deleted) {
-            return ResponseEntity.noContent().build(); // Retourne 204 No Content si la suppression a réussi
+            return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build(); // Retourne 404 Not Found si l'utilisateur n'existe pas
+            return ResponseEntity.notFound().build();
         }
     }
-
+    /**
+     * Endpoint test pour la suppression en cascade.
+     *
+     * @param id ID de l'utilisateur
+     * @return ResponseEntity avec un message de test
+     */
     @GetMapping("/{id}/cascade")
     public ResponseEntity<String> testCascade(@PathVariable Long id) {
         return ResponseEntity.ok("OK cascade " + id);
     }
-
+    /**
+     * Vérifie si deux utilisateurs sont amis.
+     *
+     * @param userId   ID du premier utilisateur
+     * @param friendId ID du second utilisateur
+     * @return ResponseEntity contenant true ou false
+     */
     @GetMapping("/are-friends")
     public ResponseEntity<Boolean> areFriends(
             @RequestParam Long userId,

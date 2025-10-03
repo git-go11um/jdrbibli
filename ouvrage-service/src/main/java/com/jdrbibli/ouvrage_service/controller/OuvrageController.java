@@ -21,18 +21,41 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Contrôleur REST pour gérer les {@link Ouvrage} dans le microservice {@code ouvrage-service}.
+ * <p>
+ * Fournit des endpoints pour :
+ * <ul>
+ *   <li>Récupérer tous les ouvrages d'un utilisateur</li>
+ *   <li>Récupérer un ouvrage par son identifiant ou par sa gamme</li>
+ *   <li>Créer, mettre à jour et supprimer un ouvrage</li>
+ *   <li>Uploader une image pour un ouvrage</li>
+ *   <li>Récupérer la bibliothèque d’un ami et ses ouvrages par gamme</li>
+ * </ul>
+ * Chaque requête sécurisée utilise l'en-tête {@code X-User-Id} pour identifier le propriétaire.
+ */
 @RestController
 @RequestMapping("/api/ouvrage/ouvrages")
 public class OuvrageController {
 
     private final OuvrageService ouvrageService;
     private final OuvrageMapper ouvrageMapper;
-
+/**
+     * Constructeur du contrôleur.
+     *
+     * @param ouvrageService service pour gérer les ouvrages.
+     * @param ouvrageMapper  mapper pour convertir entre {@link Ouvrage} et {@link OuvrageDTO}.
+     */
     public OuvrageController(OuvrageService ouvrageService, OuvrageMapper ouvrageMapper) {
         this.ouvrageService = ouvrageService;
         this.ouvrageMapper = ouvrageMapper;
     }
-
+    /**
+     * Récupère tous les ouvrages pour un utilisateur donné.
+     *
+     * @param ownerId identifiant du propriétaire (X-User-Id)
+     * @return liste de {@link OuvrageDTO}.
+     */
     @GetMapping
     public ResponseEntity<List<OuvrageDTO>> getAll(@RequestHeader("X-User-Id") Long ownerId) {
         List<Ouvrage> ouvrages = ouvrageService.findByOwnerId(ownerId);
@@ -42,6 +65,13 @@ public class OuvrageController {
         return ResponseEntity.ok(dtos);
     }
 
+    /**
+     * Récupère un ouvrage par son identifiant.
+     *
+     * @param id      identifiant de l'ouvrage.
+     * @param ownerId identifiant du propriétaire (X-User-Id)
+     * @return l'ouvrage correspondant ou 403/404 selon le cas.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<OuvrageDTO> getById(@PathVariable Long id,
             @RequestHeader("X-User-Id") Long ownerId) {
@@ -55,24 +85,42 @@ public class OuvrageController {
 
         return ResponseEntity.ok(ouvrageMapper.toDTO(ouvrage));
     }
-
+    /**
+     * Récupère tous les ouvrages d'une gamme donnée.
+     *
+     * @param gammeId identifiant de la gamme
+     * @return liste de {@link OuvrageDTO}.
+     */
     @GetMapping("/gammes/{gammeId}")
     public ResponseEntity<List<OuvrageDTO>> getByGamme(@PathVariable Long gammeId) {
-        List<Ouvrage> ouvrages = ouvrageService.findByGammeId(gammeId); // version publique, sans ownerId
+        List<Ouvrage> ouvrages = ouvrageService.findByGammeId(gammeId);
         List<OuvrageDTO> dtos = ouvrages.stream()
                 .map(ouvrageMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
-
+/**
+     * Crée un nouvel ouvrage pour un utilisateur.
+     *
+     * @param dto     données de l'ouvrage
+     * @param ownerId identifiant du propriétaire (X-User-Id)
+     * @return l'ouvrage créé avec statut 201.
+     */
     @PostMapping
     public ResponseEntity<OuvrageDTO> create(@RequestBody OuvrageDTO dto,
             @RequestHeader("X-User-Id") Long ownerId) {
-        dto.setOwnerId(ownerId); // obligatoire
+        dto.setOwnerId(ownerId);
         Ouvrage created = ouvrageService.createFromDTO(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ouvrageMapper.toDTO(created));
     }
-
+/**
+     * Met à jour un ouvrage existant.
+     *
+     * @param id      identifiant de l'ouvrage.
+     * @param dto     nouvelles données.
+     * @param ownerId identifiant du propriétaire (X-User-Id)
+     * @return l'ouvrage mis à jour ou 403/404 selon le cas.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<OuvrageDTO> update(@PathVariable Long id,
             @RequestBody OuvrageDTO dto,
@@ -89,7 +137,13 @@ public class OuvrageController {
         Ouvrage updated = ouvrageService.updateFromDTO(id, dto);
         return ResponseEntity.ok(ouvrageMapper.toDTO(updated));
     }
-
+/**
+     * Supprime un ouvrage.
+     *
+     * @param id      identifiant de l'ouvrage
+     * @param ownerId identifiant du propriétaire (X-User-Id)
+     * @return 204 si succès, 403 si non autorisé, 404 si non trouvé.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id,
             @RequestHeader("X-User-Id") Long ownerId) {
@@ -104,14 +158,25 @@ public class OuvrageController {
         ouvrageService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-
+/**
+     * Récupère les ouvrages d'une gamme donnée en excluant un ouvrage spécifique.
+     *
+     * @param gammeId identifiant de la gamme
+     * @param id      identifiant de l'ouvrage à exclure
+     * @return liste de {@link OuvrageDTO}.
+     */
     @GetMapping("/gammes/{gammeId}/exclude/{id}")
     public ResponseEntity<List<OuvrageDTO>> getOuvragesByGamme(@PathVariable Long gammeId,
             @PathVariable Long id) {
         List<OuvrageDTO> ouvrages = ouvrageService.getOuvragesByGamme(gammeId, id);
         return ResponseEntity.ok(ouvrages);
     }
-
+/**
+     * Upload d'une image pour un ouvrage.
+     *
+     * @param file fichier image
+     * @return URL de l'image stockée ou message d'erreur.
+     */
     @PostMapping("/upload-image")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
@@ -119,9 +184,8 @@ public class OuvrageController {
                 return ResponseEntity.badRequest().body("Fichier vide");
             }
 
-            // Générer un nom unique pour éviter les collisions
             String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path uploadPath = Paths.get("uploads/images"); // dossier où stocker les images
+            Path uploadPath = Paths.get("uploads/images");
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
@@ -129,7 +193,7 @@ public class OuvrageController {
             Path filePath = uploadPath.resolve(filename);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Retourner l’URL ou chemin relatif
+
             String imageUrl = "/uploads/images/" + filename;
             return ResponseEntity.ok(imageUrl);
 
@@ -137,7 +201,13 @@ public class OuvrageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur serveur");
         }
     }
-
+/**
+     * Récupère la bibliothèque d’un ami si les utilisateurs sont amis.
+     *
+     * @param friendId      identifiant de l'ami
+     * @param currentUserId identifiant de l'utilisateur courant (X-User-Id)
+     * @return liste de {@link OuvrageDTO} ou 403/500 selon le cas.
+     */
     @GetMapping("/friends/{friendId}/ouvrages")
     public ResponseEntity<List<OuvrageDTO>> getFriendLibrary(
             @PathVariable Long friendId,
@@ -150,7 +220,7 @@ public class OuvrageController {
         System.out.println("[DEBUG] Appel user-service : http://localhost:8082/api/users/are-friends?userId="
                 + currentUserId + "&friendId=" + friendId);
         try {
-            friends = WebClient.create("http://localhost:8082") // URL du user-service
+            friends = WebClient.create("http://localhost:8082")
                     .get()
                     .uri("/api/users/are-friends?userId={userId}&friendId={friendId}", currentUserId, friendId)
                     .retrieve()
@@ -194,7 +264,13 @@ public class OuvrageController {
         System.out.println("[DEBUG] Renvoi " + dtos.size() + " DTOs");
         return ResponseEntity.ok(dtos);
     }
-
+    /**
+     * Récupère les ouvrages d'un ami pour une gamme spécifique.
+     *
+     * @param friendId identifiant de l'ami
+     * @param gammeId  identifiant de la gamme
+     * @return liste de {@link OuvrageDTO}.
+     */
     @GetMapping("/friend/{friendId}/gamme/{gammeId}")
     public ResponseEntity<List<OuvrageDTO>> getOuvragesByFriendAndGamme(
             @PathVariable Long friendId,
@@ -207,7 +283,13 @@ public class OuvrageController {
 
         return ResponseEntity.ok(ouvragesDTO);
     }
-
+    /**
+     * Récupère un ouvrage précis d'un ami.
+     *
+     * @param friendId  identifiant de l'ami
+     * @param ouvrageId identifiant de l'ouvrage
+     * @return {@link OuvrageDTO} ou 404 si non trouvé.
+     */
     @GetMapping("/friend/{friendId}/{ouvrageId}")
     public ResponseEntity<OuvrageDTO> getOuvrageFriend(
             @PathVariable Long friendId,

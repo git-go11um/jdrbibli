@@ -7,9 +7,30 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+/**
+ * Configuration du service d'envoi d'e-mails.
+ * <p>
+ * Cette classe fournit un {@link JavaMailSender} configuré pour un serveur SMTP local.
+ * Dans le contexte actuel, il s'agit d'un serveur SMTP fictif (Fake SMTP) pour les tests.
+ * </p>
+ */
 @Configuration
 public class MailConfig {
 
+    /**
+     * Configure et retourne un {@link JavaMailSender}.
+     * <p>
+     * La configuration utilise :
+     * <ul>
+     *     <li>Host : localhost</li>
+     *     <li>Port : 25</li>
+     *     <li>Pas d'authentification SMTP</li>
+     *     <li>Pas de TLS</li>
+     *     <li>Logs activés pour le débogage</li>
+     * </ul>
+     *
+     * @return un {@link JavaMailSender} prêt à l'utilisation pour l'envoi d'e-mails
+     */
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -17,8 +38,6 @@ public class MailConfig {
         mailSender.setHost("localhost"); // Fake SMTP
         mailSender.setPort(25);          // port où Fake SMTP écoute
 
-        mailSender.setUsername("");      // inutile
-        mailSender.setPassword("");      // inutile
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");

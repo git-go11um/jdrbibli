@@ -16,18 +16,33 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Contrôleur REST pour gérer les demandes d'amitié et la liste d'amis.
+ * <p>
+ * Fournit des endpoints pour envoyer, accepter, rejeter des demandes d'amitié,
+ * supprimer des amis, lister les amis et accéder aux ouvrages d'un ami.
+ */
 @RestController
 @RequestMapping("/api/friends")
 public class FriendRequestController {
 
     private final FriendRequestService friendRequestService;
 
+    /**
+     * Constructeur du contrôleur.
+     *
+     * @param friendRequestService service gérant la logique métier des amis
+     */
     public FriendRequestController(FriendRequestService friendRequestService) {
         this.friendRequestService = friendRequestService;
     }
 
     /**
-     * Envoyer une demande d'ami.
+     * Envoie une demande d'amitié d'un utilisateur vers un autre.
+     *
+     * @param senderId   ID de l'utilisateur qui envoie la demande
+     * @param receiverId ID de l'utilisateur qui reçoit la demande
+     * @return DTO représentant la demande d'amitié créée
      */
     @PostMapping("/request")
     public FriendRequestDTO sendRequest(@RequestParam Long senderId, @RequestParam Long receiverId) {
@@ -36,7 +51,10 @@ public class FriendRequestController {
     }
 
     /**
-     * Accepter une demande d'ami.
+     * Accepte une demande d'amitié.
+     *
+     * @param requestId ID de la demande à accepter
+     * @return DTO de la demande d'amitié acceptée
      */
     @PostMapping("/{requestId}/accept")
     public FriendRequestDTO acceptRequest(@PathVariable Long requestId) {
@@ -45,7 +63,10 @@ public class FriendRequestController {
     }
 
     /**
-     * Refuser une demande d'ami.
+     * Rejette une demande d'amitié.
+     *
+     * @param requestId ID de la demande à rejeter
+     * @return DTO de la demande d'amitié rejetée
      */
     @PostMapping("/{requestId}/reject")
     public FriendRequestDTO rejectRequest(@PathVariable Long requestId) {
@@ -54,7 +75,10 @@ public class FriendRequestController {
     }
 
     /**
-     * Supprimer un ami existant.
+     * Supprime un ami de la liste d'un utilisateur.
+     *
+     * @param userId   ID de l'utilisateur qui supprime l'ami
+     * @param friendId ID de l'ami à supprimer
      */
     @DeleteMapping("/{friendId}")
     public void removeFriend(@RequestParam Long userId, @PathVariable Long friendId) {
@@ -62,18 +86,24 @@ public class FriendRequestController {
     }
 
     /**
-     * Lister les amis d’un utilisateur.
+     * Liste tous les amis d'un utilisateur.
+     *
+     * @param userId ID de l'utilisateur
+     * @return liste de DTO représentant les amis
      */
     @GetMapping
     public List<FriendDTO> listFriends(@RequestParam Long userId) {
-        List<UserProfile> friends = friendRequestService.listFriends(userId); // ✅ maintenant c'est cohérent
+        List<UserProfile> friends = friendRequestService.listFriends(userId);
         return friends.stream()
                 .map(FriendMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Lister les demandes d'amis reçues.
+     * Liste les demandes d'amitié reçues par un utilisateur.
+     *
+     * @param userId ID de l'utilisateur
+     * @return liste de DTO représentant les demandes reçues
      */
     @GetMapping("/requests/received")
     public List<FriendRequestDTO> listReceivedRequests(@RequestParam Long userId) {
@@ -83,18 +113,24 @@ public class FriendRequestController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Récupère les ouvrages d'un ami si la relation d'amitié existe.
+     *
+     * @param friendId ID de l'ami dont on veut les ouvrages
+     * @param userId   ID de l'utilisateur qui effectue la requête (header X-User-Id)
+     * @return liste de DTO représentant les ouvrages de l'ami
+     * @throws ResponseStatusException si les deux utilisateurs ne sont pas amis
+     */
     @GetMapping("/{friendId}/ouvrages")
     public List<OuvrageDTO> getFriendOuvrages(
             @PathVariable Long friendId,
             @RequestHeader("X-User-Id") Long userId) {
 
-        // Vérifie que userId et friendId sont amis
         boolean areFriends = friendRequestService.areFriends(userId, friendId);
         if (!areFriends) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pas ami avec cet utilisateur");
         }
 
-        // Récupère les ouvrages du friendId
         return friendRequestService.listFriendOuvrages(friendId);
     }
 

@@ -10,15 +10,37 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Client pour envoyer des événements d'audit vers le service Audit.
+ * <p>
+ * Cette classe utilise Spring {@link RestTemplate} pour faire des requêtes HTTP POST
+ * vers l'URL configurée pour le service d'audit. Les événements envoyés contiennent 
+ * le nom du service, l'action effectuée et des détails supplémentaires.
+ * </p>
+ * <p>
+ * L'URL du service d'audit est configurable via la propriété `app.audit-url` dans `application.yml`.
+ * Si elle n'est pas définie, la valeur par défaut est `http://localhost:8085/api/audit/logs`.
+ * </p>
+ */
 @Component
 public class AuditClient {
     private final Logger log = LoggerFactory.getLogger(AuditClient.class);
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // configurable via application.yml
+    /**
+     * URL du service Audit.
+     * Configurable via la propriété `app.audit-url`.
+     */
     @Value("${app.audit-url:http://localhost:8085/api/audit/logs}")
     private String auditUrl;
 
+    /**
+     * Envoie un événement d'audit au service Audit.
+     *
+     * @param serviceName le nom du service générant l'événement (ex: "auth-service")
+     * @param action      l'action effectuée (ex: "login", "password-reset")
+     * @param details     des informations supplémentaires sur l'événement
+     */
     public void logEvent(String serviceName, String action, String details) {
         try {
             HttpHeaders headers = new HttpHeaders();

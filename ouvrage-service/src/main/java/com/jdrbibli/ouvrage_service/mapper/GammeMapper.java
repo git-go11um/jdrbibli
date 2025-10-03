@@ -7,15 +7,33 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper pour convertir entre l'entité {@link Gamme} et son DTO {@link GammeDTO}.
+ * <p>
+ * Permet de transformer une entité Gamme en DTO pour l'API, et inversement.
+ * Inclut également le mapping des ouvrages associés via {@link OuvrageMapper}.
+ */
 @Component
 public class GammeMapper {
 
     private final OuvrageMapper ouvrageMapper;
 
+    /**
+     * Constructeur avec injection de l'OuvrageMapper.
+     *
+     * @param ouvrageMapper le mapper pour les ouvrages associés
+     */
     public GammeMapper(OuvrageMapper ouvrageMapper) {
         this.ouvrageMapper = ouvrageMapper;
     }
 
+    /**
+     * Convertit une entité {@link Gamme} en {@link GammeDTO}.
+     * Les ouvrages associés sont également convertis en DTOs.
+     *
+     * @param gamme l'entité Gamme à convertir
+     * @return le DTO correspondant, ou null si l'entité est null
+     */
     public GammeDTO toDTO(Gamme gamme) {
         if (gamme == null)
             return null;
@@ -36,6 +54,13 @@ public class GammeMapper {
         return dto;
     }
 
+    /**
+     * Convertit un {@link GammeDTO} en entité {@link Gamme}.
+     * Les ouvrages ne sont pas mappés ici.
+     *
+     * @param dto le DTO à convertir
+     * @return l'entité Gamme correspondante, ou null si le DTO est null
+     */
     public Gamme toEntity(GammeDTO dto) {
         if (dto == null)
             return null;

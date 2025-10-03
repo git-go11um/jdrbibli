@@ -24,6 +24,13 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Service pour la gestion des demandes d'amis et des relations d'amitié entre utilisateurs.
+ * <p>
+ * Ce service permet d'envoyer, accepter, rejeter et supprimer des demandes d'amis,
+ * ainsi que de lister les amis et leurs ouvrages.
+ * </p>
+ */
 @Service
 public class FriendRequestService {
 
@@ -46,7 +53,13 @@ public class FriendRequestService {
     }
 
     /**
-     * Envoie une demande d'ami.
+     * Envoie une demande d'amitié d'un utilisateur vers un autre.
+     *
+     * @param senderId   ID de l'utilisateur envoyant la demande
+     * @param receiverId ID de l'utilisateur recevant la demande
+     * @return la demande d'ami créée
+     * @throws IllegalArgumentException si l'utilisateur tente de s'envoyer une demande à lui-même
+     * @throws RuntimeException         si l'un des utilisateurs n'existe pas ou si une demande existe déjà
      */
     public FriendRequest sendFriendRequest(Long senderId, Long receiverId) {
         if (senderId.equals(receiverId)) {
@@ -68,7 +81,11 @@ public class FriendRequestService {
     }
 
     /**
-     * Accepte une demande d'ami.
+     * Accepte une demande d'amitié.
+     *
+     * @param requestId ID de la demande à accepter
+     * @return la demande mise à jour
+     * @throws RuntimeException si la demande n'existe pas
      */
     public FriendRequest acceptFriendRequest(Long requestId) {
         FriendRequest request = friendRequestRepository.findById(requestId)
@@ -79,7 +96,11 @@ public class FriendRequestService {
     }
 
     /**
-     * Rejette une demande d'ami.
+     * Rejette une demande d'amitié.
+     *
+     * @param requestId ID de la demande à rejeter
+     * @return la demande mise à jour
+     * @throws RuntimeException si la demande n'existe pas
      */
     public FriendRequest rejectFriendRequest(Long requestId) {
         FriendRequest request = friendRequestRepository.findById(requestId)
@@ -90,7 +111,11 @@ public class FriendRequestService {
     }
 
     /**
-     * Supprime une amitié.
+     * Supprime une relation d'amitié existante entre deux utilisateurs.
+     *
+     * @param userId   ID de l'utilisateur
+     * @param friendId ID de l'ami
+     * @throws RuntimeException si l'amitié n'existe pas ou si l'un des utilisateurs n'existe pas
      */
     public void removeFriend(Long userId, Long friendId) {
         UserProfile user = userRepository.findById(userId)
@@ -108,7 +133,11 @@ public class FriendRequestService {
     }
 
     /**
-     * Retourne la liste des amis d'un utilisateur.
+     * Liste les amis d'un utilisateur.
+     *
+     * @param userId ID de l'utilisateur
+     * @return liste des profils amis
+     * @throws RuntimeException si l'utilisateur n'existe pas
      */
     public List<UserProfile> listFriends(Long userId) {
         UserProfile user = userRepository.findById(userId)
@@ -122,7 +151,10 @@ public class FriendRequestService {
     }
 
     /**
-     * Liste toutes les demandes d'amis reçues en attente.
+     * Liste les demandes d'amitié reçues en attente pour un utilisateur.
+     *
+     * @param userId ID de l'utilisateur
+     * @return liste des demandes reçues
      */
     public List<FriendRequest> listReceivedRequests(Long userId) {
         List<FriendRequest> requests = friendRequestRepository.findByReceiverIdAndStatus(userId,
@@ -139,6 +171,14 @@ public class FriendRequestService {
         return requests;
     }
 
+    /**
+     * Vérifie si deux utilisateurs sont amis.
+     *
+     * @param userId1 ID du premier utilisateur
+     * @param userId2 ID du second utilisateur
+     * @return true si les deux utilisateurs sont amis
+     * @throws RuntimeException si l'un des utilisateurs n'existe pas
+     */
     public boolean areFriends(Long userId1, Long userId2) {
         UserProfile user1 = userRepository.findById(userId1)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
@@ -148,6 +188,13 @@ public class FriendRequestService {
         return friendRequestRepository.findAcceptedFriendshipBetweenUsers(user1, user2).isPresent();
     }
 
+    /**
+     * Récupère la liste des ouvrages publics d'un ami via le service Ouvrage.
+     *
+     * @param friendId ID de l'ami
+     * @return liste des ouvrages de l'ami
+     * @throws RuntimeException si l'utilisateur n'existe pas
+     */
     public List<OuvrageDTO> listFriendOuvrages(Long friendId) {
         UserProfile friend = userRepository.findById(friendId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));

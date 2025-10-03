@@ -1,9 +1,11 @@
 package com.jdrbibli.userservice.entity;
 
 import java.time.LocalDateTime;
-
 import jakarta.persistence.*;
 
+/**
+ * Entité représentant une demande d'amitié entre deux utilisateurs.
+ */
 @Entity
 @Table(name = "friend_requests", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "sender_id", "receiver_id" })
@@ -14,16 +16,17 @@ public class FriendRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // L'utilisateur qui envoie la demande
+    /** Utilisateur qui envoie la demande */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
     private UserProfile sender;
 
-    // L'utilisateur qui reçoit la demande
+    /** Utilisateur qui reçoit la demande */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "receiver_id", nullable = false)
     private UserProfile receiver;
 
+    /** Statut de la demande */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.PENDING;
@@ -34,13 +37,14 @@ public class FriendRequest {
         REJECTED
     }
 
+    /** Date de création de la demande */
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    /** Date à laquelle la demande a été acceptée ou rejetée */
     @Column
     private LocalDateTime respondedAt;
 
-    // Constructeurs
     public FriendRequest() {
     }
 
@@ -56,7 +60,6 @@ public class FriendRequest {
         this.status = status;
     }
 
-    // Hooks JPA
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -69,62 +72,26 @@ public class FriendRequest {
         }
     }
 
-    // Getters & Setters
-    public Long getId() {
-        return id;
-    }
+    // --- Getters / Setters ---
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public UserProfile getSender() { return sender; }
+    public void setSender(UserProfile sender) { this.sender = sender; }
 
-    public UserProfile getSender() {
-        return sender;
-    }
+    public UserProfile getReceiver() { return receiver; }
+    public void setReceiver(UserProfile receiver) { this.receiver = receiver; }
 
-    public void setSender(UserProfile sender) {
-        this.sender = sender;
-    }
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
 
-    public UserProfile getReceiver() {
-        return receiver;
-    }
+    public boolean isPending() { return status == Status.PENDING; }
+    public boolean isAccepted() { return status == Status.ACCEPTED; }
+    public boolean isRejected() { return status == Status.REJECTED; }
 
-    public void setReceiver(UserProfile receiver) {
-        this.receiver = receiver;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public boolean isPending() {
-        return status == Status.PENDING;
-    }
-
-    public boolean isAccepted() {
-        return status == Status.ACCEPTED;
-    }
-
-    public boolean isRejected() {
-        return status == Status.REJECTED;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getRespondedAt() {
-        return respondedAt;
-    }
-
-    public void setRespondedAt(LocalDateTime respondedAt) {
-        this.respondedAt = respondedAt;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getRespondedAt() { return respondedAt; }
+    public void setRespondedAt(LocalDateTime respondedAt) { this.respondedAt = respondedAt; }
 
     @Override
     public String toString() {

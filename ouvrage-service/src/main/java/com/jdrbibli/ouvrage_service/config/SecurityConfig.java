@@ -17,6 +17,22 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.List;
+
+/**
+ * Configuration de la sécurité pour le microservice {@code ouvrage-service}.
+ * <p>
+ * Cette classe configure Spring Security pour gérer :
+ * <ul>
+ *   <li>L'authentification via JWT avec {@link JwtAuthenticationFilter} et {@link JwtTokenProvider}</li>
+ *   <li>La gestion des utilisateurs avec {@link UserDetailsService}</li>
+ *   <li>Le chiffrement des mots de passe avec {@link BCryptPasswordEncoder}</li>
+ *   <li>La configuration CORS pour autoriser le front Angular sur localhost:4200</li>
+ *   <li>La désactivation de CSRF pour les requêtes API REST</li>
+ * </ul>
+ * <p>
+ * Les endpoints liés aux ouvrages et gammes sont actuellement ouverts à tous les accès.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -24,11 +40,25 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Constructeur de la configuration de sécurité.
+     *
+     * @param jwtTokenProvider     fournisseur de tokens JWT pour l'authentification.
+     * @param userDetailsService   service Spring Security pour charger les informations des utilisateurs.
+     */
     public SecurityConfig(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * Définit la chaîne de filtres de sécurité HTTP pour l'application.
+     *
+     * @param http               configuration HttpSecurity.
+     * @param authenticationManager gestionnaire d'authentification.
+     * @return la chaîne de filtres de sécurité.
+     * @throws Exception si la configuration échoue.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager)
             throws Exception {
@@ -45,6 +75,14 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Configure le {@link AuthenticationManager} avec le {@link UserDetailsService}
+     * et le {@link PasswordEncoder} pour Spring Security.
+     *
+     * @param http configuration HttpSecurity.
+     * @return le gestionnaire d'authentification.
+     * @throws Exception si la configuration échoue.
+     */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -54,15 +92,26 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Fournit un {@link PasswordEncoder} basé sur BCrypt pour sécuriser les mots de passe.
+     *
+     * @return le {@link BCryptPasswordEncoder}.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Configure un filtre CORS pour autoriser les requêtes du front Angular
+     * sur localhost:4200 avec tous les headers et méthodes.
+     *
+     * @return le {@link CorsFilter}.
+     */
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:4200"); // Angular
+        config.addAllowedOrigin("http://localhost:4200");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setAllowCredentials(true);
