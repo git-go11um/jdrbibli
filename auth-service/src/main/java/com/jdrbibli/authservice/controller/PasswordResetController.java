@@ -11,16 +11,16 @@ import java.util.Map;
 
 /**
  * Contrôleur pour gérer la réinitialisation des mots de passe.
- * <p>
+ * 
  * Fournit des endpoints pour :
  * <ul>
  *     <li>Vérifier la validité d'un code de réinitialisation</li>
  *     <li>Confirmer et appliquer la réinitialisation du mot de passe</li>
  * </ul>
- * </p>
- * <p>
+ * 
+ * 
  * Communique avec {@link IUserService} pour effectuer la logique métier.
- * </p>
+ * 
  */
 @RestController
 @RequestMapping("/auth/password-reset")

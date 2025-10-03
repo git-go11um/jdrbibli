@@ -2,10 +2,10 @@ package com.jdrbibli.authservice.dto;
 
 /**
  * DTO représentant le profil d'un utilisateur.
- * <p>
+ * 
  * Contient les informations basiques de l'utilisateur utilisées 
  * lors de la communication entre les microservices (auth-service et user-service).
- * </p>
+ * 
  */
 public class UserProfileDTO {
 

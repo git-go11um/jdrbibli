@@ -7,10 +7,10 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Classe principale du microservice UserService.
- * <p>
+ * 
  * Cette classe démarre l'application Spring Boot et configure les beans globaux
  * tels que {@link RestTemplate} pour permettre les appels HTTP vers d'autres services.
- * </p>
+ * 
  */
 @SpringBootApplication
 public class UserServiceApplication {

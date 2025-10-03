@@ -3,10 +3,10 @@ package com.jdrbibli.authservice.dto;
 /**
  * Représente les informations nécessaires pour confirmer une réinitialisation
  * de mot de passe.
- * <p>
+ * 
  * Utilisé lors de la validation du code de réinitialisation et de la définition
  * d'un nouveau mot de passe.
- * </p>
+ * 
  */
 public class PasswordResetConfirmation {
 

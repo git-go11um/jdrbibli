@@ -6,13 +6,13 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Configuration pour les appels HTTP externes via RestTemplate.
- * <p>
+ * 
  * Cette classe fournit un bean {@link RestTemplate} qui peut être injecté
  * dans les différents services ou composants du microservice AuthService.
- * <p>
+ * 
  * {@link RestTemplate} permet de faire des requêtes HTTP (GET, POST, etc.)
  * vers d'autres services ou API externes.
- * </p>
+ * 
  */
 @Configuration
 public class RestTemplateConfig {

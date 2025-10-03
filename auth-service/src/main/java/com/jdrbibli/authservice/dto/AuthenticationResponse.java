@@ -2,9 +2,9 @@ package com.jdrbibli.authservice.dto;
 
 /**
  * Représente la réponse renvoyée lors d'une authentification réussie.
- * <p>
+ * 
  * Contient le token JWT généré et les informations de l'utilisateur associé.
- * </p>
+ * 
  */
 public class AuthenticationResponse {
 

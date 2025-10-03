@@ -18,13 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Configuration de la sécurité pour le microservice AuthService.
- * <p>
+ * 
  * Cette classe configure Spring Security pour le service d'authentification.
  * Elle définit les endpoints publics et sécurisés, le filtre JWT, ainsi que
  * les beans nécessaires pour l'authentification et l'encodage des mots de
  * passe.
- * </p>
- * <p>
+ * 
+ * 
  * Les endpoints suivants sont publics :
  * <ul>
  * <li>POST /auth/login</li>
@@ -33,7 +33,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * <li>/auth/refresh</li>
  * </ul>
  * Tous les autres endpoints sous /auth/** nécessitent une authentification.
- * </p>
+ * 
  */
 @Configuration
 @EnableMethodSecurity
@@ -60,11 +60,11 @@ public class SecurityConfig {
 
     /**
      * Bean pour le {@link AuthenticationProvider} utilisant DAO.
-     * <p>
+     * 
      * Utilise {@link DaoAuthenticationProvider} avec
      * {@link CustomUserDetailsService}
      * et {@link PasswordEncoder} pour authentifier les utilisateurs.
-     * </p>
+     * 
      *
      * @return un {@link AuthenticationProvider} configuré
      */
@@ -90,7 +90,7 @@ public class SecurityConfig {
 
     /**
      * Bean pour la chaîne de filtres de sécurité {@link SecurityFilterChain}.
-     * <p>
+     * 
      * Configure :
      * <ul>
      * <li>Désactivation de CSRF</li>
@@ -98,7 +98,7 @@ public class SecurityConfig {
      * <li>Filtre JWT avant UsernamePasswordAuthenticationFilter</li>
      * <li>Autorisation des endpoints publics et sécurisation des autres</li>
      * </ul>
-     * </p>
+     * 
      *
      * @param http configuration HTTP
      * @return un {@link SecurityFilterChain} configuré

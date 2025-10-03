@@ -17,15 +17,15 @@ import java.io.IOException;
  * Filtre Spring Security qui intercepte chaque requête HTTP et valide
  * le JWT présent dans l'en-tête Authorization.
  * 
- * <p>
+ * 
  * Si le token est valide, il place une authentification dans le contexte
  * de sécurité Spring afin que l'utilisateur soit reconnu pour cette requête.
- * </p>
  * 
- * <p>
+ * 
+ * 
  * Les requêtes de création d'utilisateur (/api/users POST) sont exclues
  * du filtrage JWT afin de permettre l'inscription sans authentification.
- * </p>
+ * 
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

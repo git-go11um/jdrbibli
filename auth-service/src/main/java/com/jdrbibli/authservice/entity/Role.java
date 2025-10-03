@@ -5,10 +5,10 @@ import org.springframework.security.core.GrantedAuthority;
 
 /**
  * Entité représentant un rôle attribué à un utilisateur.
- * <p>
+ * 
  * Cette entité implémente {@link GrantedAuthority} pour être compatible avec
  * Spring Security.
- * </p>
+ * 
  */
 @Entity
 @Table(name = "roles")

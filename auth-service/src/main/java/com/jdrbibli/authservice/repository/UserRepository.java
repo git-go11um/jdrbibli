@@ -7,11 +7,11 @@ import java.util.Optional;
 
 /**
  * Repository JPA pour gérer les utilisateurs.
- * <p>
+ * 
  * Il étend JpaRepository pour bénéficier des opérations CRUD classiques.
  * Plusieurs méthodes personnalisées permettent de rechercher et de vérifier l'existence d'un utilisateur
  * par son pseudo ou son email.
- * </p>
+ * 
  */
 public interface UserRepository extends JpaRepository<User, Long> {
 

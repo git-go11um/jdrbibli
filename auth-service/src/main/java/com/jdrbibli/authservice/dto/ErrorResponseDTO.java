@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 
 /**
  * Représente la réponse d'erreur renvoyée par l'API.
- * <p>
+ * 
  * Contient un message d'erreur, un code HTTP et l'horodatage de l'erreur.
  * Cette classe est utilisée pour centraliser et standardiser les réponses d'erreur.
- * </p>
+ * 
  */
 public class ErrorResponseDTO {
 

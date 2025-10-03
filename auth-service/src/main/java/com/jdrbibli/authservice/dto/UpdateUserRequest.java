@@ -2,9 +2,9 @@ package com.jdrbibli.authservice.dto;
 
 /**
  * DTO utilisé pour la mise à jour des informations d'un utilisateur.
- * <p>
+ * 
  * Contient les champs modifiables par l'utilisateur : pseudo et email.
- * </p>
+ * 
  */
 public class UpdateUserRequest {
 

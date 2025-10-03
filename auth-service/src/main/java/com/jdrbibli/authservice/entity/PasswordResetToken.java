@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 
 /**
  * Entité représentant un token de réinitialisation de mot de passe.
- * <p>
+ * 
  * Chaque token est associé à un utilisateur et possède une date d'expiration.
  * Utilisé pour les processus de "password reset" dans AuthService.
- * </p>
+ * 
  */
 @Entity
 public class PasswordResetToken {

@@ -8,9 +8,9 @@ import java.util.Set;
 
 /**
  * Entité représentant un utilisateur dans le système.
- * <p>
+ * 
  * Cette entité implémente {@link UserDetails} pour l'intégration avec Spring Security.
- * </p>
+ * 
  */
 @Entity
 @Table(name = "users")

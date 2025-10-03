@@ -10,10 +10,10 @@ import java.util.List;
 
 /**
  * Service pour la gestion de la ludothèque d'un utilisateur.
- * <p>
+ * 
  * Permet de récupérer les ouvrages d'un utilisateur via le service Ouvrage
  * en utilisant WebClient.
- * </p>
+ * 
  */
 @Service
 public class UserLudothequeService {

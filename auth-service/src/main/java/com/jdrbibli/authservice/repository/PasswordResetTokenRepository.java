@@ -8,11 +8,11 @@ import java.util.Optional;
 
 /**
  * Repository JPA pour gérer les tokens de réinitialisation de mot de passe.
- * <p>
+ * 
  * Il étend JpaRepository pour bénéficier de toutes les opérations CRUD.
  * Les méthodes personnalisées permettent de rechercher ou supprimer un token
  * en fonction de l'utilisateur ou du token lui-même.
- * </p>
+ * 
  */
 @Repository
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
@@ -27,9 +27,9 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
 
     /**
      * Supprime tous les tokens associés à un utilisateur donné.
-     * <p>
+     * 
      * Utile lorsque l'utilisateur réinitialise son mot de passe ou est supprimé.
-     * </p>
+     * 
      *
      * @param userId ID de l'utilisateur
      */

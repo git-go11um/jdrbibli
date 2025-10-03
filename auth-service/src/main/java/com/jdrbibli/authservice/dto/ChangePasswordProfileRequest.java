@@ -2,10 +2,10 @@ package com.jdrbibli.authservice.dto;
 
 /**
  * Représente la requête de changement de mot de passe pour un utilisateur connecté.
- * <p>
+ * 
  * Contient le mot de passe actuel, le nouveau mot de passe et la confirmation du nouveau mot de passe.
  * Cette classe est utilisée lors de la modification du mot de passe via le profil utilisateur.
- * </p>
+ * 
  */
 public class ChangePasswordProfileRequest {
 

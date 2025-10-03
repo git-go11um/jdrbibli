@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 
 /**
  * Classe représentant une erreur API standardisée.
- * <p>
+ * 
  * Cette classe est utilisée pour renvoyer des réponses d'erreur JSON cohérentes
  * aux clients lorsqu'une exception est levée dans le backend.
- * </p>
+ * 
  */
 public class ApiError {
 

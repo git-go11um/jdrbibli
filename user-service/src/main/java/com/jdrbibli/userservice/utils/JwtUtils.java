@@ -9,10 +9,10 @@ import java.security.Key;
 
 /**
  * Utilitaire pour la manipulation et la validation des JSON Web Tokens (JWT).
- * <p>
+ * 
  * Fournit des méthodes pour extraire le nom d'utilisateur d'un token JWT
  * et pour vérifier sa validité.
- * </p>
+ * 
  */
 public class JwtUtils {
 

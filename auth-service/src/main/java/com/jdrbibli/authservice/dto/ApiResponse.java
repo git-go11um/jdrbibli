@@ -2,10 +2,10 @@ package com.jdrbibli.authservice.dto;
 
 /**
  * Représente la réponse standard envoyée par le serveur après une opération.
- * <p>
+ * 
  * Contient un message, un indicateur de succès et éventuellement un token JWT
  * (par exemple après login ou modification de mot de passe).
- * </p>
+ * 
  */
 public class ApiResponse {
 

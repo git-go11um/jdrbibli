@@ -2,10 +2,10 @@ package com.jdrbibli.authservice.dto;
 
 /**
  * Représente la requête de changement de mot de passe pour un utilisateur.
- * <p>
+ * 
  * Contient le nouveau mot de passe et sa confirmation. Utilisée lorsqu'un mot de passe
  * doit être modifié sans fournir le mot de passe actuel (ex. réinitialisation via code).
- * </p>
+ * 
  */
 public class ChangePasswordRequest {
 

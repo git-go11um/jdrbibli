@@ -7,10 +7,10 @@ import java.util.Optional;
 
 /**
  * Repository JPA pour gérer les rôles des utilisateurs.
- * <p>
+ * 
  * Il étend JpaRepository pour bénéficier des opérations CRUD de base.
  * La méthode personnalisée permet de rechercher un rôle par son nom unique.
- * </p>
+ * 
  */
 public interface RoleRepository extends JpaRepository<Role, Long> {
 

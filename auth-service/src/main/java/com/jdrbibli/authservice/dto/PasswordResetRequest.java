@@ -2,10 +2,10 @@ package com.jdrbibli.authservice.dto;
 
 /**
  * Représente une requête de réinitialisation de mot de passe.
- * <p>
+ * 
  * Contient le pseudo de l'utilisateur, le code de réinitialisation reçu et le nouveau mot de passe choisi.
  * Utilisé par les endpoints de réinitialisation de mot de passe pour valider et appliquer le changement.
- * </p>
+ * 
  */
 public class PasswordResetRequest {
 

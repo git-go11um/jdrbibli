@@ -26,10 +26,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Service pour la gestion des demandes d'amis et des relations d'amitié entre utilisateurs.
- * <p>
+ * 
  * Ce service permet d'envoyer, accepter, rejeter et supprimer des demandes d'amis,
  * ainsi que de lister les amis et leurs ouvrages.
- * </p>
+ * 
  */
 @Service
 public class FriendRequestService {

@@ -2,10 +2,10 @@ package com.jdrbibli.authservice.dto;
 
 /**
  * Représente la requête de connexion (login) d'un utilisateur.
- * <p>
+ * 
  * Contient le pseudo et le mot de passe nécessaires pour l'authentification.
  * Utilisé par AuthController pour valider les informations de connexion.
- * </p>
+ * 
  */
 public class LoginRequest {
 

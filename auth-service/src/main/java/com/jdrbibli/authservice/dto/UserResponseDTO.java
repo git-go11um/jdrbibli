@@ -4,10 +4,10 @@ import java.util.Set;
 
 /**
  * DTO représentant la réponse contenant les informations d'un utilisateur.
- * <p>
+ * 
  * Utilisé pour renvoyer les détails d'un utilisateur via les endpoints de l'API AuthService.
  * Contient le pseudo, l'email, l'identifiant et les rôles de l'utilisateur.
- * </p>
+ * 
  */
 public class UserResponseDTO {
 

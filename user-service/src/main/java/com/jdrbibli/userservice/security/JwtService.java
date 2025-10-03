@@ -18,14 +18,14 @@ import java.util.function.Function;
 /**
  * Service de gestion des JSON Web Tokens (JWT).
  * 
- * <p>
+ * 
  * Ce service permet de générer des tokens JWT, d'extraire des informations
  * depuis un token, et de valider un token pour un utilisateur donné.
- * </p>
  * 
- * <p>
+ * 
+ * 
  * Les tokens sont signés avec un secret HMAC et ont une durée de vie configurable.
- * </p>
+ * 
  */
 @Service
 public class JwtService {

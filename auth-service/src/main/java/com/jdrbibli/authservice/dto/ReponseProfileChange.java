@@ -2,10 +2,10 @@ package com.jdrbibli.authservice.dto;
 
 /**
  * Représente la réponse envoyée après une modification du profil utilisateur.
- * <p>
+ * 
  * Contient un message informatif sur le résultat de l'opération et,
  * si applicable, un nouveau token JWT mis à jour après le changement de pseudo ou d'autres informations sensibles.
- * </p>
+ * 
  */
 public class ReponseProfileChange {
 

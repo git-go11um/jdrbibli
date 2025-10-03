@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Contrôleur pour gérer les utilisateurs.
- * <p>
+ * 
  * Fournit des endpoints pour :
  * <ul>
  *     <li>Récupérer un utilisateur par son ID</li>
  *     <li>Supprimer un utilisateur et ses entités associées en cascade</li>
  * </ul>
- * </p>
- * <p>
+ * 
+ * 
  * Utilise {@link UserService} pour la logique métier.
- * </p>
+ * 
  */
 @RestController
 @RequestMapping("/users")

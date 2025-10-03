@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * Gestionnaire global des exceptions pour tout le projet AuthService.
- * <p>
+ * 
  * Grâce à l'annotation @RestControllerAdvice, toutes les exceptions
  * lancées dans les contrôleurs REST sont interceptées ici.
- * </p>
+ * 
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {

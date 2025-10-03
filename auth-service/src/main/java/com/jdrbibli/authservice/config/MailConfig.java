@@ -9,17 +9,17 @@ import java.util.Properties;
 
 /**
  * Configuration du service d'envoi d'e-mails.
- * <p>
+ * 
  * Cette classe fournit un {@link JavaMailSender} configuré pour un serveur SMTP local.
  * Dans le contexte actuel, il s'agit d'un serveur SMTP fictif (Fake SMTP) pour les tests.
- * </p>
+ * 
  */
 @Configuration
 public class MailConfig {
 
     /**
      * Configure et retourne un {@link JavaMailSender}.
-     * <p>
+     * 
      * La configuration utilise :
      * <ul>
      *     <li>Host : localhost</li>

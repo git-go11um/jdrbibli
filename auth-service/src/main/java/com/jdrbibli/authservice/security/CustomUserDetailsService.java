@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service pour charger les informations d'un utilisateur pour Spring Security.
- * <p>
+ * 
  * Implémente UserDetailsService afin que Spring Security puisse récupérer les informations
  * d'authentification (pseudo, mot de passe, rôles) d'un utilisateur.
- * </p>
+ * 
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

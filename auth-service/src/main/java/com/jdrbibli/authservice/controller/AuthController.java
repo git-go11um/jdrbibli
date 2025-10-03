@@ -20,7 +20,7 @@ import java.util.Map;
 
 /**
  * Contrôleur principal pour l'authentification et la gestion des utilisateurs.
- * <p>
+ * 
  * Cette classe expose les endpoints REST pour :
  * <ul>
  *     <li>Inscription et création de compte</li>
@@ -30,12 +30,12 @@ import java.util.Map;
  *     <li>Mise à jour du profil utilisateur</li>
  *     <li>Suppression du compte utilisateur</li>
  * </ul>
- * </p>
- * <p>
+ * 
+ * 
  * Elle communique avec {@link IUserService} pour la logique métier, {@link JwtService} pour les tokens JWT,
  * et utilise {@link WebClient} ou {@link RestTemplate} pour interagir avec d'autres microservices
  * (ex. user-service pour la création de profil).
- * </p>
+ * 
  */
 @RestController
 @RequestMapping("/auth")
@@ -65,7 +65,7 @@ public class AuthController {
 
     /**
      * Endpoint pour inscrire un nouvel utilisateur.
-     * <p>
+     * 
      * Crée l'utilisateur dans auth-service et le profil dans user-service,
      * puis retourne un token JWT et les informations de l'utilisateur.
      *

@@ -16,13 +16,13 @@ import java.io.IOException;
 
 /**
  * Filtre Spring Security exécuté une seule fois par requête.
- * <p>
+ * 
  * Ce filtre intercepte chaque requête HTTP pour :
  * 1. Vérifier la présence d'un header "Authorization" avec un JWT.
  * 2. Extraire le pseudo de l'utilisateur depuis le JWT.
  * 3. Charger les informations de l'utilisateur via CustomUserDetailsService.
  * 4. Remplir le SecurityContext si le JWT est valide.
- * </p>
+ * 
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

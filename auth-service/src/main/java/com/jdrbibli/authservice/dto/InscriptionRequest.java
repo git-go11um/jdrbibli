@@ -5,13 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * Représente la requête d'inscription d'un nouvel utilisateur.
- * <p>
+ * 
  * Contient les informations nécessaires pour créer un compte utilisateur dans
  * auth-service.
  * Les annotations de validation permettent de s'assurer que les champs
  * obligatoires
  * sont fournis et que l'email est valide.
- * </p>
+ * 
  */
 public class InscriptionRequest {
 

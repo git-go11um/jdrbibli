@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 
 /**
  * Service pour la gestion des profils utilisateurs.
- * <p>
+ * 
  * Permet la création, la mise à jour et la suppression des profils,
  * la gestion des avatars, et la récupération des amis et des ouvrages.
- * </p>
+ * 
  */
 @Service
 public class UserProfileService {
