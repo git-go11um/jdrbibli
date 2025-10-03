@@ -2,51 +2,68 @@
 
     <!-- Chargement -->
     <div *ngIf="loading" class="loading">Chargement en cours...</div>
-
+  
     <!-- Erreur -->
     <div *ngIf="!loading && errorMessage" class="error">{{ errorMessage }}</div>
-
-    <!-- Détails de l'ouvrage -->
-    <div *ngIf="!loading && ouvrage" class="detail-container">
-
-        <div class="left-column">
-            <!-- Nom de la gamme cliquable -->
-            <div *ngIf="ouvrage.gammeNom" class="gamme-link">
-                <span (click)="revenirALaGamme()">{{ ouvrage.gammeNom }}</span>
-            </div>
-
-            <!-- Image de l'ouvrage -->
-            <div *ngIf="ouvrage.imageUrl" class="ouvrage-image">
-                <img [src]="'http://localhost:8083' + ouvrage.imageUrl" alt="{{ ouvrage.titre || 'Ouvrage' }}" />
-            </div>
-
-            <h2>{{ ouvrage.titre }}</h2>
-
-            <div class="info-row"><strong>Description :</strong> {{ ouvrage.description || 'Non renseigné' }}</div>
-            <div class="info-row"><strong>Version :</strong> {{ ouvrage.version || 'Non renseigné' }}</div>
-            <div class="info-row"><strong>Type :</strong> {{ ouvrage.typeOuvrage || 'Non renseigné' }}</div>
-            <div class="info-row"><strong>Langue :</strong> {{ ouvrage.langue || 'Non renseigné' }}</div>
-            <div class="info-row"><strong>Éditeur :</strong> {{ ouvrage.editeur || 'Non renseigné' }}</div>
-            <div class="info-row"><strong>État :</strong> {{ ouvrage.etat || 'Non renseigné' }}</div>
-            <div class="info-row" *ngIf="ouvrage.isbn"><strong>ISBN :</strong> {{ ouvrage.isbn }}</div>
-            <div class="info-row" *ngIf="ouvrage.pret != null"><strong>Prêt :</strong> {{ ouvrage.pret ? 'Oui' : 'Non'
-                }}</div>
-            <div class="info-row" *ngIf="ouvrage.errata"><strong>Errata :</strong> {{ ouvrage.errata }}</div>
-            <div class="info-row" *ngIf="ouvrage.notes"><strong>Notes :</strong> {{ ouvrage.notes }}</div>
-
-            <div *ngIf="ouvrage.scenariosContenus?.length" class="info-row scenarios">
-                <strong>Scénarios contenus :</strong>
-                <ul>
-                    <li *ngFor="let sc of ouvrage.scenariosContenus">{{ sc }}</li>
-                </ul>
-            </div>
-
-            <!-- Bouton retour à la gamme -->
-            <button class="back-button" *ngIf="gammeId" (click)="revenirALaGamme()">
-                Retour à la gamme
-            </button>
-
+  
+    <!-- Conteneur principal des colonnes -->
+    <div *ngIf="!loading && ouvrage" class="columns-container">
+  
+      <!-- Colonne gauche : infos de l’ouvrage -->
+      <div class="detail-left box">
+        <!-- Nom de la gamme cliquable -->
+        <div *ngIf="ouvrage.gammeNom" class="gamme-link">
+          <span (click)="revenirALaGamme()">{{ ouvrage.gammeNom }}</span>
         </div>
-
+  
+        <!-- Image de l'ouvrage -->
+        <div *ngIf="ouvrage.imageUrl" class="ouvrage-image">
+          <img [src]="'http://localhost:8083' + ouvrage.imageUrl" alt="{{ ouvrage.titre || 'Ouvrage' }}" />
+        </div>
+  
+        <h2>{{ ouvrage.titre }}</h2>
+  
+        <div class="info-row"><strong>Description :</strong> {{ ouvrage.description || 'Non renseigné' }}</div>
+        <div class="info-row"><strong>Version :</strong> {{ ouvrage.version || 'Non renseigné' }}</div>
+        <div class="info-row"><strong>Type :</strong> {{ ouvrage.typeOuvrage || 'Non renseigné' }}</div>
+        <div class="info-row"><strong>Langue :</strong> {{ ouvrage.langue || 'Non renseigné' }}</div>
+        <div class="info-row"><strong>Éditeur :</strong> {{ ouvrage.editeur || 'Non renseigné' }}</div>
+        <div class="info-row"><strong>État :</strong> {{ ouvrage.etat || 'Non renseigné' }}</div>
+        <div class="info-row" *ngIf="ouvrage.isbn"><strong>ISBN :</strong> {{ ouvrage.isbn }}</div>
+        <div class="info-row" *ngIf="ouvrage.pret != null"><strong>Prêt :</strong> {{ ouvrage.pret ? 'Oui' : 'Non' }}</div>
+        <div class="info-row" *ngIf="ouvrage.errata"><strong>Errata :</strong> {{ ouvrage.errata }}</div>
+        <div class="info-row" *ngIf="ouvrage.notes"><strong>Notes :</strong> {{ ouvrage.notes }}</div>
+  
+        <div *ngIf="ouvrage.scenariosContenus?.length" class="info-row scenarios">
+          <strong>Scénarios contenus :</strong>
+          <ul>
+            <li *ngFor="let sc of ouvrage.scenariosContenus">{{ sc }}</li>
+          </ul>
+        </div>
+  
+        <!-- Bouton retour à la gamme -->
+        <button class="back-button" *ngIf="gammeId" (click)="revenirALaGamme()">
+          Retour à la gamme
+        </button>
+      </div>
+  
+      <!-- Colonne droite : autres ouvrages -->
+      <div class="detail-right box">
+        <section class="autres-ouvrages">
+          <h3>Autres ouvrages de la gamme</h3>
+          <ul *ngIf="ouvragesGamme?.length; else noOthers">
+            <li *ngFor="let autre of ouvragesGamme">
+              <button class="other-book-btn" (click)="ouvrirPageOuvrageAmi(autre.id!)">
+                {{ autre.titre }}
+              </button>
+            </li>
+          </ul>
+          <ng-template #noOthers>
+            <p>Aucun autre ouvrage dans cette gamme pour l'instant.</p>
+          </ng-template>
+        </section>
+      </div>
+  
     </div>
-</div>
+  </div>
+  

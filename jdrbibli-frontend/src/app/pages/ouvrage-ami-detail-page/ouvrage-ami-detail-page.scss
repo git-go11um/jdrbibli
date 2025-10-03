@@ -1,46 +1,49 @@
 .ouvrage-ami-detail-page {
-    background-color: #EBF2FA; /* Fond bleu clair */
+    background-color: #EBF2FA; 
     min-height: 100vh;
     padding: 1.5rem;
   
-    .detail-container {
-      background-color: #ffffff; /* Boîte blanche */
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      margin: 0 auto;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-  
-    .loading,
-    .error {
+    .loading, .error {
       text-align: center;
       margin: 2rem 0;
       font-size: 1.2rem;
     }
   
-    .error {
-      color: red;
-    }
+    .error { color: red; }
   
-    .left-column {
+    .columns-container {
       display: flex;
       flex-direction: column;
+      gap: 1.5rem;
+    }
   
-      .gamme-link {
-        font-size: 1.5rem;
-        color: #1a73e8;
-        cursor: pointer;
-        text-decoration: underline;
-        margin-bottom: 0.5rem;
+    .box {
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      width: 100%;
+    }
   
-        &:hover {
-          color: #155db2;
-        }
+    /* Colonnes côté à côte sur desktop */
+    @media (min-width: 1025px) {
+      .columns-container {
+        flex-direction: row;
+        gap: 2rem;
       }
+      .detail-left, .detail-right {
+        flex: 1;
+      }
+    }
   
+    /* Mobile / Tablette : colonnes empilées */
+    @media (max-width: 1024px) {
+      .columns-container {
+        flex-direction: column;
+      }
+    }
+  
+    .detail-left {
       .ouvrage-image img {
         width: 100%;
         max-width: 300px;
@@ -49,66 +52,65 @@
         margin-bottom: 1rem;
       }
   
-      h2 {
-        font-size: 1.6rem;
-        margin-bottom: 0.5rem;
-      }
-  
-      .info-row {
-        margin: 0.5rem 0;
-        font-size: 0.95rem;
-  
-        ul {
-          margin: 0.25rem 0 0 1rem;
-        }
-      }
-  
       .back-button {
         margin-top: 1rem;
-        align-self: flex-start;
         padding: 0.5rem 1rem;
         border: none;
         border-radius: 4px;
-        background-color: #679436; /* Vert */
+        background-color: #679436;
         color: white;
         font-weight: 600;
         cursor: pointer;
         transition: background-color 0.25s;
   
-        &:hover {
-          background-color: #50712a;
+        &:hover { background-color: #50712a; }
+      }
+    }
+    .detail-right {
+        .autres-ouvrages {
+          h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+          }
+      
+          ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem; // espace vertical entre les boutons
+          }
+      
+          li {
+            display: flex;
+            justify-content: flex-start; // aligne les boutons à gauche
+          }
+      
+          .other-book-btn {
+            max-width: 200px;       // largeur max des boutons
+            width: 100%;            // mais remplissage du li jusqu'à max-width
+            padding: 0.5rem 0.8rem; // hauteur du bouton
+            border: none;
+            border-radius: 4px;
+            background-color: #1a73e8;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.25s;
+      
+            &:hover {
+              background-color: #155db2;
+            }
+          }
+      
+          p {
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+          }
         }
       }
-    }
-  
-    /*======================================
-    =            Responsive                =
-    ======================================*/
-  
-    /* Smartphone */
-    @media (max-width: 600px) {
-      .detail-container {
-        max-width: 100%;
-        padding: 1rem;
-      }
-  
-      .left-column h2 {
-        font-size: 1.3rem;
-      }
-    }
-  
-    /* Tablette */
-    @media (min-width: 601px) and (max-width: 1024px) {
-      .detail-container {
-        max-width: 90%;
-      }
-    }
-  
-    /* Laptop / Desktop */
-    @media (min-width: 1025px) {
-      .detail-container {
-        max-width: 800px;
-      }
-    }
+      
+      
   }
   

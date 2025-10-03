@@ -1,3 +1,10 @@
+.ouvrage-ami-page-wrapper {
+    min-height: 100vh;
+    background-color: #EBF2FA; // fond bleu clair
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1.5rem;
 .ouvrage-ami-page {
     padding: 1rem;
 
@@ -68,7 +75,7 @@
         }
     }
 }
-
+}
 /*======================================
 =            Responsive                =
 ======================================*/
