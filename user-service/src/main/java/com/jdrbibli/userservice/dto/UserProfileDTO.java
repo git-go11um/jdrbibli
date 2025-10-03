@@ -2,7 +2,7 @@ package com.jdrbibli.userservice.dto;
 
 /**
  * Data Transfer Object représentant un profil utilisateur.
- * <p>
+ * 
  * Contient l'identifiant, le pseudo, l'email et l'URL de l'avatar.
  */
 public class UserProfileDTO {

@@ -8,17 +8,17 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 /**
  * Configuration CORS pour le gateway-service.
- * <p>
+ * 
  * Cette classe définit les règles CORS (Cross-Origin Resource Sharing) permettant
  * au frontend Angular (http://localhost:4200) d'accéder aux endpoints du gateway.
- * <p>
+ * 
  * Elle autorise :
  * <ul>
  *   <li>tous les headers</li>
  *   <li>tous les types de méthodes HTTP</li>
  *   <li>l'envoi de cookies et d'informations d'authentification</li>
  * </ul>
- * <p>
+ * 
  * Les règles sont appliquées à toutes les routes (/**).
  */
 @Configuration

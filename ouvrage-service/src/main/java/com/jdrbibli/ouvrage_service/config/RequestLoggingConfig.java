@@ -6,14 +6,14 @@ import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 /**
  * Configuration du logging des requêtes HTTP pour le microservice {@code ouvrage-service}.
- * <p>
+ * 
  * Cette classe crée un {@link CommonsRequestLoggingFilter} pour enregistrer dans les logs :
  * <ul>
  *   <li>Les informations du client (adresse IP, session, etc.)</li>
  *   <li>La query string de la requête</li>
  *   <li>Le corps de la requête (payload) jusqu'à 10 000 caractères</li>
  * </ul>
- * <p>
+ * 
  * Les headers HTTP ne sont pas inclus dans les logs pour éviter d'exposer des informations sensibles.
  * Ce filtre est utile pour le debug et le suivi des requêtes entrantes.
  */

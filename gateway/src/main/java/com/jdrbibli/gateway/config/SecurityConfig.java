@@ -11,10 +11,10 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 /**
  * Configuration de sécurité du gateway-service.
- * <p>
+ * 
  * Cette classe définit les règles de sécurité pour toutes les requêtes HTTP
  * entrantes dans le gateway. 
- * <p>
+ * 
  * Elle utilise Spring WebFlux Security et configure notamment :
  * <ul>
  *   <li>Désactivation du CSRF (non nécessaire pour une API REST sécurisée par JWT)</li>
@@ -22,7 +22,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
  *   <li>Autorisation des routes publiques comme /login, /register et /password-reset/**</li>
  *   <li>Désactivation de l'authentification HTTP Basic et du formulaire de login</li>
  * </ul>
- * <p>
+ * 
  * ⚠️ Actuellement, le gateway ne valide plus aucun JWT et laisse passer toutes les requêtes.
  */
 @Configuration

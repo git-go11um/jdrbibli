@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Point d'entrée principal du microservice Ouvrage-Service.
- * <p>
+ * 
  * Cette classe démarre l'application Spring Boot et initialise le contexte.
  */
 @SpringBootApplication

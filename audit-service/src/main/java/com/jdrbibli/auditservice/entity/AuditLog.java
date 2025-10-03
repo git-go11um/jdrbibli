@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 /**
  * Représente un log d'audit stocké dans MongoDB.
- * <p>
+ * 
  * Chaque log correspond à une action effectuée par un service
  * dans l'écosystème JdrBibli (ex. mise à jour d'utilisateur, suppression de
  * ressource).

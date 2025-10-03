@@ -6,11 +6,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Configuration MVC pour le microservice {@code ouvrage-service}.
- * <p>
+ * 
  * Cette classe permet de configurer le mapping des ressources statiques accessibles via HTTP.
  * Actuellement, elle configure un {@link ResourceHandlerRegistry} pour exposer les images
  * stockées localement dans le dossier {@code uploads/images}.
- * <p>
+ * 
  * Exemple :
  * <ul>
  *   <li>Une image sauvegardée dans {@code uploads/images/mon_image.jpg} sera accessible via

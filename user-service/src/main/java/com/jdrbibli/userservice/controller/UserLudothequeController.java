@@ -11,7 +11,7 @@ import java.util.Optional;
 
 /**
  * Contrôleur pour gérer la ludothèque d'un utilisateur.
- * <p>
+ * 
  * Permet d'ajouter ou de retirer des ouvrages de la ludothèque
  * d'un utilisateur spécifique.
  */

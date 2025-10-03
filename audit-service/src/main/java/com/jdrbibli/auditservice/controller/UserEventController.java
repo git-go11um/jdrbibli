@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Contrôleur REST permettant de gérer les événements liés aux utilisateurs.
- * <p>
+ * 
  * Un {@link UserEvent} représente une action spécifique effectuée par un utilisateur
  * (ex. connexion, changement de mot de passe, modification de profil, etc.).
  * Ce contrôleur expose des endpoints pour :

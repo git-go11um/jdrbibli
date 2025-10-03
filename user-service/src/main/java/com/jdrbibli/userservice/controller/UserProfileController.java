@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Contrôleur REST pour la gestion des profils utilisateurs.
- * <p>
+ * 
  * Permet de créer, lire, mettre à jour et supprimer des utilisateurs,
  * gérer les avatars, rechercher par pseudo, et vérifier les relations d'amitié.
  */

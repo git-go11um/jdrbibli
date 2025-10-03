@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Configuration des routes pour le gateway-service.
- * <p>
+ * 
  * Cette classe définit comment les requêtes entrantes sont routées vers les microservices
  * correspondants. Elle utilise le {@link RouteLocatorBuilder} de Spring Cloud Gateway.
- * <p>
+ * 
  * Exemple : toutes les requêtes commençant par {@code /api/auth/**} sont redirigées
  * vers le microservice {@code auth-service} sur {@code http://localhost:8081}, 
  * en supprimant le préfixe {@code /api}.

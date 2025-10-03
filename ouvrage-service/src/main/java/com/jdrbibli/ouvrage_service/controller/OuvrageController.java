@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * Contrôleur REST pour gérer les {@link Ouvrage} dans le microservice {@code ouvrage-service}.
- * <p>
+ * 
  * Fournit des endpoints pour :
  * <ul>
  *   <li>Récupérer tous les ouvrages d'un utilisateur</li>

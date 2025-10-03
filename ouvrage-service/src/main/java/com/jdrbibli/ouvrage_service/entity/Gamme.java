@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 /**
  * Entité représentant une Gamme d'ouvrages.
- * <p>
+ * 
  * Une Gamme est possédée par un utilisateur (ownerId) et contient une liste d'ouvrages associés.
  * La relation avec les ouvrages est de type OneToMany, avec suppression en cascade et orphanRemoval activé.
  */

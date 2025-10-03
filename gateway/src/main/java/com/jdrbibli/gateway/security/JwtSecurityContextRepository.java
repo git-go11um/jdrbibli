@@ -10,10 +10,10 @@ import reactor.core.publisher.Mono;
 
 /**
  * Repository de contexte de sécurité pour Spring WebFlux utilisant JWT.
- * <p>
+ * 
  * Implémente {@link ServerSecurityContextRepository} pour charger le {@link SecurityContext}
  * à partir d'un JWT présent dans le header {@code Authorization} de la requête.
- * <p>
+ * 
  * ⚠️ Actuellement, le gateway ne valide plus les JWT, mais cette classe est prête
  * pour la réactivation de l'authentification basée sur JWT.
  */

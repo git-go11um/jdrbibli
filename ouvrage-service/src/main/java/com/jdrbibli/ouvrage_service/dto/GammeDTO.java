@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Data Transfer Object représentant une {@link com.jdrbibli.ouvrage_service.entity.Gamme}.
- * <p>
+ * 
  * Utilisé pour transférer les données de la gamme entre le backend et le frontend,
  * incluant la liste des {@link OuvrageDTO} associés.
  */

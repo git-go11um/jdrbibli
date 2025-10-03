@@ -348,7 +348,7 @@ public class UserService implements IUserService {
 
     /**
      * Met à jour le profil d'un utilisateur (pseudo et/ou e-mail).
-     * <p>
+     * 
      * Si aucun changement n'est détecté, retourne une réponse indiquant
      * qu'aucune modification n'a été effectuée. Si un changement est appliqué,
      * le profil est mis à jour en base de données, synchronisé avec le
@@ -421,7 +421,7 @@ public class UserService implements IUserService {
 
     /**
      * Change le mot de passe d'un utilisateur identifié par son pseudo.
-     * <p>
+     * 
      * Vérifie que :
      * <ul>
      * <li>le nouveau mot de passe et sa confirmation correspondent</li>
@@ -468,7 +468,7 @@ public class UserService implements IUserService {
 
     /**
      * Crée un profil utilisateur dans le microservice {@code user-service}.
-     * <p>
+     * 
      * Le profil est créé avec les informations fournies (id, pseudo, e-mail).
      * L'appel se fait via {@link RestTemplate} avec un jeton JWT généré
      * pour garantir l'authentification.
@@ -526,7 +526,7 @@ public class UserService implements IUserService {
 
     /**
      * Convertit une entité {@link User} en un objet {@link UserResponseDTO}.
-     * <p>
+     * 
      * L'objet retourné contient les informations principales de l'utilisateur
      * (id, pseudo, e-mail) ainsi que l'ensemble de ses rôles.
      *

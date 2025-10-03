@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * Point d'entrée principal du microservice {@code auth-service}.
- * <p>
+ * 
  * Cette classe configure et lance l'application Spring Boot.
  * Elle active également :
  * <ul>
@@ -16,7 +16,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * <li>la gestion des dépôts JPA grâce à {@link EnableJpaRepositories}</li>
  * <li>le scan des entités JPA via {@link EntityScan}</li>
  * </ul>
- * <p>
+ * 
  * Le microservice gère l'authentification et la gestion des utilisateurs
  * (inscription, connexion, réinitialisation de mot de passe, etc.).
  */

@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Service métier pour la gestion des événements utilisateur.
- * <p>
+ * 
  * Fournit des méthodes pour enregistrer et récupérer les {@link UserEvent}.
  * Ce service centralise la logique métier liée aux actions des utilisateurs
  * et encapsule l'accès au {@link UserEventRepository}.

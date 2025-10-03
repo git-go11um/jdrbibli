@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Contrôleur REST permettant de gérer les journaux d'audit.
- * <p>
+ * 
  * Les journaux d'audit enregistrent les actions effectuées
  * dans les différents microservices du projet JdrBibli.
  * Ce contrôleur fournit des endpoints pour :

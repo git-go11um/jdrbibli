@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * Fournisseur de tokens JWT pour l'authentification.
- * <p>
+ * 
  * Cette classe permet de générer, valider et lire les informations contenues
  * dans un token JWT. Les tokens expirent après une durée définie (24 heures).
  */
@@ -55,7 +55,7 @@ public class JwtTokenProvider {
 
     /**
      * Vérifie si un token JWT est valide.
-     * <p>
+     * 
      * Le token est considéré valide s'il peut être parsé et si sa date
      * d'expiration n'est pas dépassée.
      *

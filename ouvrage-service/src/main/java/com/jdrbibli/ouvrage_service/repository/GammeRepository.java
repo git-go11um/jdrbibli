@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Repository pour l'entité {@link Gamme}.
- * <p>
+ * 
  * Fournit des méthodes pour accéder et manipuler les gammes dans la base de données.
  * Hérite de {@link JpaRepository} pour bénéficier des opérations CRUD standards.
  */

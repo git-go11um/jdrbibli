@@ -2,7 +2,7 @@ package com.jdrbibli.userservice.dto;
 
 /**
  * Data Transfer Object représentant un ami.
- * <p>
+ * 
  * Contient les informations essentielles pour exposer un utilisateur
  * dans le contexte des relations d'amitié.
  */

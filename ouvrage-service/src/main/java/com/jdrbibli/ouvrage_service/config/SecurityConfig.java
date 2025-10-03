@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * Configuration de la sécurité pour le microservice {@code ouvrage-service}.
- * <p>
+ * 
  * Cette classe configure Spring Security pour gérer :
  * <ul>
  *   <li>L'authentification via JWT avec {@link JwtAuthenticationFilter} et {@link JwtTokenProvider}</li>
@@ -30,7 +30,7 @@ import java.util.List;
  *   <li>La configuration CORS pour autoriser le front Angular sur localhost:4200</li>
  *   <li>La désactivation de CSRF pour les requêtes API REST</li>
  * </ul>
- * <p>
+ * 
  * Les endpoints liés aux ouvrages et gammes sont actuellement ouverts à tous les accès.
  */
 @Configuration

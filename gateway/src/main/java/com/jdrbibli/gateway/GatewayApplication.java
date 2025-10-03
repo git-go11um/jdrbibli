@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Point d'entrée principal du microservice {@code gateway-service}.
- * <p>
+ * 
  * Cette classe configure et lance l'application Spring Boot.
  * Le gateway-service agit comme point d'entrée unique pour tous les autres microservices
  * du projet JdrBibli, en gérant :
@@ -14,7 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *   <li>la sécurité via JWT (si activée)</li>
  *   <li>la configuration CORS et les filtres globaux</li>
  * </ul>
- * <p>
+ * 
  * Elle active la configuration automatique Spring Boot et démarre le contexte de l'application.
  */
 @SpringBootApplication

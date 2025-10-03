@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Mapper pour convertir entre l'entité {@link Ouvrage} et son DTO {@link OuvrageDTO}.
- * <p>
+ * 
  * Permet de transformer une entité Ouvrage en DTO pour l'API, et inversement.
  * Gère également la conversion des listes JSON stockées dans la base pour les scénarios contenus.
  */

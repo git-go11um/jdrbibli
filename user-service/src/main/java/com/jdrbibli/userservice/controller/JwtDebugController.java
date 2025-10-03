@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Contrôleur de test pour vérifier et déboguer les JWT.
- * <p>
+ * 
  * Fournit un endpoint pour tester la validité d'un token et extraire le pseudo associé.
  */
 @RestController

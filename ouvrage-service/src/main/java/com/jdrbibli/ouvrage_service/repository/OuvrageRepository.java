@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /**
  * Repository pour l'entité {@link Ouvrage}.
- * <p>
+ * 
  * Fournit des méthodes pour accéder et manipuler les ouvrages dans la base de données.
  * Hérite de {@link JpaRepository} pour bénéficier des opérations CRUD standards.
  */

@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * Filtre global pour logger les requêtes entrantes dans le gateway-service.
- * <p>
+ * 
  * Ce {@link WebFilter} intercepte toutes les requêtes HTTP avant qu'elles ne soient routées
  * vers les microservices et affiche dans la console :
  * <ul>
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
  *   <li>le header Authorization (JWT si présent)</li>
  *   <li>le header X-User-Id (identifiant de l'utilisateur si présent)</li>
  * </ul>
- * <p>
+ * 
  * Le filtre est exécuté avec une priorité {@link Order} égale à 1.
  */
 @Component

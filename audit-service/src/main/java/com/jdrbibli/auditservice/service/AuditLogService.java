@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Service métier pour la gestion des logs d'audit.
- * <p>
+ * 
  * Fournit des méthodes pour créer, sauvegarder et récupérer les {@link AuditLog}.
  * Ce service encapsule l'accès au {@link AuditLogRepository} et centralise la logique
  * métier liée aux logs d'audit.

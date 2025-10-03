@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * Service pour gérer les opérations sur les {@link Ouvrage}.
- * <p>
+ * 
  * Ce service fournit des méthodes pour créer, mettre à jour, supprimer et récupérer des ouvrages,
  * ainsi que pour récupérer des ouvrages associés à une gamme spécifique.
  */

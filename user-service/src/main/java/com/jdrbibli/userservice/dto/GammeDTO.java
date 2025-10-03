@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Data Transfer Object représentant une gamme.
- * <p>
+ * 
  * Une gamme contient un identifiant, un titre et une liste d'ouvrages associés.
  */
 public class GammeDTO {

@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * Gestionnaire global des exceptions pour le microservice ouvrage-service.
- * <p>
+ * 
  * Capture les exceptions et retourne un corps JSON standard avec timestamp, statut, type et message.
  */
 @ControllerAdvice

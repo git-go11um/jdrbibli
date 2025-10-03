@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Mapper pour convertir entre l'entité {@link Gamme} et son DTO {@link GammeDTO}.
- * <p>
+ * 
  * Permet de transformer une entité Gamme en DTO pour l'API, et inversement.
  * Inclut également le mapping des ouvrages associés via {@link OuvrageMapper}.
  */

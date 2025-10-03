@@ -7,7 +7,7 @@ import java.time.Instant;
 
 /**
  * Représente un événement généré par un utilisateur dans le système JdrBibli.
- * <p>
+ * 
  * Chaque {@link UserEvent} correspond à une action effectuée par un utilisateur
  * (ex. connexion, changement de mot de passe, modification de profil,
  * suppression de ressource).

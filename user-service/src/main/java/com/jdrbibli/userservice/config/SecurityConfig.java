@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Configuration de sécurité pour le microservice User-Service.
- * <p>
+ * 
  * Cette classe configure Spring Security pour :
  * <ul>
  *     <li>Désactiver CSRF</li>

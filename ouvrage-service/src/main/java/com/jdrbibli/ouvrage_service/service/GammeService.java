@@ -12,7 +12,7 @@ import java.util.Optional;
 
 /**
  * Service pour gérer les opérations sur les {@link Gamme}.
- * <p>
+ * 
  * Ce service fournit des méthodes pour créer, lire, mettre à jour et supprimer
  * des gammes, ainsi que pour récupérer toutes les gammes appartenant à un utilisateur.
  */
@@ -55,7 +55,7 @@ public class GammeService {
 
     /**
      * Sauvegarde une gamme.
-     * <p>
+     * 
      * Vérifie que l'identifiant du propriétaire est défini avant la sauvegarde.
      *
      * @param gamme la gamme à sauvegarder
@@ -71,7 +71,7 @@ public class GammeService {
 
     /**
      * Supprime une gamme par son identifiant.
-     * <p>
+     * 
      * Si {@code force} est false et que la gamme contient des ouvrages, une
      * exception est levée. Sinon, la gamme et ses ouvrages associés (via cascade) sont supprimés.
      *

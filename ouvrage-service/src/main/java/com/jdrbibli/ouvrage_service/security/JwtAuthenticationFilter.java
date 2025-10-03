@@ -16,7 +16,7 @@ import java.io.IOException;
 
 /**
  * Filtre Spring Security pour l'authentification JWT.
- * <p>
+ * 
  * Ce filtre intercepte chaque requête HTTP et vérifie la présence d'un token JWT
  * dans l'en-tête "Authorization". Si le token est valide, il crée un objet d'authentification
  * et le place dans le contexte de sécurité Spring.

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service de gestion des utilisateurs pour Spring Security.
- * <p>
+ * 
  * Implémente {@link UserDetailsService} pour fournir les informations d'authentification
  * nécessaires à Spring Security lors du login.
- * <p>
+ * 
  * Cette implémentation est un exemple simple avec un utilisateur "admin" codé en dur.
  */
 @Service

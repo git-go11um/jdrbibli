@@ -15,11 +15,11 @@ import java.util.Collections;
 
 /**
  * Gestionnaire d'authentification réactif pour valider les tokens JWT.
- * <p>
+ * 
  * Implémente {@link ReactiveAuthenticationManager} pour Spring Security WebFlux.
  * Cette classe décode et valide les JWT afin d'extraire le nom d'utilisateur
  * et créer un objet {@link Authentication}.
- * <p>
+ * 
  * ⚠️ Actuellement, le gateway ne l'utilise plus car la validation JWT est désactivée.
  */
 public class JwtAuthenticationManager implements ReactiveAuthenticationManager {

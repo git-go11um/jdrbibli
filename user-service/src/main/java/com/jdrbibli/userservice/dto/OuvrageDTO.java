@@ -2,7 +2,7 @@ package com.jdrbibli.userservice.dto;
 
 /**
  * Data Transfer Object représentant un ouvrage.
- * <p>
+ * 
  * Contient un identifiant unique et un titre.
  */
 public class OuvrageDTO {

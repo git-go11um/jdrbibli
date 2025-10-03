@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 /**
  * Data Transfer Object représentant une demande d'amitié entre deux utilisateurs.
- * <p>
+ * 
  * Contient les informations sur l'expéditeur, le destinataire, le statut de la demande,
  * ainsi que les dates de création et de réponse.
  */

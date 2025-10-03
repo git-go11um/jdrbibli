@@ -2,7 +2,7 @@ package com.jdrbibli.authservice.util;
 
 /**
  * Utilitaire de validation des mots de passe.
- * <p>
+ * 
  * Cette classe fournit une méthode statique {@link #validate(String)} qui
  * permet de vérifier
  * qu'un mot de passe respecte un ensemble de règles de sécurité minimales :

@@ -11,7 +11,7 @@ import jakarta.persistence.*;
 
 /**
  * Entité représentant un Ouvrage.
- * <p>
+ * 
  * Un Ouvrage appartient à une Gamme et possède diverses informations comme le titre, la description,
  * l'éditeur, la date de publication, ainsi que des relations vers d'autres ouvrages ou scénarios.
  * Certains champs comme {@link #scenariosContenus} sont stockés en JSON et exposés via des méthodes utilitaires.
@@ -82,7 +82,7 @@ public class Ouvrage {
 
     /**
      * Contenu des scénarios sous forme JSON stocké en base.
-     * <p>
+     * 
      * Utiliser {@link #getScenariosContenusList()} et {@link #setScenariosContenusList(List)} pour
      * manipuler la liste de scénarios directement.
      */

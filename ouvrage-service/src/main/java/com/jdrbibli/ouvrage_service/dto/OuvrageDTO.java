@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Data Transfer Object représentant un {@link com.jdrbibli.ouvrage_service.entity.Ouvrage}.
- * <p>
+ * 
  * Utilisé pour transférer les informations d'un ouvrage entre le backend et le frontend.
  * Contient toutes les informations descriptives, de publication, de relation à la gamme et à d'autres ouvrages,
  * ainsi que l'état de prêt et les liens vers les images.

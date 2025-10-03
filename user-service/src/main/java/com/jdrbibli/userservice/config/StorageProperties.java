@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Propriétés de configuration pour le stockage des avatars utilisateur.
- * <p>
+ * 
  * Cette classe permet de lier la propriété YAML/Properties {@code user.avatar.uploadDir}
  * à la variable {@link #uploadDir}. Elle définit le répertoire dans lequel
  * les fichiers avatars seront uploadés.

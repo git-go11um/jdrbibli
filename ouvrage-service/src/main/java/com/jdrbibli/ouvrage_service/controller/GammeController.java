@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 /**
  * Contrôleur REST pour gérer les {@link Gamme} dans le microservice {@code ouvrage-service}.
- * <p>
+ * 
  * Fournit des endpoints pour :
  * <ul>
  *   <li>Récupérer toutes les gammes d'un utilisateur</li>

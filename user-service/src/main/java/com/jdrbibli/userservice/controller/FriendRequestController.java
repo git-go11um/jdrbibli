@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  * Contrôleur REST pour gérer les demandes d'amitié et la liste d'amis.
- * <p>
+ * 
  * Fournit des endpoints pour envoyer, accepter, rejeter des demandes d'amitié,
  * supprimer des amis, lister les amis et accéder aux ouvrages d'un ami.
  */
