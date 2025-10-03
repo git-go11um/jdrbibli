@@ -2,7 +2,7 @@
 
     <h2>Ouvrages de la gamme</h2>
 
-    <button (click)="retourLudothequeAmi()">← Retour à la ludothèque de l’ami</button>
+    <button (click)="retourLudothequeAmi()">Retour à la ludothèque de l’ami</button>
 
     <div *ngIf="loading" class="loading">Chargement...</div>
 
@@ -11,7 +11,7 @@
     <div *ngIf="!loading && !errorMessage && ouvrages.length > 0" class="ouvrages-list">
         <div *ngFor="let ouvrage of ouvrages" class="ouvrage-card">
             <h3>{{ ouvrage.titre || 'Titre non renseigné' }}</h3>
-            <p *ngIf="ouvrage.description"><strong>Description :</strong> {{ ouvrage.description }}</p>
+            
 
             <button (click)="ouvrirDetail(ouvrage.id!)">Voir plus de détails</button>
         </div>
