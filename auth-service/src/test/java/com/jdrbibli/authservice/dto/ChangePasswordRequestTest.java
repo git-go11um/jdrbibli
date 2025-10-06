@@ -1,19 +1,18 @@
-/* package com.jdrbibli.authservice.dto;
+package com.jdrbibli.authservice.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class ChangePasswordRequestTest {
+class ChangePasswordRequestTest {
 
     @Test
-    void testGettersAndSetters() {
+    void settersAndGetters_shouldWorkCorrectly() {
         ChangePasswordRequest request = new ChangePasswordRequest();
 
-        request.setNewPassword("newPass123");
-        request.setConfirmNewPassword("newPass123");
+        request.setNewPassword("newPass");
+        request.setConfirmNewPassword("newPass");
 
-        assertEquals("newPass123", request.getNewPassword());
-        assertEquals("newPass123", request.getConfirmNewPassword());
+        assertThat(request.getNewPassword()).isEqualTo("newPass");
+        assertThat(request.getConfirmNewPassword()).isEqualTo("newPass");
     }
 }
- */

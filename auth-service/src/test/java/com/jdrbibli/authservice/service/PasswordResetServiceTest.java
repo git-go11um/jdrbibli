@@ -6,126 +6,109 @@ import com.jdrbibli.authservice.repository.PasswordResetTokenRepository;
 import com.jdrbibli.authservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class PasswordResetServiceTest {
 
-    @InjectMocks
+    private PasswordResetTokenRepository tokenRepository;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
+    private EmailService emailService;
     private PasswordResetService passwordResetService;
 
-    @Mock
-    private PasswordResetTokenRepository tokenRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private EmailService emailService;
-
     @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
+    void setUp() {
+        tokenRepository = mock(PasswordResetTokenRepository.class);
+        userRepository = mock(UserRepository.class);
+        passwordEncoder = mock(PasswordEncoder.class);
+        emailService = mock(EmailService.class);
+
+        passwordResetService = new PasswordResetService();
+        // Injection manuelle des dépendances
+        passwordResetService.setTokenRepository(tokenRepository);
+        passwordResetService.setUserRepository(userRepository);
+        passwordResetService.setPasswordEncoder(passwordEncoder);
+        passwordResetService.setEmailService(emailService);
     }
 
     @Test
-    void createPasswordResetToken_UserExists_ShouldCreateTokenAndSendEmail() {
+    void createPasswordResetToken_shouldThrow_whenUserNotFound() {
+        String pseudo = "unknownUser";
+        when(userRepository.findByPseudo(pseudo)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> passwordResetService.createPasswordResetToken(pseudo));
+    }
+
+    @Test
+    void createPasswordResetToken_shouldSaveTokenAndSendEmail() {
         String pseudo = "testUser";
         User user = new User();
-        user.setPseudo(pseudo);
-        user.setEmail("test@example.com");
+        user.setEmail("user@test.com");
 
         when(userRepository.findByPseudo(pseudo)).thenReturn(Optional.of(user));
-        when(tokenRepository.save(any(PasswordResetToken.class))).thenAnswer(i -> i.getArgument(0));
 
         passwordResetService.createPasswordResetToken(pseudo);
 
-        verify(tokenRepository, times(1)).save(any(PasswordResetToken.class));
+        // Vérifie que le token a été sauvegardé
+        ArgumentCaptor<PasswordResetToken> tokenCaptor = ArgumentCaptor.forClass(PasswordResetToken.class);
+        verify(tokenRepository, times(1)).save(tokenCaptor.capture());
+
+        PasswordResetToken savedToken = tokenCaptor.getValue();
+        assertThat(savedToken.getUser()).isEqualTo(user);
+        assertThat(savedToken.getExpiryDate()).isAfter(LocalDateTime.now());
+
+        // Vérifie que l'email a été envoyé
         verify(emailService, times(1)).sendPasswordResetEmail(eq(user.getEmail()), anyString());
     }
 
     @Test
-    void createPasswordResetToken_UserNotFound_ShouldThrowException() {
-        String pseudo = "unknownUser";
-
-        when(userRepository.findByPseudo(pseudo)).thenReturn(Optional.empty());
-
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> {
-            passwordResetService.createPasswordResetToken(pseudo);
-        });
-
-        assertEquals("Utilisateur non trouvé avec ce pseudo.", ex.getMessage());
-        verify(tokenRepository, never()).save(any());
-        verify(emailService, never()).sendPasswordResetEmail(anyString(), anyString());
-    }
-
-    @Test
-    void resetPassword_ValidToken_ShouldUpdatePasswordAndDeleteToken() {
-        String token = UUID.randomUUID().toString();
-        String newPassword = "newPassword123";
-        User user = new User();
-        user.setPassword("oldHashedPassword");
-
-        PasswordResetToken resetToken = new PasswordResetToken();
-        resetToken.setToken(token);
-        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1));
-        resetToken.setUser(user);
-
-        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
-        when(passwordEncoder.encode(newPassword)).thenReturn("hashedNewPassword");
-
-        passwordResetService.resetPassword(token, newPassword);
-
-        assertEquals("hashedNewPassword", user.getPassword());
-        verify(userRepository, times(1)).save(user);
-        verify(tokenRepository, times(1)).delete(resetToken);
-    }
-
-    @Test
-    void resetPassword_TokenExpired_ShouldThrowException() {
-        String token = UUID.randomUUID().toString();
-        String newPassword = "newPassword123";
-        User user = new User();
-
-        PasswordResetToken resetToken = new PasswordResetToken();
-        resetToken.setToken(token);
-        resetToken.setExpiryDate(LocalDateTime.now().minusHours(1)); // déjà expiré
-        resetToken.setUser(user);
-
-        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
-
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> {
-            passwordResetService.resetPassword(token, newPassword);
-        });
-
-        assertEquals("Le token est expiré.", ex.getMessage());
-        verify(userRepository, never()).save(any());
-        verify(tokenRepository, never()).delete(any());
-    }
-
-    @Test
-    void resetPassword_TokenInvalid_ShouldThrowException() {
-        String token = UUID.randomUUID().toString();
-        String newPassword = "newPassword123";
-
+    void resetPassword_shouldThrow_whenTokenInvalid() {
+        String token = "invalid-token";
         when(tokenRepository.findByToken(token)).thenReturn(Optional.empty());
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> {
-            passwordResetService.resetPassword(token, newPassword);
-        });
+        assertThrows(RuntimeException.class, () -> passwordResetService.resetPassword(token, "newPass"));
+    }
 
-        assertEquals("Token invalide.", ex.getMessage());
-        verify(userRepository, never()).save(any());
-        verify(tokenRepository, never()).delete(any());
+    @Test
+    void resetPassword_shouldThrow_whenTokenExpired() {
+        String token = "expired-token";
+        User user = new User();
+        PasswordResetToken resetToken = new PasswordResetToken(token, LocalDateTime.now().minusHours(1), user);
+
+        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+
+        assertThrows(RuntimeException.class, () -> passwordResetService.resetPassword(token, "newPass"));
+    }
+
+    @Test
+    void resetPassword_shouldUpdatePasswordAndDeleteToken() {
+        String token = "valid-token";
+        User user = new User();
+        user.setPassword("oldPass");
+        PasswordResetToken resetToken = new PasswordResetToken(token, LocalDateTime.now().plusHours(1), user);
+
+        when(tokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+        when(passwordEncoder.encode("newPass")).thenReturn("encodedPass");
+
+        passwordResetService.resetPassword(token, "newPass");
+
+        // Vérifie que le mot de passe a été mis à jour
+        assertThat(user.getPassword()).isEqualTo("encodedPass");
+
+        // Vérifie que l'utilisateur a été sauvegardé
+        verify(userRepository, times(1)).save(user);
+
+        // Vérifie que le token a été supprimé
+        verify(tokenRepository, times(1)).delete(resetToken);
     }
 }

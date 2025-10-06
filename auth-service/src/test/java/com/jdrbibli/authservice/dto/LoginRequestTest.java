@@ -1,19 +1,19 @@
-/* package com.jdrbibli.authservice.dto;
+package com.jdrbibli.authservice.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-public class LoginRequestTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+class LoginRequestTest {
 
     @Test
-    void testGettersAndSetters() {
-        LoginRequest loginRequest = new LoginRequest();
+    void gettersAndSetters_shouldWorkCorrectly() {
+        LoginRequest request = new LoginRequest();
 
-        loginRequest.setPseudo("monPseudo");
-        loginRequest.setPassword("monpassword");
+        request.setPseudo("testUser");
+        request.setPassword("password123");
 
-        assertEquals("monPseudo", loginRequest.getPseudo());
-        assertEquals("monpassword", loginRequest.getPassword());
+        assertThat(request.getPseudo()).isEqualTo("testUser");
+        assertThat(request.getPassword()).isEqualTo("password123");
     }
 }
- */

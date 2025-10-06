@@ -1,97 +1,91 @@
 package com.jdrbibli.authservice.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.Set;
-import java.util.HashSet;
-
 import org.junit.jupiter.api.Test;
 
-public class UserTest {
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class UserTest {
 
     @Test
-    void testConstructorAndGetters() {
-        Role role = new Role("ROLE_USER");
+    void testAllArgsConstructorAndGetters() {
         Set<Role> roles = new HashSet<>();
-        roles.add(role);
+        roles.add(new Role("ROLE_USER"));
 
-        User user = new User(1L, "pseudoTest", "email@test.com", "passwordHash", roles, "code123", 123456789L);
-
-        assertEquals(1L, user.getId());
-        assertEquals("pseudoTest", user.getPseudo());
-        assertEquals("email@test.com", user.getEmail());
-        assertEquals("passwordHash", user.getPassword());
-        assertEquals(roles, user.getRoles());
-        assertEquals("code123", user.getResetPasswordCode());
-        assertEquals(123456789L, user.getResetPasswordCodeExpiration());
+        User user = new User(1L, "pseudo", "email@test.com", "password", roles, "code", 123456L);
+        assertThat(user.getId()).isEqualTo(1L);
+        assertThat(user.getPseudo()).isEqualTo("pseudo");
+        assertThat(user.getEmail()).isEqualTo("email@test.com");
+        assertThat(user.getPassword()).isEqualTo("password");
+        assertThat(user.getRoles()).containsExactlyElementsOf(roles);
+        assertThat(user.getResetPasswordCode()).isEqualTo("code");
+        assertThat(user.getResetPasswordCodeExpiration()).isEqualTo(123456L);
+        assertThat(user.getAuthorities()).containsExactlyElementsOf(roles);
+        assertThat(user.getUsername()).isEqualTo("pseudo");
+        assertThat(user.isAccountNonExpired()).isTrue();
+        assertThat(user.isAccountNonLocked()).isTrue();
+        assertThat(user.isCredentialsNonExpired()).isTrue();
+        assertThat(user.isEnabled()).isTrue();
     }
 
     @Test
-    void testSetters() {
+    void testDefaultConstructorAndSetters() {
         User user = new User();
-
         user.setId(2L);
-        user.setPseudo("pseudoSetter");
-        user.setEmail("setter@test.com");
-        user.setPassword("passwordSetter");
-
-        Role role = new Role("ROLE_ADMIN");
+        user.setPseudo("pseudo2");
+        user.setEmail("email2@test.com");
+        user.setPassword("pass2");
         Set<Role> roles = new HashSet<>();
-        roles.add(role);
+        roles.add(new Role("ROLE_ADMIN"));
         user.setRoles(roles);
+        user.setResetPasswordCode("reset2");
+        user.setResetPasswordCodeExpiration(654321L);
 
-        user.setResetPasswordCode("resetCodeSetter");
-        user.setResetPasswordCodeExpiration(987654321L);
-
-        assertEquals(2L, user.getId());
-        assertEquals("pseudoSetter", user.getPseudo());
-        assertEquals("setter@test.com", user.getEmail());
-        assertEquals("passwordSetter", user.getPassword());
-        assertEquals(roles, user.getRoles());
-        assertEquals("resetCodeSetter", user.getResetPasswordCode());
-        assertEquals(987654321L, user.getResetPasswordCodeExpiration());
-    }
-
-    @Test
-    void testUserDetailsMethods() {
-        Role role1 = new Role("ROLE_USER");
-        Role role2 = new Role("ROLE_ADMIN");
-        Set<Role> roles = new HashSet<>();
-        roles.add(role1);
-        roles.add(role2);
-
-        User user = new User(3L, "pseudoDetails", "user@test.com", "pass", roles, null, null);
-
-        assertEquals(roles, user.getAuthorities());
-        assertEquals("pseudoDetails", user.getUsername());
-        assertTrue(user.isAccountNonExpired());
-        assertTrue(user.isAccountNonLocked());
-        assertTrue(user.isCredentialsNonExpired());
-        assertTrue(user.isEnabled());
+        assertThat(user.getId()).isEqualTo(2L);
+        assertThat(user.getPseudo()).isEqualTo("pseudo2");
+        assertThat(user.getEmail()).isEqualTo("email2@test.com");
+        assertThat(user.getPassword()).isEqualTo("pass2");
+        assertThat(user.getRoles()).containsExactlyElementsOf(roles);
+        assertThat(user.getResetPasswordCode()).isEqualTo("reset2");
+        assertThat(user.getResetPasswordCodeExpiration()).isEqualTo(654321L);
     }
 
     @Test
     void testBuilder() {
-        Role role = new Role("ROLE_BUILDER");
         Set<Role> roles = new HashSet<>();
-        roles.add(role);
+        roles.add(new Role("ROLE_USER"));
 
         User user = User.builder()
-                .id(10L)
-                .pseudo("builderPseudo")
-                .email("builder@example.com")
-                .password("builderPass")
+                .id(3L)
+                .pseudo("pseudo3")
+                .email("email3@test.com")
+                .password("password3")
                 .roles(roles)
-                .resetPasswordCode("resetBuilder")
-                .resetPasswordCodeExpiration(123L)
+                .resetPasswordCode("code3")
+                .resetPasswordCodeExpiration(999999L)
                 .build();
 
-        assertEquals(10L, user.getId());
-        assertEquals("builderPseudo", user.getPseudo());
-        assertEquals("builder@example.com", user.getEmail());
-        assertEquals("builderPass", user.getPassword());
-        assertEquals(roles, user.getRoles());
-        assertEquals("resetBuilder", user.getResetPasswordCode());
-        assertEquals(123L, user.getResetPasswordCodeExpiration());
+        assertThat(user.getId()).isEqualTo(3L);
+        assertThat(user.getPseudo()).isEqualTo("pseudo3");
+        assertThat(user.getEmail()).isEqualTo("email3@test.com");
+        assertThat(user.getPassword()).isEqualTo("password3");
+        assertThat(user.getRoles()).containsExactlyElementsOf(roles);
+        assertThat(user.getResetPasswordCode()).isEqualTo("code3");
+        assertThat(user.getResetPasswordCodeExpiration()).isEqualTo(999999L);
+    }
+
+    @Test
+    void testResetTokensSetterAndGetter() {
+        User user = new User();
+        Set<PasswordResetToken> tokens = new HashSet<>();
+        PasswordResetToken token = new PasswordResetToken();
+        token.setToken("token123");
+        tokens.add(token);
+
+        user.setResetTokens(tokens);
+
+        assertThat(user.getResetTokens()).containsExactlyElementsOf(tokens);
     }
 }

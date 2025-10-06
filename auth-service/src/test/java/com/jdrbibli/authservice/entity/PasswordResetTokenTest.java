@@ -1,60 +1,56 @@
-
 package com.jdrbibli.authservice.entity;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
-public class PasswordResetTokenTest {
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class PasswordResetTokenTest {
 
     @Test
-    void testConstructorAndGetters() {
+    void testAllArgsConstructorAndGetters() {
         User user = new User();
+        user.setId(1L);
         user.setPseudo("testUser");
 
-        String tokenStr = "abc123";
         LocalDateTime expiry = LocalDateTime.now().plusHours(1);
+        PasswordResetToken token = new PasswordResetToken("token123", expiry, user);
 
-        PasswordResetToken token = new PasswordResetToken(tokenStr, expiry, user);
-
-        assertNull(token.getId(), "Id should be null initially");
-        assertEquals(tokenStr, token.getToken());
-        assertEquals(expiry, token.getExpiryDate());
-        assertEquals(user, token.getUser());
+        assertThat(token.getToken()).isEqualTo("token123");
+        assertThat(token.getExpiryDate()).isEqualTo(expiry);
+        assertThat(token.getUser()).isEqualTo(user);
+        assertThat(token.getUser().getPseudo()).isEqualTo("testUser");
     }
 
     @Test
-    void testSetters() {
-        PasswordResetToken token = new PasswordResetToken();
-
-        token.setId(10L);
-        token.setToken("tokenXYZ");
-        LocalDateTime expiry = LocalDateTime.now().plusDays(1);
-        token.setExpiryDate(expiry);
-
+    void testDefaultConstructorAndSetters() {
         User user = new User();
-        user.setPseudo("pseudoSetter");
+        user.setId(2L);
+        user.setPseudo("anotherUser");
+
+        LocalDateTime expiry = LocalDateTime.now().plusDays(1);
+        PasswordResetToken token = new PasswordResetToken();
+        token.setId(10L);
+        token.setToken("myToken");
+        token.setExpiryDate(expiry);
         token.setUser(user);
 
-        assertEquals(10L, token.getId());
-        assertEquals("tokenXYZ", token.getToken());
-        assertEquals(expiry, token.getExpiryDate());
-        assertEquals(user, token.getUser());
+        assertThat(token.getId()).isEqualTo(10L);
+        assertThat(token.getToken()).isEqualTo("myToken");
+        assertThat(token.getExpiryDate()).isEqualTo(expiry);
+        assertThat(token.getUser()).isEqualTo(user);
+        assertThat(token.getUser().getPseudo()).isEqualTo("anotherUser");
     }
 
     @Test
     void testToString() {
         User user = new User();
-        user.setPseudo("pseudoToString");
+        user.setPseudo("userToString");
+        PasswordResetToken token = new PasswordResetToken("tok", LocalDateTime.now(), user);
 
-        PasswordResetToken token = new PasswordResetToken("toto", LocalDateTime.of(2025, 7, 14, 15, 0), user);
-
-        String toString = token.toString();
-
-        assertTrue(toString.contains("toto"));
-        assertTrue(toString.contains("pseudoToString"));
-        assertTrue(toString.contains("2025-07-14T15:00"));
+        String str = token.toString();
+        assertThat(str).contains("tok");
+        assertThat(str).contains("userToString");
     }
 }

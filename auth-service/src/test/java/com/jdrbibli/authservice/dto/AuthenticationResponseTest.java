@@ -1,40 +1,43 @@
-/* package com.jdrbibli.authservice.dto;
-
-import static org.junit.jupiter.api.Assertions.*;
+package com.jdrbibli.authservice.dto;
 
 import org.junit.jupiter.api.Test;
 
-public class AuthenticationResponseTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+class AuthenticationResponseTest {
 
     @Test
-    void testConstructorAndGetters() {
-        UserResponseDTO userDto = new UserResponseDTO();
-        userDto.setPseudo("testUser");
-        userDto.setEmail("test@example.com");
+    void defaultConstructor_shouldCreateEmptyObject() {
+        AuthenticationResponse response = new AuthenticationResponse();
 
-        AuthenticationResponse response = new AuthenticationResponse("jwt-token-123", userDto);
-
-        assertEquals("jwt-token-123", response.getToken());
-        assertEquals(userDto, response.getUser());
-        assertEquals("testUser", response.getUser().getPseudo());
-        assertEquals("test@example.com", response.getUser().getEmail());
+        assertThat(response.getToken()).isNull();
+        assertThat(response.getUser()).isNull();
     }
 
     @Test
-    void testSetters() {
+    void fullConstructor_shouldInitializeFields() {
+        UserResponseDTO userDto = new UserResponseDTO();
+        userDto.setPseudo("user123");
+        userDto.setEmail("user@test.com");
+
+        AuthenticationResponse response = new AuthenticationResponse("jwt-token", userDto);
+
+        assertThat(response.getToken()).isEqualTo("jwt-token");
+        assertThat(response.getUser()).isEqualTo(userDto);
+    }
+
+    @Test
+    void settersAndGetters_shouldWorkCorrectly() {
         AuthenticationResponse response = new AuthenticationResponse();
 
         UserResponseDTO userDto = new UserResponseDTO();
-        userDto.setPseudo("pseudoSetter");
-        userDto.setEmail("setter@example.com");
+        userDto.setPseudo("pseudo");
+        userDto.setEmail("email@test.com");
 
-        response.setToken("tokenSetter");
+        response.setToken("nouveau-token");
         response.setUser(userDto);
 
-        assertEquals("tokenSetter", response.getToken());
-        assertEquals(userDto, response.getUser());
-        assertEquals("pseudoSetter", response.getUser().getPseudo());
-        assertEquals("setter@example.com", response.getUser().getEmail());
+        assertThat(response.getToken()).isEqualTo("nouveau-token");
+        assertThat(response.getUser()).isEqualTo(userDto);
     }
 }
- */

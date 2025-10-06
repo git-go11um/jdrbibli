@@ -1,21 +1,29 @@
-/* package com.jdrbibli.authservice.dto;
+package com.jdrbibli.authservice.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-public class ReponseProfileChangeTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+class ReponseProfileChangeTest {
 
     @Test
-    void testConstructorAndGetter() {
-        ReponseProfileChange response = new ReponseProfileChange("Modification réussie", null);
-        assertEquals("Modification réussie", response.getMessage());
+    void gettersAndSetters_shouldWorkCorrectly() {
+        ReponseProfileChange response = new ReponseProfileChange();
+
+        // Utilisation des setters
+        response.setMessage("Profil mis à jour");
+        response.setNewToken("token123");
+
+        // Vérification avec assertions
+        assertThat(response.getMessage()).isEqualTo("Profil mis à jour");
+        assertThat(response.getNewToken()).isEqualTo("token123");
     }
 
     @Test
-    void testSetter() {
-        ReponseProfileChange response = new ReponseProfileChange();
-        response.setMessage("Message mis à jour");
-        assertEquals("Message mis à jour", response.getMessage());
+    void constructorWithParams_shouldSetFieldsCorrectly() {
+        ReponseProfileChange response = new ReponseProfileChange("Succès", "token456");
+
+        assertThat(response.getMessage()).isEqualTo("Succès");
+        assertThat(response.getNewToken()).isEqualTo("token456");
     }
 }
- */

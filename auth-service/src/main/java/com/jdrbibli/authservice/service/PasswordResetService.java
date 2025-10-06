@@ -80,4 +80,21 @@ public class PasswordResetService {
         // Suppression du token après usage
         tokenRepository.delete(resetToken);
     }
+
+    public void setTokenRepository(PasswordResetTokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
+
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public void setEmailService(EmailService emailService) {
+        this.emailService = emailService;
+    }
+
 }

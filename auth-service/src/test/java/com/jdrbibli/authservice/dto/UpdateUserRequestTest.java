@@ -1,19 +1,21 @@
-/* package com.jdrbibli.authservice.dto;
+package com.jdrbibli.authservice.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-public class UpdateUserRequestTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+class UpdateUserRequestTest {
 
     @Test
-    void testGettersAndSetters() {
+    void gettersAndSetters_shouldWorkCorrectly() {
         UpdateUserRequest request = new UpdateUserRequest();
 
+        // Utilisation des setters
         request.setPseudo("nouveauPseudo");
-        request.setEmail("nouveau.email@example.com");
+        request.setEmail("email@test.com");
 
-        assertEquals("nouveauPseudo", request.getPseudo());
-        assertEquals("nouveau.email@example.com", request.getEmail());
+        // Vérification avec assertions
+        assertThat(request.getPseudo()).isEqualTo("nouveauPseudo");
+        assertThat(request.getEmail()).isEqualTo("email@test.com");
     }
 }
- */

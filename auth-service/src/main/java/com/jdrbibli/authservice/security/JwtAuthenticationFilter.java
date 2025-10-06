@@ -98,4 +98,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // On continue la chaîne de filtres
         filterChain.doFilter(request, response);
     }
+
+    public void setJwtService(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
+
+    public void setUserDetailsService(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
 }

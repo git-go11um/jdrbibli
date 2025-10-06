@@ -8,48 +8,63 @@ class PasswordValidatorTest {
 
     @Test
     void testValidPassword() {
-        assertDoesNotThrow(() -> PasswordValidator.validate("Valid1!Password"));
+        String validPassword = "Abcdef1!";
+        assertDoesNotThrow(() -> PasswordValidator.validate(validPassword));
     }
 
     @Test
-    void testPasswordTooShort() {
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> PasswordValidator.validate("Ab1!"));
-        assertTrue(ex.getMessage().contains("au moins 8 caractères"));
+    void testTooShortPassword() {
+        String shortPassword = "Ab1!";
+        Exception ex = assertThrows(IllegalArgumentException.class,
+                () -> PasswordValidator.validate(shortPassword));
+        assertEquals("Le mot de passe doit contenir au moins 8 caractères.", ex.getMessage());
     }
 
     @Test
-    void testMissingUppercase() {
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> PasswordValidator.validate("valid1!password"));
-        assertTrue(ex.getMessage().contains("au moins une lettre majuscule"));
+    void testNoUppercase() {
+        String password = "abcdef1!";
+        Exception ex = assertThrows(IllegalArgumentException.class,
+                () -> PasswordValidator.validate(password));
+        assertEquals("Le mot de passe doit contenir au moins une lettre majuscule.", ex.getMessage());
     }
 
     @Test
-    void testMissingLowercase() {
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> PasswordValidator.validate("VALID1!PASSWORD"));
-        assertTrue(ex.getMessage().contains("au moins une lettre minuscule"));
+    void testNoLowercase() {
+        String password = "ABCDEF1!";
+        Exception ex = assertThrows(IllegalArgumentException.class,
+                () -> PasswordValidator.validate(password));
+        assertEquals("Le mot de passe doit contenir au moins une lettre minuscule.", ex.getMessage());
     }
 
     @Test
-    void testMissingDigit() {
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> PasswordValidator.validate("Valid!Password"));
-        assertTrue(ex.getMessage().contains("au moins un chiffre"));
+    void testNoDigit() {
+        String password = "Abcdefg!";
+        Exception ex = assertThrows(IllegalArgumentException.class,
+                () -> PasswordValidator.validate(password));
+        assertEquals("Le mot de passe doit contenir au moins un chiffre.", ex.getMessage());
     }
 
     @Test
-    void testMissingSpecialCharacter() {
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> PasswordValidator.validate("Valid1Password"));
-        assertTrue(ex.getMessage().contains("au moins un caractère spécial"));
+    void testNoSpecialChar() {
+        String password = "Abcdef12";
+        Exception ex = assertThrows(IllegalArgumentException.class,
+                () -> PasswordValidator.validate(password));
+        assertEquals("Le mot de passe doit contenir au moins un caractère spécial (par ex. !@#$%^&*).",
+                ex.getMessage());
     }
 
     @Test
     void testContainsSpace() {
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> PasswordValidator.validate("Valid1! Pass"));
-        assertTrue(ex.getMessage().contains("ne doit pas contenir d'espaces"));
+        String password = "Abc def1!";
+        Exception ex = assertThrows(IllegalArgumentException.class,
+                () -> PasswordValidator.validate(password));
+        assertEquals("Le mot de passe ne doit pas contenir d'espaces.", ex.getMessage());
+    }
+
+    @Test
+    void testNullPassword() {
+        Exception ex = assertThrows(IllegalArgumentException.class,
+                () -> PasswordValidator.validate(null));
+        assertEquals("Le mot de passe doit contenir au moins 8 caractères.", ex.getMessage());
     }
 }

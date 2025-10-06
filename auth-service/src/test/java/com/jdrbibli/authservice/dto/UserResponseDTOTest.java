@@ -1,36 +1,33 @@
-/* package com.jdrbibli.authservice.dto;
+package com.jdrbibli.authservice.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
-import java.util.HashSet;
 
-public class UserResponseDTOTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+class UserResponseDTOTest {
 
     @Test
-    void testConstructorAndGetters() {
-        Set<String> roles = new HashSet<>();
-        roles.add("ROLE_USER");
-        roles.add("ROLE_ADMIN");
+    void testAllArgsConstructor() {
+        Set<String> roles = Set.of("ROLE_USER", "ROLE_ADMIN");
+        UserResponseDTO dto = new UserResponseDTO(1L, "pseudo1", "email@test.com", roles);
 
-        UserResponseDTO dto = new UserResponseDTO(1L, "pseudoTest", "email@test.com", roles);
-
-        assertEquals(1L, dto.getId());
-        assertEquals("pseudoTest", dto.getPseudo());
-        assertEquals("email@test.com", dto.getEmail());
-        assertEquals(roles, dto.getRoles());
+        assertThat(dto.getId()).isEqualTo(1L);
+        assertThat(dto.getPseudo()).isEqualTo("pseudo1");
+        assertThat(dto.getEmail()).isEqualTo("email@test.com");
+        assertThat(dto.getRoles()).containsExactlyInAnyOrder("ROLE_USER", "ROLE_ADMIN");
     }
 
     @Test
-    void testSettersAndGetters() {
+    void testDefaultConstructorAndSetters() {
         UserResponseDTO dto = new UserResponseDTO();
+        dto.setPseudo("pseudo2");
+        dto.setEmail("email2@test.com");
 
-        dto.setPseudo("pseudoSetter");
-        dto.setEmail("setter@email.com");
-
-        assertEquals("pseudoSetter", dto.getPseudo());
-        assertEquals("setter@email.com", dto.getEmail());
+        assertThat(dto.getId()).isNull();
+        assertThat(dto.getPseudo()).isEqualTo("pseudo2");
+        assertThat(dto.getEmail()).isEqualTo("email2@test.com");
+        assertThat(dto.getRoles()).isNull();
     }
 }
- */

@@ -49,4 +49,5 @@ public class ReponseProfileChange {
     public void setNewToken(String newToken) {
         this.newToken = newToken;
     }
+
 }

@@ -7,14 +7,18 @@ import org.springframework.stereotype.Service;
 
 /**
  * Service pour l'envoi d'emails.
- * Utilisé principalement pour envoyer des emails de réinitialisation de mot de passe.
+ * Utilisé principalement pour envoyer des emails de réinitialisation de mot de
+ * passe.
  */
 @Service
 public class EmailService {
 
-    // Injection du composant Spring pour envoyer des emails
+    private final JavaMailSender mailSender;
+
     @Autowired
-    private JavaMailSender mailSender;
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     /**
      * Envoie un email pour la réinitialisation du mot de passe.
@@ -24,12 +28,12 @@ public class EmailService {
      */
     public void sendPasswordResetEmail(String toEmail, String token) {
         SimpleMailMessage message = new SimpleMailMessage();
-        
+
         // Destinataire
         message.setTo(toEmail);
         // Sujet de l'email
         message.setSubject("Réinitialisation de votre mot de passe");
-        
+
         // Contenu de l'email
         String text = "Bonjour,\n\n"
                 + "Vous avez demandé à réinitialiser votre mot de passe.\n"
@@ -39,7 +43,7 @@ public class EmailService {
                 + "Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer ce message.\n\n"
                 + "Cordialement,\n"
                 + "L'équipe JdrBibli";
-        
+
         message.setText(text);
 
         // Envoi de l'email

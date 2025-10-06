@@ -1,46 +1,51 @@
-/* package com.jdrbibli.authservice.dto;
-
-import static org.junit.jupiter.api.Assertions.*;
+package com.jdrbibli.authservice.dto;
 
 import org.junit.jupiter.api.Test;
 
-public class ApiResponseTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Tests unitaires pour la classe {@link ApiResponse}.
+ * 
+ * Vérifie les constructeurs, getters et setters.
+ */
+class ApiResponseTest {
 
     @Test
-    void testConstructorWithMessageOnly() {
-        ApiResponse response = new ApiResponse("Operation réussie");
+    void constructorWithMessage_shouldInitializeFieldsCorrectly() {
+        // Arrange & Act
+        ApiResponse response = new ApiResponse("Opération réussie");
 
-        assertEquals("Operation réussie", response.getMessage());
-        assertTrue(response.isSuccess());
-        assertNull(response.getToken());
+        // Assert
+        assertThat(response.getMessage()).isEqualTo("Opération réussie");
+        assertThat(response.isSuccess()).isTrue();
+        assertThat(response.getToken()).isNull();
     }
 
     @Test
-    void testConstructorWithAllFields() {
-        ApiResponse response = new ApiResponse("Auth OK", true, "jwt-token-123");
+    void fullConstructor_shouldInitializeAllFields() {
+        // Arrange & Act
+        ApiResponse response = new ApiResponse("Erreur", false, "jwt-token");
 
-        assertEquals("Auth OK", response.getMessage());
-        assertTrue(response.isSuccess());
-        assertEquals("jwt-token-123", response.getToken());
-
-        ApiResponse failResponse = new ApiResponse("Erreur", false, null);
-
-        assertEquals("Erreur", failResponse.getMessage());
-        assertFalse(failResponse.isSuccess());
-        assertNull(failResponse.getToken());
+        // Assert
+        assertThat(response.getMessage()).isEqualTo("Erreur");
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getToken()).isEqualTo("jwt-token");
     }
 
     @Test
-    void testSettersAndGetters() {
-        ApiResponse response = new ApiResponse("Init");
+    void settersAndGetters_shouldWorkCorrectly() {
+        // Arrange
+        ApiResponse response = new ApiResponse("Initial");
 
-        response.setMessage("Modifié");
+        // Act
+        response.setMessage("Nouveau message");
         response.setSuccess(false);
-        response.setToken("token-modifie");
+        response.setToken("nouveau-token");
 
-        assertEquals("Modifié", response.getMessage());
-        assertFalse(response.isSuccess());
-        assertEquals("token-modifie", response.getToken());
+        // Assert
+        assertThat(response.getMessage()).isEqualTo("Nouveau message");
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getToken()).isEqualTo("nouveau-token");
     }
 }
- */

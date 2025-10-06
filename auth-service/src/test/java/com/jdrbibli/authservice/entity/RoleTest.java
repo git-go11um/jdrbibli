@@ -1,29 +1,29 @@
 package com.jdrbibli.authservice.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
-public class RoleTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+class RoleTest {
 
     @Test
-    void testConstructorAndGetters() {
-        Role role = new Role("ROLE_ADMIN");
+    void testAllArgsConstructorAndGetters() {
+        Role role = new Role("ROLE_USER");
+        role.setId(1L);
 
-        assertNull(role.getId(), "Id should be null initially");
-        assertEquals("ROLE_ADMIN", role.getRoleName());
-        assertEquals("ROLE_ADMIN", role.getAuthority());
+        assertThat(role.getId()).isEqualTo(1L);
+        assertThat(role.getRoleName()).isEqualTo("ROLE_USER");
+        assertThat(role.getAuthority()).isEqualTo("ROLE_USER"); // Spring Security
     }
 
     @Test
-    void testSetters() {
+    void testDefaultConstructorAndSetters() {
         Role role = new Role();
+        role.setId(2L);
+        role.setRoleName("ROLE_ADMIN");
 
-        role.setId(5L);
-        role.setRoleName("ROLE_USER");
-
-        assertEquals(5L, role.getId());
-        assertEquals("ROLE_USER", role.getRoleName());
-        assertEquals("ROLE_USER", role.getAuthority());
+        assertThat(role.getId()).isEqualTo(2L);
+        assertThat(role.getRoleName()).isEqualTo("ROLE_ADMIN");
+        assertThat(role.getAuthority()).isEqualTo("ROLE_ADMIN");
     }
 }

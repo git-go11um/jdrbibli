@@ -1,33 +1,30 @@
-/* package com.jdrbibli.authservice.dto;
+package com.jdrbibli.authservice.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class PasswordResetConfirmationTest {
+class PasswordResetConfirmationTest {
 
     @Test
-    void testConstructorAndGetters() {
-        PasswordResetConfirmation prc = new PasswordResetConfirmation(
-                "userPseudo",
-                "resetCode123",
-                "newPass456");
+    void gettersAndSetters_shouldWorkCorrectly() {
+        // Utilisation du constructeur par défaut et des setters
+        PasswordResetConfirmation confirmation = new PasswordResetConfirmation();
+        confirmation.setPseudo("testUser");
+        confirmation.setCode("1234");
+        confirmation.setNewPassword("newPass");
 
-        assertEquals("userPseudo", prc.getPseudo());
-        assertEquals("resetCode123", prc.getCode());
-        assertEquals("newPass456", prc.getNewPassword());
+        assertThat(confirmation.getPseudo()).isEqualTo("testUser");
+        assertThat(confirmation.getCode()).isEqualTo("1234");
+        assertThat(confirmation.getNewPassword()).isEqualTo("newPass");
     }
 
     @Test
-    void testSetters() {
-        PasswordResetConfirmation prc = new PasswordResetConfirmation();
+    void constructorWithParameters_shouldSetFieldsCorrectly() {
+        // Utilisation du constructeur complet
+        PasswordResetConfirmation confirmation = new PasswordResetConfirmation("testUser", "1234", "newPass");
 
-        prc.setPseudo("pseudoSetter");
-        prc.setCode("codeSetter");
-        prc.setNewPassword("passSetter");
-
-        assertEquals("pseudoSetter", prc.getPseudo());
-        assertEquals("codeSetter", prc.getCode());
-        assertEquals("passSetter", prc.getNewPassword());
+        assertThat(confirmation.getPseudo()).isEqualTo("testUser");
+        assertThat(confirmation.getCode()).isEqualTo("1234");
+        assertThat(confirmation.getNewPassword()).isEqualTo("newPass");
     }
 }
- */

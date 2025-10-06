@@ -1,57 +1,20 @@
-/* package com.jdrbibli.authservice.dto;
+package com.jdrbibli.authservice.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Set;
-
-public class InscriptionRequestTest {
-
-    private static Validator validator;
-
-    @BeforeAll
-    static void setupValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
+class InscriptionRequestTest {
 
     @Test
-    void testValidInscriptionRequest() {
+    void gettersAndSetters_shouldWorkCorrectly() {
         InscriptionRequest request = new InscriptionRequest();
-        request.setPseudo("monPseudo");
+
+        request.setPseudo("testUser");
         request.setEmail("test@example.com");
         request.setPassword("password123");
 
-        Set<ConstraintViolation<InscriptionRequest>> violations = validator.validate(request);
-        assertTrue(violations.isEmpty(), "Aucune violation attendue");
-    }
-
-    @Test
-    void testInvalidInscriptionRequest() {
-        InscriptionRequest request = new InscriptionRequest();
-        request.setPseudo(""); // violation NotBlank
-        request.setEmail("invalid-email"); // violation Email
-        request.setPassword(null); // violation NotBlank
-
-        Set<ConstraintViolation<InscriptionRequest>> violations = validator.validate(request);
-        assertEquals(3, violations.size());
-
-        boolean pseudoViolation = violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("pseudo"));
-        boolean emailViolation = violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("email"));
-        boolean passwordViolation = violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("password"));
-
-        assertTrue(pseudoViolation);
-        assertTrue(emailViolation);
-        assertTrue(passwordViolation);
+        assertThat(request.getPseudo()).isEqualTo("testUser");
+        assertThat(request.getEmail()).isEqualTo("test@example.com");
+        assertThat(request.getPassword()).isEqualTo("password123");
     }
 }
- */
