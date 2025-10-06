@@ -104,4 +104,9 @@ public class FriendRequest {
                 ", respondedAt=" + respondedAt +
                 '}';
     }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    
 }

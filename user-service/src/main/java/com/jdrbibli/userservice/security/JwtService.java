@@ -121,9 +121,14 @@ public class JwtService {
      * @return true si le token est valide et non expiré
      */
     public boolean isTokenValid(String token, String pseudo) {
-        final String extractedPseudo = extractPseudo(token);
-        return (extractedPseudo.equals(pseudo)) && !isTokenExpired(token);
+        try {
+            final String extractedPseudo = extractPseudo(token);
+            return (extractedPseudo.equals(pseudo)) && !isTokenExpired(token);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return false; // token expiré => invalide
+        }
     }
+    
 
     /**
      * Vérifie si le token JWT est expiré.

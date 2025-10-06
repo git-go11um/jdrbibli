@@ -1,10 +1,9 @@
-/* package com.jdrbibli.ouvrage_service.dto;
+package com.jdrbibli.ouvrage_service.dto;
 
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,68 +13,49 @@ class OuvrageDTOTest {
     void testGettersAndSetters() {
         OuvrageDTO dto = new OuvrageDTO();
 
-        Long id = 10L;
-        String titre = "Titre Test";
-        String description = "Description Test";
-        Long gammeId = 5L;
-        String version = "1.0";
-        String typeOuvrage = "Livre";
-        LocalDate datePublication = LocalDate.of(2023, 7, 14);
-        String langue = "Français";
-        String editeur = "Éditeur Test";
-        String etat = "Neuf";
-        String isbn = "978-3-16-148410-0";
-        String ouvrageLie = "Ouvrage lié";
-        String scenarioLie = "Scénario lié";
-        Boolean pret = Boolean.TRUE;
-        String errata = "Pas d'errata";
-        String notes = "Quelques notes";
-        List<String> scenariosContenus = new ArrayList<>(List.of("Scénario 1", "Scénario 2"));
-        List<String> autresOuvragesGamme = new ArrayList<>(List.of("Ouvrage A", "Ouvrage B"));
-       
-        String ownerPseudo = "userTest";
+        dto.setId(1L);
+        dto.setTitre("Titre1");
+        dto.setDescription("Description1");
+        dto.setGammeId(10L);
+        dto.setVersion("v1");
+        dto.setTypeOuvrage("Livre");
+        dto.setDatePublication(LocalDate.of(2025, 10, 6));
+        dto.setLangue("FR");
+        dto.setEditeur("EditeurX");
+        dto.setEtat("Neuf");
+        dto.setIsbn("1234567890");
+        dto.setOuvrageLie("OuvrageLie1");
+        dto.setScenarioLie("ScenarioLie1");
+        dto.setPret(true);
+        dto.setErrata("ErrataX");
+        dto.setNotes("NotesX");
+        dto.setScenariosContenus(List.of("Scenario1", "Scenario2"));
+        dto.setAutresOuvragesGamme(List.of("Ouvrage2", "Ouvrage3"));
+        dto.setImageUrl("/images/ouvrage1.png");
+        dto.setOwnerId(42L);
+        dto.setGammeNom("GammeX");
 
-        dto.setId(id);
-        dto.setTitre(titre);
-        dto.setDescription(description);
-        dto.setGammeId(gammeId);
-        dto.setVersion(version);
-        dto.setTypeOuvrage(typeOuvrage);
-        dto.setDatePublication(datePublication);
-        dto.setLangue(langue);
-        dto.setEditeur(editeur);
-        dto.setEtat(etat);
-        dto.setIsbn(isbn);
-        dto.setOuvrageLie(ouvrageLie);
-        dto.setScenarioLie(scenarioLie);
-        dto.setPret(pret);
-        dto.setErrata(errata);
-        dto.setNotes(notes);
-        dto.setScenariosContenus(scenariosContenus);
-        dto.setAutresOuvragesGamme(autresOuvragesGamme);
-       
-        dto.setOwnerPseudo(ownerPseudo);
-
-        assertEquals(id, dto.getId());
-        assertEquals(titre, dto.getTitre());
-        assertEquals(description, dto.getDescription());
-        assertEquals(gammeId, dto.getGammeId());
-        assertEquals(version, dto.getVersion());
-        assertEquals(typeOuvrage, dto.getTypeOuvrage());
-        assertEquals(datePublication, dto.getDatePublication());
-        assertEquals(langue, dto.getLangue());
-        assertEquals(editeur, dto.getEditeur());
-        assertEquals(etat, dto.getEtat());
-        assertEquals(isbn, dto.getIsbn());
-        assertEquals(ouvrageLie, dto.getOuvrageLie());
-        assertEquals(scenarioLie, dto.getScenarioLie());
-        assertEquals(pret, dto.getPret());
-        assertEquals(errata, dto.getErrata());
-        assertEquals(notes, dto.getNotes());
-        assertEquals(scenariosContenus, dto.getScenariosContenus());
-        assertEquals(autresOuvragesGamme, dto.getAutresOuvragesGamme());
-       
-        assertEquals(ownerPseudo, dto.getOwnerPseudo());
+        // Assertions
+        assertEquals(1L, dto.getId());
+        assertEquals("Titre1", dto.getTitre());
+        assertEquals("Description1", dto.getDescription());
+        assertEquals(10L, dto.getGammeId());
+        assertEquals("v1", dto.getVersion());
+        assertEquals("Livre", dto.getTypeOuvrage());
+        assertEquals(LocalDate.of(2025, 10, 6), dto.getDatePublication());
+        assertEquals("FR", dto.getLangue());
+        assertEquals("EditeurX", dto.getEditeur());
+        assertEquals("Neuf", dto.getEtat());
+        assertEquals("1234567890", dto.getIsbn());
+        assertEquals("OuvrageLie1", dto.getOuvrageLie());
+        assertEquals("ScenarioLie1", dto.getScenarioLie());
+        assertTrue(dto.getPret());
+        assertEquals("ErrataX", dto.getErrata());
+        assertEquals("NotesX", dto.getNotes());
+        assertEquals(List.of("Scenario1", "Scenario2"), dto.getScenariosContenus());
+        assertEquals(List.of("Ouvrage2", "Ouvrage3"), dto.getAutresOuvragesGamme());
+        assertEquals("/images/ouvrage1.png", dto.getImageUrl());
+        assertEquals(42L, dto.getOwnerId());
+        assertEquals("GammeX", dto.getGammeNom());
     }
 }
- */

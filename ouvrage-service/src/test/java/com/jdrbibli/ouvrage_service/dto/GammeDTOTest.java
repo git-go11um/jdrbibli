@@ -1,43 +1,45 @@
-/* package com.jdrbibli.ouvrage_service.dto;
+package com.jdrbibli.ouvrage_service.dto;
 
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GammeDTOTest {
 
     @Test
-    void testGettersAndSetters() {
-        GammeDTO dto = new GammeDTO();
+    void testConstructorAndGettersSetters() {
+        // Création avec constructeur vide et setters
+        GammeDTO gamme = new GammeDTO();
+        gamme.setId(1L);
+        gamme.setNom("Gamme1");
+        gamme.setDescription("Description de la gamme");
+        gamme.setOwnerId(42L);
 
-        Long id = 1L;
-        String nom = "Gamme Test";
-        String description = "Description de la gamme";
-        String ownerPseudo = "userTest";
+        OuvrageDTO ouvrage = new OuvrageDTO();
+        ouvrage.setId(100L);
+        ouvrage.setTitre("Ouvrage1");
 
-        dto.setId(id);
-        dto.setNom(nom);
-        dto.setDescription(description);
-        dto.setOwnerPseudo(ownerPseudo);
+        gamme.setOuvrages(List.of(ouvrage));
 
-        assertEquals(id, dto.getId());
-        assertEquals(nom, dto.getNom());
-        assertEquals(description, dto.getDescription());
-        assertEquals(ownerPseudo, dto.getOwnerPseudo());
-    }
+        // Vérifications
+        assertEquals(1L, gamme.getId());
+        assertEquals("Gamme1", gamme.getNom());
+        assertEquals("Description de la gamme", gamme.getDescription());
+        assertEquals(42L, gamme.getOwnerId());
 
-    @Test
-    void testConstructor() {
-        Long id = 2L;
-        String nom = "Autre Gamme";
-        String description = "Une autre description";
-        String ownerPseudo = "user2";
+        List<OuvrageDTO> ouvrages = gamme.getOuvrages();
+        assertNotNull(ouvrages);
+        assertEquals(1, ouvrages.size());
+        assertEquals("Ouvrage1", ouvrages.get(0).getTitre());
 
-        GammeDTO dto = new GammeDTO(id, nom, description, ownerPseudo);
-
-        assertEquals(id, dto.getId());
-        assertEquals(nom, dto.getNom());
-        assertEquals(description, dto.getDescription());
-        assertEquals(ownerPseudo, dto.getOwnerPseudo());
+        // Création avec constructeur avec paramètres
+        GammeDTO gamme2 = new GammeDTO(2L, "Gamme2", "Desc2", 99L);
+        assertEquals(2L, gamme2.getId());
+        assertEquals("Gamme2", gamme2.getNom());
+        assertEquals("Desc2", gamme2.getDescription());
+        assertEquals(99L, gamme2.getOwnerId());
+        assertTrue(gamme2.getOuvrages().isEmpty());
     }
 }
- */

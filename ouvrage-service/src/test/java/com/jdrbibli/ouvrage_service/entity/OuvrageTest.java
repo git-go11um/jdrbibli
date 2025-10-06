@@ -1,4 +1,4 @@
-/* package com.jdrbibli.ouvrage_service.entity;
+package com.jdrbibli.ouvrage_service.entity;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,72 +13,60 @@ class OuvrageTest {
     void testGettersAndSetters() {
         Ouvrage ouvrage = new Ouvrage();
 
-        Long id = 10L;
-        String titre = "Manuel du joueur";
-        String description = "Description du manuel";
-        Gamme gamme = new Gamme();
-        gamme.setId(1L);
-        String version = "1.0";
-        String typeOuvrage = "Livre";
-        LocalDate datePublication = LocalDate.of(2020, 5, 20);
-        String langue = "Français";
-        String editeur = "Editions JDR";
-        String etat = "Neuf";
-        String isbn = "123-4567890123";
-        String ouvrageLie = "Ouvrage lié 1";
-        String scenarioLie = "Scenario lié A";
-        Boolean pret = true;
-        String errata = "Quelques errata";
-        String notes = "Notes diverses";
-        String ownerPseudo = "user1";
+        ouvrage.setId(1L);
+        ouvrage.setTitre("Ouvrage1");
+        ouvrage.setDescription("Description de l'ouvrage");
+        ouvrage.setVersion("1.0");
+        ouvrage.setTypeOuvrage("Livre");
+        ouvrage.setDatePublication(LocalDate.of(2025, 10, 6));
+        ouvrage.setLangue("Français");
+        ouvrage.setEditeur("Éditeur Test");
+        ouvrage.setEtat("Neuf");
+        ouvrage.setIsbn("1234567890");
+        ouvrage.setOuvrageLie("Ouvrage2");
+        ouvrage.setScenarioLie("Scenario1");
+        ouvrage.setPret(true);
+        ouvrage.setErrata("Errata test");
+        ouvrage.setNotes("Notes test");
+        ouvrage.setOwnerId(42L);
+        ouvrage.setImageUrl("http://example.com/image.png");
 
-        List<String> scenariosContenus = List.of("Scénario 1", "Scénario 2");
-        List<String> autresOuvragesGamme = List.of("Ouvrage 2", "Ouvrage 3");
+        // Test Scenarios Contenus via JSON
+        List<String> scenarios = List.of("Scenario A", "Scenario B");
+        ouvrage.setScenariosContenusList(scenarios);
+        List<String> retrievedScenarios = ouvrage.getScenariosContenusList();
 
-
-        // Set values
-        ouvrage.setId(id);
-        ouvrage.setTitre(titre);
-        ouvrage.setDescription(description);
-        ouvrage.setGamme(gamme);
-        ouvrage.setVersion(version);
-        ouvrage.setTypeOuvrage(typeOuvrage);
-        ouvrage.setDatePublication(datePublication);
-        ouvrage.setLangue(langue);
-        ouvrage.setEditeur(editeur);
-        ouvrage.setEtat(etat);
-        ouvrage.setIsbn(isbn);
-        ouvrage.setOuvrageLie(ouvrageLie);
-        ouvrage.setScenarioLie(scenarioLie);
-        ouvrage.setPret(pret);
-        ouvrage.setErrata(errata);
-        ouvrage.setNotes(notes);
-        ouvrage.setOwnerPseudo(ownerPseudo);
-        ouvrage.setScenariosContenus(scenariosContenus);
-        ouvrage.setAutresOuvragesGamme(autresOuvragesGamme);
-
+        // Test Autres Ouvrages
+        List<String> autresOuvrages = List.of("Ouvrage3", "Ouvrage4");
+        ouvrage.setAutresOuvragesGamme(autresOuvrages);
 
         // Assertions
-        assertEquals(id, ouvrage.getId());
-        assertEquals(titre, ouvrage.getTitre());
-        assertEquals(description, ouvrage.getDescription());
-        assertEquals(gamme, ouvrage.getGamme());
-        assertEquals(version, ouvrage.getVersion());
-        assertEquals(typeOuvrage, ouvrage.getTypeOuvrage());
-        assertEquals(datePublication, ouvrage.getDatePublication());
-        assertEquals(langue, ouvrage.getLangue());
-        assertEquals(editeur, ouvrage.getEditeur());
-        assertEquals(etat, ouvrage.getEtat());
-        assertEquals(isbn, ouvrage.getIsbn());
-        assertEquals(ouvrageLie, ouvrage.getOuvrageLie());
-        assertEquals(scenarioLie, ouvrage.getScenarioLie());
-        assertEquals(pret, ouvrage.getPret());
-        assertEquals(errata, ouvrage.getErrata());
-        assertEquals(notes, ouvrage.getNotes());
-        assertEquals(ownerPseudo, ouvrage.getOwnerPseudo());
-        assertEquals(scenariosContenus, ouvrage.getScenariosContenus());
-        assertEquals(autresOuvragesGamme, ouvrage.getAutresOuvragesGamme());
+        assertEquals(1L, ouvrage.getId());
+        assertEquals("Ouvrage1", ouvrage.getTitre());
+        assertEquals("Description de l'ouvrage", ouvrage.getDescription());
+        assertEquals("1.0", ouvrage.getVersion());
+        assertEquals("Livre", ouvrage.getTypeOuvrage());
+        assertEquals(LocalDate.of(2025, 10, 6), ouvrage.getDatePublication());
+        assertEquals("Français", ouvrage.getLangue());
+        assertEquals("Éditeur Test", ouvrage.getEditeur());
+        assertEquals("Neuf", ouvrage.getEtat());
+        assertEquals("1234567890", ouvrage.getIsbn());
+        assertEquals("Ouvrage2", ouvrage.getOuvrageLie());
+        assertEquals("Scenario1", ouvrage.getScenarioLie());
+        assertTrue(ouvrage.getPret());
+        assertEquals("Errata test", ouvrage.getErrata());
+        assertEquals("Notes test", ouvrage.getNotes());
+        assertEquals(42L, ouvrage.getOwnerId());
+        assertEquals("http://example.com/image.png", ouvrage.getImageUrl());
 
+        assertNotNull(retrievedScenarios);
+        assertEquals(2, retrievedScenarios.size());
+        assertEquals("Scenario A", retrievedScenarios.get(0));
+        assertEquals("Scenario B", retrievedScenarios.get(1));
+
+        assertNotNull(ouvrage.getAutresOuvragesGamme());
+        assertEquals(2, ouvrage.getAutresOuvragesGamme().size());
+        assertEquals("Ouvrage3", ouvrage.getAutresOuvragesGamme().get(0));
+        assertEquals("Ouvrage4", ouvrage.getAutresOuvragesGamme().get(1));
     }
 }
- */

@@ -218,4 +218,9 @@ public class FriendRequestService {
         log.info("#ouvrages récupérés={}", ouvrages.size());
         return ouvrages;
     }
+
+    public void setOuvrageServiceUrl(String url) {
+        this.ouvrageServiceUrl = url;
+    }
+    
 }

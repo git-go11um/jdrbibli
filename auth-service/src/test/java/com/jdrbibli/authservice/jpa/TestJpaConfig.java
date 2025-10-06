@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EntityScan("com.jdrbibli.authservice.entity")
-@EnableJpaRepositories("com.jdrbibli.authservice.repository")
+@EnableJpaRepositories(basePackages = "com.jdrbibli.authservice.repository")
+@EntityScan(basePackages = "com.jdrbibli.authservice.entity")
 public class TestJpaConfig {
+    // Configuration minimale pour scanner uniquement les entités et les repositories
 }

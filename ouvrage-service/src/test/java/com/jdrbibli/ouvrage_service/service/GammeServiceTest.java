@@ -1,17 +1,27 @@
-/* package com.jdrbibli.ouvrage_service.service;
+package com.jdrbibli.ouvrage_service.service;
 
 import com.jdrbibli.ouvrage_service.entity.Gamme;
+import com.jdrbibli.ouvrage_service.entity.Ouvrage;
+import com.jdrbibli.ouvrage_service.exception.ResourceNotFoundException;
 import com.jdrbibli.ouvrage_service.mapper.GammeMapper;
 import com.jdrbibli.ouvrage_service.repository.GammeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class GammeServiceTest {
 
     @Mock
@@ -23,83 +33,102 @@ class GammeServiceTest {
     @InjectMocks
     private GammeService gammeService;
 
+    private Gamme gamme;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void testFindByOwnerPseudo_returnsList() {
-        String owner = "user1";
-        List<Gamme> expectedList = List.of(new Gamme(), new Gamme());
-        when(gammeRepository.findByOwnerPseudo(owner)).thenReturn(expectedList);
-
-        List<Gamme> actualList = gammeService.findByOwnerPseudo(owner);
-
-        assertEquals(expectedList, actualList);
-        verify(gammeRepository, times(1)).findByOwnerPseudo(owner);
-    }
-
-    @Test
-    void testFindById_found() {
-        Gamme gamme = new Gamme();
+        gamme = new Gamme();
         gamme.setId(1L);
+        gamme.setNom("Test Gamme");
+        gamme.setOwnerId(42L);
+        gamme.setOuvrages(new ArrayList<>());
+    }
+
+    @Test
+    void save_shouldSaveGamme_whenOwnerIdIsSet() {
+        when(gammeRepository.save(gamme)).thenReturn(gamme);
+
+        Gamme saved = gammeService.save(gamme);
+
+        assertEquals(gamme, saved);
+        verify(gammeRepository).save(gamme);
+    }
+
+    @Test
+    void save_shouldThrow_whenOwnerIdIsNull() {
+        gamme.setOwnerId(null);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> gammeService.save(gamme));
+        assertEquals("OwnerId must be set", exception.getMessage());
+    }
+
+    @Test
+    void findByOwnerId_shouldReturnListOfGammes() {
+        List<Gamme> gammes = Arrays.asList(gamme);
+        when(gammeRepository.findByOwnerId(42L)).thenReturn(gammes);
+
+        List<Gamme> result = gammeService.findByOwnerId(42L);
+
+        assertEquals(1, result.size());
+        assertEquals(gamme, result.get(0));
+    }
+
+    @Test
+    void findById_shouldReturnGamme_whenExists() {
         when(gammeRepository.findById(1L)).thenReturn(Optional.of(gamme));
 
         Optional<Gamme> result = gammeService.findById(1L);
 
         assertTrue(result.isPresent());
         assertEquals(gamme, result.get());
-        verify(gammeRepository, times(1)).findById(1L);
     }
 
     @Test
-    void testFindById_notFound() {
-        when(gammeRepository.findById(999L)).thenReturn(Optional.empty());
+    void findById_shouldReturnEmpty_whenNotExists() {
+        when(gammeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Optional<Gamme> result = gammeService.findById(999L);
+        Optional<Gamme> result = gammeService.findById(1L);
 
         assertFalse(result.isPresent());
-        verify(gammeRepository, times(1)).findById(999L);
     }
 
     @Test
-    void testSave_withValidOwnerPseudo() {
-        Gamme gamme = new Gamme();
-        gamme.setOwnerPseudo("owner1");
-        when(gammeRepository.save(gamme)).thenReturn(gamme);
+    void deleteById_shouldThrow_whenGammeNotFound() {
+        when(gammeRepository.findById(1L)).thenReturn(Optional.empty());
 
-        Gamme saved = gammeService.save(gamme);
-
-        assertEquals(gamme, saved);
-        verify(gammeRepository, times(1)).save(gamme);
+        assertThrows(ResourceNotFoundException.class, () -> gammeService.deleteById(1L, true));
     }
 
     @Test
-    void testSave_withoutOwnerPseudo_throwsException() {
-        Gamme gamme = new Gamme();
-        gamme.setOwnerPseudo(null);
+    void deleteById_shouldThrow_whenGammeHasOuvrages_andForceFalse() {
+        gamme.getOuvrages().add(new Ouvrage());
+        when(gammeRepository.findById(1L)).thenReturn(Optional.of(gamme));
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            gammeService.save(gamme);
-        });
-        assertEquals("OwnerPseudo must be set", ex.getMessage());
-
-        gamme.setOwnerPseudo("   "); // blank string
-
-        ex = assertThrows(IllegalArgumentException.class, () -> {
-            gammeService.save(gamme);
-        });
-        assertEquals("OwnerPseudo must be set", ex.getMessage());
-
-        verify(gammeRepository, never()).save(any());
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> gammeService.deleteById(1L, false));
+        assertEquals("La gamme contient des ouvrages. Utilisez force=true pour supprimer.", exception.getMessage());
     }
 
     @Test
-    void testDeleteById_callsRepositoryDelete() {
-        Long id = 10L;
-        gammeService.deleteById(id, true);
-        verify(gammeRepository, times(1)).deleteById(id);
+    void deleteById_shouldDelete_whenForceTrue() {
+        gamme.getOuvrages().add(new Ouvrage());
+        when(gammeRepository.findById(1L)).thenReturn(Optional.of(gamme));
+
+        gammeService.deleteById(1L, true);
+
+        verify(gammeRepository).delete(gamme);
+    }
+
+    @Test
+    void deleteByOwnerId_shouldDeleteAllGammesOfOwner() {
+        Gamme autreGamme = new Gamme();
+        autreGamme.setId(2L);
+        autreGamme.setOwnerId(42L);
+        List<Gamme> gammes = Arrays.asList(gamme, autreGamme);
+
+        when(gammeRepository.findByOwnerId(42L)).thenReturn(gammes);
+
+        gammeService.deleteByOwnerId(42L);
+
+        verify(gammeRepository, times(1)).delete(gamme);
+        verify(gammeRepository, times(1)).delete(autreGamme);
     }
 }
- */

@@ -1,21 +1,23 @@
-/* package com.jdrbibli.ouvrage_service.config;
+package com.jdrbibli.ouvrage_service.config;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class RequestLoggingConfigTest {
 
     @Autowired
-    private CommonsRequestLoggingFilter logFilter;
+    private ApplicationContext applicationContext;
 
     @Test
-    void testLogFilterBeanExists() {
-        assertNotNull(logFilter, "Le bean CommonsRequestLoggingFilter doit être créé");
+    void logFilterBean_shouldBeCreated() {
+        CommonsRequestLoggingFilter filter = applicationContext.getBean(CommonsRequestLoggingFilter.class);
+        assertThat(filter).isNotNull();
+        assertThat(filter).isInstanceOf(CommonsRequestLoggingFilter.class);
     }
 }
- */

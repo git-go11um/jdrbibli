@@ -1,49 +1,64 @@
-/* package com.jdrbibli.ouvrage_service.exception;
+package com.jdrbibli.ouvrage_service.exception;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-// Classe test dédiée à l’exception handler
 class GlobalExceptionHandlerTest {
 
-    private MockMvc mockMvc;
+    private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
-    // Dummy controller qui va juste lancer l'exception pour tester le handler
-    @org.springframework.web.bind.annotation.RestController
-    static class TestController {
-        @org.springframework.web.bind.annotation.GetMapping("/notfound")
-        public void throwNotFound() {
-            throw new ResourceNotFoundException("Ressource inexistante");
-        }
-    }
+    @Test
+    void handleResourceNotFound_shouldReturnNotFoundResponse() {
+        // Arrange
+        ResourceNotFoundException ex = new ResourceNotFoundException("Ressource introuvable");
 
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new TestController())
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
+        // Act
+        ResponseEntity<Object> response = handler.handleResourceNotFound(ex);
+
+        // Assert
+        assertEquals(404, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals("Resource Not Found", body.get("error"));
+        assertEquals("Ressource introuvable", body.get("message"));
+        assertNotNull(body.get("timestamp"));
     }
 
     @Test
-    void handleResourceNotFoundException_returns404_withProperBody() throws Exception {
-        mockMvc.perform(get("/notfound"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.error").value("Resource Not Found"))
-                .andExpect(jsonPath("$.message").value("Ressource inexistante"))
-                .andExpect(jsonPath("$.timestamp").exists());
+    void handleRuntimeException_shouldReturnBadRequestResponse() {
+        // Arrange
+        RuntimeException ex = new RuntimeException("Erreur runtime");
+
+        // Act
+        ResponseEntity<Object> response = handler.handleRuntimeException(ex);
+
+        // Assert
+        assertEquals(400, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals("Runtime Error", body.get("error"));
+        assertEquals("Erreur runtime", body.get("message"));
+        assertNotNull(body.get("timestamp"));
+    }
+
+    @Test
+    void handleGenericException_shouldReturnInternalServerErrorResponse() {
+        // Arrange
+        Exception ex = new Exception("Erreur générique");
+
+        // Act
+        ResponseEntity<Object> response = handler.handleGenericException(ex);
+
+        // Assert
+        assertEquals(500, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals("Internal Server Error", body.get("error"));
+        assertEquals("Erreur générique", body.get("message"));
+        assertNotNull(body.get("timestamp"));
     }
 }
- */

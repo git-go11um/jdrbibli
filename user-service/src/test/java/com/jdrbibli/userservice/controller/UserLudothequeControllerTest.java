@@ -1,4 +1,4 @@
-/* package com.jdrbibli.userservice.controller;
+package com.jdrbibli.userservice.controller;
 
 import com.jdrbibli.userservice.dto.OuvrageDTO;
 import com.jdrbibli.userservice.entity.UserProfile;
@@ -6,110 +6,120 @@ import com.jdrbibli.userservice.repository.UserProfileRepository;
 import com.jdrbibli.userservice.service.UserLudothequeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserLudothequeController.class)
-public class UserLudothequeControllerTest {
+class UserLudothequeControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
     private UserProfileRepository userProfileRepository;
-
-    @MockBean
     private UserLudothequeService userLudothequeService;
-
-    private UserProfile user;
+    private UserLudothequeController controller;
 
     @BeforeEach
-    public void setUp() {
-        user = new UserProfile();
-        user.setId(1L);
-        user.setPseudo("testUser");
+    void setUp() {
+        userProfileRepository = mock(UserProfileRepository.class);
+        userLudothequeService = mock(UserLudothequeService.class);
+        controller = new UserLudothequeController(userProfileRepository, userLudothequeService);
+    }
+
+    @Test
+    void addOuvrageToLudotheque_shouldAddOuvrage() {
+        Long userId = 1L;
+        Long ouvrageId = 100L;
+
+        UserProfile user = new UserProfile();
+        user.setId(userId);
         user.setOuvrageIds(new ArrayList<>());
-    }
 
-    @Test
-    public void testAddOuvrageToLudotheque_Success() throws Exception {
         OuvrageDTO ouvrageDTO = new OuvrageDTO();
-        ouvrageDTO.setId(100L);
-        ouvrageDTO.setTitre("Test Ouvrage");
+        ouvrageDTO.setId(ouvrageId);
 
-        when(userProfileRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userLudothequeService.getOuvrageById(100L)).thenReturn(ouvrageDTO);
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userLudothequeService.getOuvrageById(ouvrageId)).thenReturn(ouvrageDTO);
         when(userProfileRepository.save(any(UserProfile.class))).thenReturn(user);
 
-        mockMvc.perform(post("/api/users/1/ludotheque/100")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Ouvrage ajouté à la ludothèque !"));
+        ResponseEntity<?> response = controller.addOuvrageToLudotheque(userId, ouvrageId);
 
-        // Vérifie que l'ID de l'ouvrage a bien été ajouté
-        assert (user.getOuvrageIds().contains(100L));
-        verify(userProfileRepository).save(user);
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(user.getOuvrageIds()).contains(ouvrageId);
+
+        // Vérifie que save a bien été appelé
+        ArgumentCaptor<UserProfile> captor = ArgumentCaptor.forClass(UserProfile.class);
+        verify(userProfileRepository).save(captor.capture());
+        assertThat(captor.getValue().getOuvrageIds()).contains(ouvrageId);
     }
 
     @Test
-    public void testAddOuvrageToLudotheque_OuvrageNotFound() throws Exception {
-        when(userProfileRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userLudothequeService.getOuvrageById(100L)).thenReturn(null);
+    void addOuvrageToLudotheque_shouldReturnNotFoundIfUserMissing() {
+        Long userId = 1L;
+        Long ouvrageId = 100L;
 
-        mockMvc.perform(post("/api/users/1/ludotheque/100")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.empty());
 
-        verify(userProfileRepository, never()).save(any());
+        ResponseEntity<?> response = controller.addOuvrageToLudotheque(userId, ouvrageId);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(404);
     }
 
     @Test
-    public void testAddOuvrageToLudotheque_UserNotFound() throws Exception {
-        when(userProfileRepository.findById(1L)).thenReturn(Optional.empty());
+    void addOuvrageToLudotheque_shouldReturnNotFoundIfOuvrageMissing() {
+        Long userId = 1L;
+        Long ouvrageId = 100L;
 
-        mockMvc.perform(post("/api/users/1/ludotheque/100")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        UserProfile user = new UserProfile();
+        user.setId(userId);
+        user.setOuvrageIds(new ArrayList<>());
 
-        verify(userProfileRepository, never()).save(any());
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userLudothequeService.getOuvrageById(ouvrageId)).thenReturn(null);
+
+        ResponseEntity<?> response = controller.addOuvrageToLudotheque(userId, ouvrageId);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(404);
     }
 
     @Test
-    public void testRemoveOuvrageFromLudotheque_Success() throws Exception {
-        user.getOuvrageIds().add(100L);
-        when(userProfileRepository.findById(1L)).thenReturn(Optional.of(user));
+    void removeOuvrageFromLudotheque_shouldRemoveOuvrage() {
+        Long userId = 1L;
+        Long ouvrageId = 100L;
+
+        UserProfile user = new UserProfile();
+        user.setId(userId);
+        List<Long> ouvrageIds = new ArrayList<>();
+        ouvrageIds.add(ouvrageId);
+        user.setOuvrageIds(ouvrageIds);
+
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userProfileRepository.save(any(UserProfile.class))).thenReturn(user);
 
-        mockMvc.perform(delete("/api/users/1/ludotheque/100")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Ouvrage retiré de la ludothèque !"));
+        ResponseEntity<?> response = controller.removeOuvrageFromLudotheque(userId, ouvrageId);
 
-        // Vérifie que l'ID a bien été retiré
-        assert (!user.getOuvrageIds().contains(100L));
-        verify(userProfileRepository).save(user);
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(user.getOuvrageIds()).doesNotContain(ouvrageId);
+
+        // Vérifie que save a bien été appelé
+        ArgumentCaptor<UserProfile> captor = ArgumentCaptor.forClass(UserProfile.class);
+        verify(userProfileRepository).save(captor.capture());
+        assertThat(captor.getValue().getOuvrageIds()).doesNotContain(ouvrageId);
     }
 
     @Test
-    public void testRemoveOuvrageFromLudotheque_UserNotFound() throws Exception {
-        when(userProfileRepository.findById(1L)).thenReturn(Optional.empty());
+    void removeOuvrageFromLudotheque_shouldReturnNotFoundIfUserMissing() {
+        Long userId = 1L;
+        Long ouvrageId = 100L;
 
-        mockMvc.perform(delete("/api/users/1/ludotheque/100")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+        when(userProfileRepository.findById(userId)).thenReturn(Optional.empty());
 
-        verify(userProfileRepository, never()).save(any());
+        ResponseEntity<?> response = controller.removeOuvrageFromLudotheque(userId, ouvrageId);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(404);
     }
 }
- */

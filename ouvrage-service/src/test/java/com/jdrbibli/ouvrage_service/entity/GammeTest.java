@@ -1,4 +1,4 @@
-/* package com.jdrbibli.ouvrage_service.entity;
+package com.jdrbibli.ouvrage_service.entity;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,25 +12,26 @@ class GammeTest {
     void testGettersAndSetters() {
         Gamme gamme = new Gamme();
 
-        Long id = 123L;
-        String nom = "Fantasy";
-        String description = "Gamme fantasy pour JDR";
-        String ownerPseudo = "user123";
-        Ouvrage ouvrage = new Ouvrage(); // Tu peux créer un ouvrage minimal ou un mock si nécessaire
+        gamme.setId(1L);
+        gamme.setNom("Gamme1");
+        gamme.setDescription("Description de la gamme");
+        gamme.setOwnerId(42L);
 
-        gamme.setId(id);
-        gamme.setNom(nom);
-        gamme.setDescription(description);
-        gamme.setOwnerPseudo(ownerPseudo);
-        gamme.setOuvrages(List.of(ouvrage));
+        Ouvrage ouvrage1 = new Ouvrage();
+        ouvrage1.setTitre("Ouvrage1");
+        Ouvrage ouvrage2 = new Ouvrage();
+        ouvrage2.setTitre("Ouvrage2");
 
-        assertEquals(id, gamme.getId());
-        assertEquals(nom, gamme.getNom());
-        assertEquals(description, gamme.getDescription());
-        assertEquals(ownerPseudo, gamme.getOwnerPseudo());
+        gamme.setOuvrages(List.of(ouvrage1, ouvrage2));
+
+        // Assertions
+        assertEquals(1L, gamme.getId());
+        assertEquals("Gamme1", gamme.getNom());
+        assertEquals("Description de la gamme", gamme.getDescription());
+        assertEquals(42L, gamme.getOwnerId());
         assertNotNull(gamme.getOuvrages());
-        assertEquals(1, gamme.getOuvrages().size());
-        assertSame(ouvrage, gamme.getOuvrages().get(0));
+        assertEquals(2, gamme.getOuvrages().size());
+        assertEquals("Ouvrage1", gamme.getOuvrages().get(0).getTitre());
+        assertEquals("Ouvrage2", gamme.getOuvrages().get(1).getTitre());
     }
 }
- */

@@ -9,14 +9,23 @@ import com.jdrbibli.authservice.exception.UserNotFoundException;
 import com.jdrbibli.authservice.repository.PasswordResetTokenRepository;
 import com.jdrbibli.authservice.repository.UserRepository;
 import com.jdrbibli.authservice.security.JwtTokenProvider;
+import com.jdrbibli.authservice.util.PasswordValidator;
+
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.Message;
+import org.powermock.api.mockito.PowerMockito;
+
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -40,6 +49,9 @@ class UserServiceTest {
     private PasswordResetTokenRepository passwordResetTokenRepository;
     @Mock
     private AuditClient auditClient;
+
+    @Mock
+    private RestTemplate restTemplate;
 
     @InjectMocks
     private UserService userService;
@@ -221,4 +233,108 @@ class UserServiceTest {
         assertNull(response.getNewToken());
         verify(userRepository, never()).save(any());
     }
+
+    @Test
+    void testChangeProfilePasswordSuccess() {
+        // Setup
+        ChangePasswordProfileRequest request = new ChangePasswordProfileRequest();
+        request.setCurrentPassword("OldPass1!");
+        request.setNewPassword("NewPass1!");
+        request.setConfirmNewPassword("NewPass1!");
+
+        User testUser = new User(1L, "john", "john@example.com", "hashedpwd", new HashSet<>(), null, null);
+
+        // Mocking user repository to return the testUser
+        when(userRepository.findByPseudo("john")).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.matches("OldPass1!", "hashedpwd")).thenReturn(true);
+        when(passwordEncoder.encode("NewPass1!")).thenReturn("newHashedPwd");
+
+        // Act
+        userService.changeProfilePassword("john", request);
+
+        // Assert
+        assertEquals("newHashedPwd", testUser.getPassword()); // Check that the password is updated
+        verify(userRepository).save(testUser); // Verify that the user was saved
+        verify(auditClient).logEvent(eq("auth-service"), eq("PASSWORD_CHANGED"), contains("john")); // Verify the event
+                                                                                                    // logging
+    }
+
+    @Test
+    void testChangeProfilePasswordMismatchThrows() {
+        // Setup
+        ChangePasswordProfileRequest request = new ChangePasswordProfileRequest();
+        request.setCurrentPassword("OldPass1!");
+        request.setNewPassword("NewPass1!");
+        request.setConfirmNewPassword("DifferentNewPass!");
+
+        // Act & Assert
+        Exception ex = assertThrows(IllegalArgumentException.class,
+                () -> userService.changeProfilePassword("john", request));
+        assertEquals("Les deux mots de passe ne correspondent pas", ex.getMessage());
+    }
+
+    @Test
+    void testChangeProfilePasswordIncorrectCurrentPasswordThrows() {
+        // Setup
+        ChangePasswordProfileRequest request = new ChangePasswordProfileRequest();
+        request.setCurrentPassword("WrongOldPass!");
+        request.setNewPassword("NewPass1!");
+        request.setConfirmNewPassword("NewPass1!");
+
+        User testUser = new User(1L, "john", "john@example.com", "hashedpwd", new HashSet<>(), null, null);
+
+        // Mocking user repository to return the testUser
+        when(userRepository.findByPseudo("john")).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.matches("WrongOldPass!", "hashedpwd")).thenReturn(false);
+
+        // Act & Assert
+        Exception ex = assertThrows(BadCredentialsException.class,
+                () -> userService.changeProfilePassword("john", request));
+        assertEquals("Mot de passe actuel incorrect", ex.getMessage());
+    }
+
+    /*
+     * @Test
+     * void testDeleteUserByIdSuccess() {
+     * // Setup
+     * Long userId = 1L;
+     * User testUser = new User(userId, "john", "john@example.com", "hashedpwd", new
+     * HashSet<>(), null, null);
+     * 
+     * // Mock userRepository
+     * when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+     * doNothing().when(userRepository).delete(testUser); // Mock delete
+     * 
+     * // Assurez-vous que l'URL est correctement construite
+     * String cascadeDeleteUrl = "http://localhost:8081/" + userId + "/cascade";
+     * doNothing().when(restTemplate).delete(eq(cascadeDeleteUrl)); // Mock cascade
+     * delete with the exact URL
+     * 
+     * // Act
+     * userService.deleteUserById(userId);
+     * 
+     * // Assert
+     * verify(userRepository).delete(testUser); // Verifies that delete was called
+     * on userRepository
+     * verify(restTemplate).delete(cascadeDeleteUrl); // Verifies that the correct
+     * URL is passed to restTemplate
+     * verify(auditClient).logEvent(eq("auth-service"), eq("USER_DELETED"),
+     * anyString()); // Verifies the log event for deletion
+     * }
+     */
+
+    @Test
+    void testDeleteUserByIdUserNotFoundThrows() {
+        // Setup
+        Long userId = 1L;
+
+        // Mock userRepository (simulate user not found)
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        Exception ex = assertThrows(UserNotFoundException.class, () -> userService.deleteUserById(userId));
+        assertEquals("Utilisateur non trouvé avec l'ID : " + userId, ex.getMessage());
+    }
+
+
 }

@@ -1,4 +1,4 @@
-/* package com.jdrbibli.ouvrage_service.service;
+package com.jdrbibli.ouvrage_service.service;
 
 import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
@@ -9,13 +9,17 @@ import com.jdrbibli.ouvrage_service.repository.GammeRepository;
 import com.jdrbibli.ouvrage_service.repository.OuvrageRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class OuvrageServiceTest {
 
     @Mock
@@ -30,158 +34,157 @@ class OuvrageServiceTest {
     @InjectMocks
     private OuvrageService ouvrageService;
 
+    private Ouvrage ouvrage;
+    private Gamme gamme;
+    private OuvrageDTO dto;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+        gamme = new Gamme();
+        gamme.setId(1L);
+        gamme.setOwnerId(42L);
 
-    @Test
-    void testFindByOwnerPseudo_returnsList() {
-        String owner = "user1";
-        List<Ouvrage> expected = List.of(new Ouvrage(), new Ouvrage());
-        when(ouvrageRepository.findByOwnerPseudo(owner)).thenReturn(expected);
-
-        List<Ouvrage> actual = ouvrageService.findByOwnerPseudo(owner);
-
-        assertEquals(expected, actual);
-        verify(ouvrageRepository, times(1)).findByOwnerPseudo(owner);
-    }
-
-    @Test
-    void testFindById_found() {
-        Ouvrage ouvrage = new Ouvrage();
+        ouvrage = new Ouvrage();
         ouvrage.setId(1L);
+        ouvrage.setGamme(gamme);
+
+        dto = new OuvrageDTO();
+        dto.setGammeId(1L);
+        dto.setOwnerId(42L);
+        dto.setTitre("Titre Test");
+    }
+
+    @Test
+    void createFromDTO_shouldCreateOuvrage_whenValid() {
+        when(gammeRepository.findById(1L)).thenReturn(Optional.of(gamme));
+        when(ouvrageMapper.toEntity(dto)).thenReturn(ouvrage);
+        when(ouvrageRepository.save(ouvrage)).thenReturn(ouvrage);
+
+        Ouvrage result = ouvrageService.createFromDTO(dto);
+
+        assertEquals(ouvrage, result);
+        assertEquals(gamme, result.getGamme());
+        verify(ouvrageRepository).save(ouvrage);
+    }
+
+    @Test
+    void createFromDTO_shouldThrow_whenGammeNotFound() {
+        when(gammeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> ouvrageService.createFromDTO(dto));
+        assertEquals("Gamme not found with id 1", exception.getMessage());
+    }
+
+    @Test
+    void createFromDTO_shouldThrow_whenOwnerIdNull() {
+        dto.setOwnerId(null);
+        when(gammeRepository.findById(1L)).thenReturn(Optional.of(gamme));
+        when(ouvrageMapper.toEntity(dto)).thenReturn(ouvrage);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> ouvrageService.createFromDTO(dto));
+        assertEquals("OwnerId must be set", exception.getMessage());
+    }
+
+    @Test
+    void updateFromDTO_shouldUpdateOuvrage_whenValid() {
+        when(ouvrageRepository.findById(1L)).thenReturn(Optional.of(ouvrage));
+        when(gammeRepository.findById(1L)).thenReturn(Optional.of(gamme));
+        when(ouvrageRepository.save(ouvrage)).thenReturn(ouvrage);
+
+        Ouvrage result = ouvrageService.updateFromDTO(1L, dto);
+
+        assertEquals(ouvrage, result);
+        verify(ouvrageRepository).save(ouvrage);
+    }
+
+    @Test
+    void updateFromDTO_shouldThrow_whenOuvrageNotFound() {
+        when(ouvrageRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> ouvrageService.updateFromDTO(1L, dto));
+        assertEquals("Ouvrage not found with id 1", exception.getMessage());
+    }
+
+    @Test
+    void updateFromDTO_shouldThrow_whenGammeNotFound() {
+        when(ouvrageRepository.findById(1L)).thenReturn(Optional.of(ouvrage));
+        when(gammeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> ouvrageService.updateFromDTO(1L, dto));
+        assertEquals("Gamme not found with id 1", exception.getMessage());
+    }
+
+    @Test
+    void deleteById_shouldCallRepository() {
+        doNothing().when(ouvrageRepository).deleteById(1L);
+
+        ouvrageService.deleteById(1L);
+
+        verify(ouvrageRepository).deleteById(1L);
+    }
+
+    @Test
+    void findByOwnerId_shouldReturnList() {
+        when(ouvrageRepository.findByOwnerId(42L)).thenReturn(Collections.singletonList(ouvrage));
+
+        List<Ouvrage> result = ouvrageService.findByOwnerId(42L);
+
+        assertEquals(1, result.size());
+        assertEquals(ouvrage, result.get(0));
+    }
+
+    @Test
+    void findById_shouldReturnOptional() {
         when(ouvrageRepository.findById(1L)).thenReturn(Optional.of(ouvrage));
 
         Optional<Ouvrage> result = ouvrageService.findById(1L);
 
         assertTrue(result.isPresent());
         assertEquals(ouvrage, result.get());
-        verify(ouvrageRepository, times(1)).findById(1L);
     }
 
     @Test
-    void testFindById_notFound() {
-        when(ouvrageRepository.findById(999L)).thenReturn(Optional.empty());
+    void findByIdAndOwnerId_shouldReturnOptional() {
+        when(ouvrageRepository.findByIdAndOwnerId(1L, 42L)).thenReturn(Optional.of(ouvrage));
 
-        Optional<Ouvrage> result = ouvrageService.findById(999L);
+        Optional<Ouvrage> result = ouvrageService.findByIdAndOwnerId(1L, 42L);
 
-        assertFalse(result.isPresent());
-        verify(ouvrageRepository, times(1)).findById(999L);
+        assertTrue(result.isPresent());
+        assertEquals(ouvrage, result.get());
     }
 
     @Test
-    void testCreateFromDTO_success() {
-        Gamme gamme = new Gamme();
-        gamme.setId(10L);
-        OuvrageDTO dto = new OuvrageDTO();
-        dto.setGammeId(10L);
-        dto.setOwnerPseudo("owner");
+    void getOuvragesByGamme_shouldReturnDTOList() {
+        when(ouvrageRepository.findByGammeIdAndIdNot(1L, 2L)).thenReturn(Collections.singletonList(ouvrage));
+        when(ouvrageMapper.toDTO(ouvrage)).thenReturn(dto);
 
-        Ouvrage mappedOuvrage = new Ouvrage();
-        when(gammeRepository.findById(10L)).thenReturn(Optional.of(gamme));
-        when(ouvrageMapper.toEntity(dto)).thenReturn(mappedOuvrage);
-        when(ouvrageRepository.save(any(Ouvrage.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        List<OuvrageDTO> result = ouvrageService.getOuvragesByGamme(1L, 2L);
 
-        Ouvrage result = ouvrageService.createFromDTO(dto);
-
-        assertNotNull(result);
-        assertEquals(gamme, result.getGamme());
-        assertEquals("owner", result.getOwnerPseudo());
-        verify(gammeRepository, times(1)).findById(10L);
-        verify(ouvrageMapper, times(1)).toEntity(dto);
-        verify(ouvrageRepository, times(1)).save(result);
+        assertEquals(1, result.size());
+        assertEquals(dto, result.get(0));
     }
 
     @Test
-    void testCreateFromDTO_gammeNotFound_throwsException() {
-        OuvrageDTO dto = new OuvrageDTO();
-        dto.setGammeId(999L);
+    void findByGammeIdAndOwnerId_shouldReturnList() {
+        when(ouvrageRepository.findByGammeIdAndOwnerId(1L, 42L)).thenReturn(Collections.singletonList(ouvrage));
 
-        when(gammeRepository.findById(999L)).thenReturn(Optional.empty());
+        List<Ouvrage> result = ouvrageService.findByGammeIdAndOwnerId(1L, 42L);
 
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () -> {
-            ouvrageService.createFromDTO(dto);
-        });
-
-        assertEquals("Gamme not found with id 999", ex.getMessage());
-        verify(ouvrageRepository, never()).save(any());
+        assertEquals(1, result.size());
+        assertEquals(ouvrage, result.get(0));
     }
 
     @Test
-    void testUpdateFromDTO_success() {
-        Long id = 1L;
-        Gamme gamme = new Gamme();
-        gamme.setId(20L);
+    void findByGammeId_shouldReturnList() {
+        when(ouvrageRepository.findByGammeId(1L)).thenReturn(Collections.singletonList(ouvrage));
 
-        Ouvrage existing = new Ouvrage();
-        existing.setId(id);
-        existing.setOwnerPseudo("ownerExisting");
+        List<Ouvrage> result = ouvrageService.findByGammeId(1L);
 
-        OuvrageDTO dto = new OuvrageDTO();
-        dto.setGammeId(20L);
-        dto.setOwnerPseudo("ownerNew");
-
-        Ouvrage mappedUpdated = new Ouvrage();
-
-        when(ouvrageRepository.findById(id)).thenReturn(Optional.of(existing));
-        when(gammeRepository.findById(20L)).thenReturn(Optional.of(gamme));
-        when(ouvrageMapper.toEntity(any(OuvrageDTO.class))).thenReturn(mappedUpdated);
-        when(ouvrageRepository.save(any(Ouvrage.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        Ouvrage result = ouvrageService.updateFromDTO(id, dto);
-
-        assertNotNull(result);
-        assertEquals(id, result.getId());
-        assertEquals(gamme, result.getGamme());
-        assertEquals("ownerExisting", dto.getOwnerPseudo()); // dto ownerPseudo est remplacé
-        verify(ouvrageRepository, times(1)).findById(id);
-        verify(gammeRepository, times(1)).findById(20L);
-        verify(ouvrageMapper, times(1)).toEntity(dto);
-        verify(ouvrageRepository, times(1)).save(result);
-    }
-
-    @Test
-    void testUpdateFromDTO_ouvrageNotFound_throwsException() {
-        Long id = 999L;
-        OuvrageDTO dto = new OuvrageDTO();
-
-        when(ouvrageRepository.findById(id)).thenReturn(Optional.empty());
-
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () -> {
-            ouvrageService.updateFromDTO(id, dto);
-        });
-
-        assertEquals("Ouvrage not found with id " + id, ex.getMessage());
-        verify(gammeRepository, never()).findById(any());
-        verify(ouvrageRepository, never()).save(any());
-    }
-
-    @Test
-    void testUpdateFromDTO_gammeNotFound_throwsException() {
-        Long id = 1L;
-        Ouvrage existing = new Ouvrage();
-        existing.setId(id);
-
-        OuvrageDTO dto = new OuvrageDTO();
-        dto.setGammeId(999L);
-
-        when(ouvrageRepository.findById(id)).thenReturn(Optional.of(existing));
-        when(gammeRepository.findById(999L)).thenReturn(Optional.empty());
-
-        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () -> {
-            ouvrageService.updateFromDTO(id, dto);
-        });
-
-        assertEquals("Gamme not found with id 999", ex.getMessage());
-        verify(ouvrageRepository, never()).save(any());
-    }
-
-    @Test
-    void testDeleteById_callsRepositoryDelete() {
-        Long id = 10L;
-        ouvrageService.deleteById(id);
-        verify(ouvrageRepository, times(1)).deleteById(id);
+        assertEquals(1, result.size());
+        assertEquals(ouvrage, result.get(0));
     }
 }
- */

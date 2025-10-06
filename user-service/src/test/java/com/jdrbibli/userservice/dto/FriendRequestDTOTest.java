@@ -1,33 +1,44 @@
 package com.jdrbibli.userservice.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class FriendRequestDTOTest {
 
     @Test
     void testGettersAndSetters() {
-        FriendRequestDTO dto = new FriendRequestDTO();
+        FriendRequestDTO request = new FriendRequestDTO();
 
         Long id = 1L;
-        Long senderId = 2L;
-        String senderPseudo = "senderUser";
-        Long receiverId = 3L;
-        String receiverPseudo = "receiverUser";
+        Long senderId = 10L;
+        String senderPseudo = "Alice";
+        Long receiverId = 20L;
+        String receiverPseudo = "Bob";
         String status = "PENDING";
+        LocalDateTime createdAt = LocalDateTime.now();
+        LocalDateTime respondedAt = LocalDateTime.now().plusHours(1);
 
-        dto.setId(id);
-        dto.setSenderId(senderId);
-        dto.setSenderPseudo(senderPseudo);
-        dto.setReceiverId(receiverId);
-        dto.setReceiverPseudo(receiverPseudo);
-        dto.setStatus(status);
+        // Setters
+        request.setId(id);
+        request.setSenderId(senderId);
+        request.setSenderPseudo(senderPseudo);
+        request.setReceiverId(receiverId);
+        request.setReceiverPseudo(receiverPseudo);
+        request.setStatus(status);
+        request.setCreatedAt(createdAt);
+        request.setRespondedAt(respondedAt);
 
-        assertEquals(id, dto.getId());
-        assertEquals(senderId, dto.getSenderId());
-        assertEquals(senderPseudo, dto.getSenderPseudo());
-        assertEquals(receiverId, dto.getReceiverId());
-        assertEquals(receiverPseudo, dto.getReceiverPseudo());
-        assertEquals(status, dto.getStatus());
+        // Getters + assertions
+        assertEquals(id, request.getId(), "L'id doit correspondre");
+        assertEquals(senderId, request.getSenderId(), "L'id de l'expéditeur doit correspondre");
+        assertEquals(senderPseudo, request.getSenderPseudo(), "Le pseudo de l'expéditeur doit correspondre");
+        assertEquals(receiverId, request.getReceiverId(), "L'id du destinataire doit correspondre");
+        assertEquals(receiverPseudo, request.getReceiverPseudo(), "Le pseudo du destinataire doit correspondre");
+        assertEquals(status, request.getStatus(), "Le statut doit correspondre");
+        assertEquals(createdAt, request.getCreatedAt(), "La date de création doit correspondre");
+        assertEquals(respondedAt, request.getRespondedAt(), "La date de réponse doit correspondre");
     }
 }

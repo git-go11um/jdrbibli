@@ -1,8 +1,9 @@
-/* package com.jdrbibli.ouvrage_service.mapper;
+package com.jdrbibli.ouvrage_service.mapper;
 
 import com.jdrbibli.ouvrage_service.dto.OuvrageDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
 import com.jdrbibli.ouvrage_service.entity.Ouvrage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -12,93 +13,102 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OuvrageMapperTest {
 
-    private final OuvrageMapper mapper = new OuvrageMapper();
+    private OuvrageMapper ouvrageMapper;
+
+    @BeforeEach
+    void setUp() {
+        ouvrageMapper = new OuvrageMapper();
+    }
 
     @Test
-    void testToDTO_and_toEntity_basic() {
+    void toDTO_shouldMapAllFields() {
+        // Arrange
         Gamme gamme = new Gamme();
-        gamme.setId(10L);
+        gamme.setId(1L);
+        gamme.setNom("Gamme1");
 
-        Ouvrage entity = new Ouvrage();
-        entity.setId(1L);
-        entity.setTitre("Titre test");
-        entity.setDescription("Description test");
-        entity.setGamme(gamme);
-        entity.setVersion("1.0");
-        entity.setTypeOuvrage("Livre");
-        entity.setDatePublication(LocalDate.of(2020, 5, 20));
-        entity.setLangue("FR");
-        entity.setEditeur("Editeur test");
-        entity.setEtat("Bon");
-        entity.setIsbn("1234567890");
-        entity.setOuvrageLie("Ouvrage lié");
-        entity.setScenarioLie("Scenario lié");
-        entity.setPret(true);
-        entity.setErrata("Errata test");
-        entity.setNotes("Notes test");
-        entity.setScenariosContenus(List.of("Scenario1", "Scenario2"));
-        entity.setAutresOuvragesGamme(List.of("Ouvrage1"));
+        Ouvrage ouvrage = new Ouvrage();
+        ouvrage.setId(100L);
+        ouvrage.setTitre("TitreOuvrage");
+        ouvrage.setDescription("Desc");
+        ouvrage.setGamme(gamme);
+        ouvrage.setVersion("v1");
+        ouvrage.setTypeOuvrage("Livre");
+        ouvrage.setDatePublication(LocalDate.of(2025, 10, 6));
+        ouvrage.setLangue("FR");
+        ouvrage.setEditeur("EditeurX");
+        ouvrage.setEtat("Neuf");
+        ouvrage.setIsbn("1234567890");
+        ouvrage.setOuvrageLie("Ouvrage2");
+        ouvrage.setScenarioLie("Scenario1");
+        ouvrage.setPret(true);
+        ouvrage.setErrata("Errata1");
+        ouvrage.setNotes("Notes internes");
+        ouvrage.setOwnerId(42L);
+        ouvrage.setImageUrl("image.png");
+        ouvrage.setScenariosContenusList(List.of("S1","S2"));
+        ouvrage.setAutresOuvragesGamme(List.of("Ouv1","Ouv2"));
 
-        entity.setOwnerPseudo("ownerUser");
+        // Act
+        OuvrageDTO dto = ouvrageMapper.toDTO(ouvrage);
 
-        OuvrageDTO dto = mapper.toDTO(entity);
-
+        // Assert
         assertNotNull(dto);
-        assertEquals(entity.getId(), dto.getId());
-        assertEquals(entity.getTitre(), dto.getTitre());
-        assertEquals(entity.getDescription(), dto.getDescription());
-        assertEquals(gamme.getId(), dto.getGammeId());
-        assertEquals(entity.getVersion(), dto.getVersion());
-        assertEquals(entity.getTypeOuvrage(), dto.getTypeOuvrage());
-        assertEquals(entity.getDatePublication(), dto.getDatePublication());
-        assertEquals(entity.getLangue(), dto.getLangue());
-        assertEquals(entity.getEditeur(), dto.getEditeur());
-        assertEquals(entity.getEtat(), dto.getEtat());
-        assertEquals(entity.getIsbn(), dto.getIsbn());
-        assertEquals(entity.getOuvrageLie(), dto.getOuvrageLie());
-        assertEquals(entity.getScenarioLie(), dto.getScenarioLie());
-        assertEquals(entity.getPret(), dto.getPret());
-        assertEquals(entity.getErrata(), dto.getErrata());
-        assertEquals(entity.getNotes(), dto.getNotes());
-        assertEquals(entity.getScenariosContenus(), dto.getScenariosContenus());
-        assertEquals(entity.getAutresOuvragesGamme(), dto.getAutresOuvragesGamme());
-
-        assertEquals(entity.getOwnerPseudo(), dto.getOwnerPseudo());
-
-        // Maintenant test inverse toEntity
-        Ouvrage entityFromDto = mapper.toEntity(dto);
-
-        assertNotNull(entityFromDto);
-        assertEquals(dto.getId(), entityFromDto.getId());
-        assertEquals(dto.getTitre(), entityFromDto.getTitre());
-        assertEquals(dto.getDescription(), entityFromDto.getDescription());
-        assertNull(entityFromDto.getGamme()); // gamme non mappée dans toEntity (à gérer ailleurs)
-        assertEquals(dto.getVersion(), entityFromDto.getVersion());
-        assertEquals(dto.getTypeOuvrage(), entityFromDto.getTypeOuvrage());
-        assertEquals(dto.getDatePublication(), entityFromDto.getDatePublication());
-        assertEquals(dto.getLangue(), entityFromDto.getLangue());
-        assertEquals(dto.getEditeur(), entityFromDto.getEditeur());
-        assertEquals(dto.getEtat(), entityFromDto.getEtat());
-        assertEquals(dto.getIsbn(), entityFromDto.getIsbn());
-        assertEquals(dto.getOuvrageLie(), entityFromDto.getOuvrageLie());
-        assertEquals(dto.getScenarioLie(), entityFromDto.getScenarioLie());
-        assertEquals(dto.getPret(), entityFromDto.getPret());
-        assertEquals(dto.getErrata(), entityFromDto.getErrata());
-        assertEquals(dto.getNotes(), entityFromDto.getNotes());
-        assertEquals(dto.getScenariosContenus(), entityFromDto.getScenariosContenus());
-        assertEquals(dto.getAutresOuvragesGamme(), entityFromDto.getAutresOuvragesGamme());
-
-        assertEquals(dto.getOwnerPseudo(), entityFromDto.getOwnerPseudo());
+        assertEquals(ouvrage.getId(), dto.getId());
+        assertEquals("TitreOuvrage", dto.getTitre());
+        assertEquals("Gamme1", dto.getGammeNom());
+        assertEquals(1L, dto.getGammeId());
+        assertEquals(List.of("S1","S2"), dto.getScenariosContenus());
+        assertEquals(List.of("Ouv1","Ouv2"), dto.getAutresOuvragesGamme());
+        assertEquals("image.png", dto.getImageUrl());
+        assertEquals(42L, dto.getOwnerId());
     }
 
     @Test
-    void testToDTO_null() {
-        assertNull(mapper.toDTO(null));
+    void toEntity_shouldMapAllFields() {
+        // Arrange
+        OuvrageDTO dto = new OuvrageDTO();
+        dto.setId(200L);
+        dto.setTitre("TitreDTO");
+        dto.setDescription("DescDTO");
+        dto.setVersion("v2");
+        dto.setTypeOuvrage("Module");
+        dto.setDatePublication(LocalDate.of(2024, 5, 20));
+        dto.setLangue("EN");
+        dto.setEditeur("EditeurY");
+        dto.setEtat("Bon");
+        dto.setIsbn("0987654321");
+        dto.setOuvrageLie("OuvrageLie");
+        dto.setScenarioLie("ScenarioLie");
+        dto.setPret(false);
+        dto.setErrata("ErrataDTO");
+        dto.setNotes("NotesDTO");
+        dto.setOwnerId(7L);
+        dto.setImageUrl("imageDTO.png");
+        dto.setScenariosContenus(List.of("S3","S4"));
+        dto.setAutresOuvragesGamme(List.of("Ouv3","Ouv4"));
+
+        // Act
+        Ouvrage entity = ouvrageMapper.toEntity(dto);
+
+        // Assert
+        assertNotNull(entity);
+        assertEquals(200L, entity.getId());
+        assertEquals("TitreDTO", entity.getTitre());
+        assertEquals("DescDTO", entity.getDescription());
+        assertEquals(List.of("S3","S4"), entity.getScenariosContenusList());
+        assertEquals(List.of("Ouv3","Ouv4"), entity.getAutresOuvragesGamme());
+        assertEquals("imageDTO.png", entity.getImageUrl());
+        assertEquals(7L, entity.getOwnerId());
     }
 
     @Test
-    void testToEntity_null() {
-        assertNull(mapper.toEntity(null));
+    void toDTO_shouldReturnNullIfEntityIsNull() {
+        assertNull(ouvrageMapper.toDTO(null));
+    }
+
+    @Test
+    void toEntity_shouldReturnNullIfDTOIsNull() {
+        assertNull(ouvrageMapper.toEntity(null));
     }
 }
- */

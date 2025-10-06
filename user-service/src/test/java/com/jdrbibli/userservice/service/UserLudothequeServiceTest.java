@@ -1,71 +1,88 @@
-/* package com.jdrbibli.userservice.service;
+package com.jdrbibli.userservice.service;
 
 import com.jdrbibli.userservice.dto.OuvrageDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
-import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
-import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class UserLudothequeServiceTest {
+class UserLudothequeServiceTest {
 
-    @Mock
     private WebClient webClient;
+    private UserLudothequeService service;
 
-    @Mock
-    private RequestHeadersUriSpec<?> requestHeadersUriSpec;
-
-    @Mock
-    private RequestHeadersSpec<?> requestHeadersSpec;
-
-    @Mock
-    private ResponseSpec responseSpec;
-
-    private UserLudothequeService userLudothequeService;
+    // Mocks intermédiaires de WebClient (types bruts)
+    private WebClient.RequestHeadersUriSpec uriSpecMock;
+    private WebClient.RequestHeadersSpec headersSpecMock;
+    private WebClient.ResponseSpec responseSpecMock;
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        userLudothequeService = new UserLudothequeService(webClient);
+    void setUp() {
+        webClient = mock(WebClient.class);
+        service = new UserLudothequeService(webClient);
+
+        uriSpecMock = mock(WebClient.RequestHeadersUriSpec.class);
+        headersSpecMock = mock(WebClient.RequestHeadersSpec.class);
+        responseSpecMock = mock(WebClient.ResponseSpec.class);
     }
 
     @Test
-    public void testGetOuvragesByIds_success() {
-        // Prépare la donnée de test
-        OuvrageDTO ouvrage = new OuvrageDTO();
-        ouvrage.setId(1L);
-        ouvrage.setTitre("Test Ouvrage");
+    void getOuvragesByIds_shouldReturnListOfOuvrages() {
+        List<Long> ids = List.of(1L, 2L);
 
-        List<Long> ids = List.of(1L);
+        OuvrageDTO o1 = new OuvrageDTO();
+        o1.setId(1L);
+        OuvrageDTO o2 = new OuvrageDTO();
+        o2.setId(2L);
 
-        // Utilisation de doReturn au lieu de when().thenReturn()
-        doReturn(requestHeadersUriSpec).when(webClient).get();
-        doReturn(requestHeadersSpec).when(requestHeadersUriSpec).uri(anyString());
-        doReturn(responseSpec).when(requestHeadersSpec).retrieve();
-        doReturn(Flux.just(ouvrage)).when(responseSpec).bodyToFlux(OuvrageDTO.class);
+        when(webClient.get()).thenReturn(uriSpecMock);
+        when(uriSpecMock.uri("/ouvrage-service/ouvrages?ids=1,2")).thenReturn(uriSpecMock);
+        when(uriSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToFlux(OuvrageDTO.class)).thenReturn(Flux.just(o1, o2));
 
-        List<OuvrageDTO> result = userLudothequeService.getOuvragesByIds(ids);
+        List<OuvrageDTO> result = service.getOuvragesByIds(ids);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Test Ouvrage", result.get(0).getTitre());
-
-        verify(webClient).get();
-        verify(requestHeadersUriSpec).uri("/ouvrage-service/ouvrages?ids=1");
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).bodyToFlux(OuvrageDTO.class);
+        assertEquals(2, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(2L, result.get(1).getId());
     }
 
+    @Test
+    void getOuvragesByIds_withEmptyList_shouldReturnEmptyList() {
+        List<OuvrageDTO> result = service.getOuvragesByIds(List.of());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getOuvrageById_shouldReturnOuvrage() {
+        Long id = 1L;
+        OuvrageDTO o = new OuvrageDTO();
+        o.setId(id);
+
+        when(webClient.get()).thenReturn(uriSpecMock);
+        when(uriSpecMock.uri("/ouvrage-service/ouvrages/1")).thenReturn(uriSpecMock);
+        when(uriSpecMock.retrieve()).thenReturn(responseSpecMock);
+        when(responseSpecMock.bodyToMono(OuvrageDTO.class)).thenReturn(Mono.just(o));
+
+        OuvrageDTO result = service.getOuvrageById(id);
+
+        assertNotNull(result);
+        assertEquals(id, result.getId());
+    }
+
+    @Test
+    void getOuvrageById_withNull_shouldReturnNull() {
+        OuvrageDTO result = service.getOuvrageById(null);
+        assertNull(result);
+    }
 }
- */

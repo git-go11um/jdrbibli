@@ -1,28 +1,27 @@
-/* package com.jdrbibli.userservice.controller;
+package com.jdrbibli.userservice.controller;
 
 import com.jdrbibli.userservice.dto.FriendDTO;
 import com.jdrbibli.userservice.dto.FriendRequestDTO;
+import com.jdrbibli.userservice.dto.OuvrageDTO;
 import com.jdrbibli.userservice.entity.FriendRequest;
 import com.jdrbibli.userservice.entity.UserProfile;
-import com.jdrbibli.userservice.mapper.FriendRequestMapper;
 import com.jdrbibli.userservice.service.FriendRequestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class FriendRequestControllerTest {
-
-    private MockMvc mockMvc;
+class FriendRequestControllerTest {
 
     @Mock
     private FriendRequestService friendRequestService;
@@ -31,131 +30,116 @@ public class FriendRequestControllerTest {
     private FriendRequestController friendRequestController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(friendRequestController).build();
     }
 
     @Test
-    public void testSendRequest() throws Exception {
-        // Crée les UserProfiles pour sender et receiver
-        UserProfile sender = new UserProfile();
-        sender.setId(1L);
-        sender.setPseudo("senderPseudo");
+    void sendRequest_shouldReturnFriendRequestDTO() {
+        FriendRequest request = new FriendRequest();
+        request.setId(1L);
 
-        UserProfile receiver = new UserProfile();
-        receiver.setId(2L);
-        receiver.setPseudo("receiverPseudo");
+        when(friendRequestService.sendFriendRequest(1L, 2L)).thenReturn(request);
 
-        // Crée la FriendRequest avec sender, receiver et status
-        FriendRequest fakeRequest = new FriendRequest();
-        fakeRequest.setId(1L);
-        fakeRequest.setSender(sender);
-        fakeRequest.setReceiver(receiver);
-        fakeRequest.setStatus(FriendRequest.Status.PENDING);
+        FriendRequestDTO dto = friendRequestController.sendRequest(1L, 2L);
 
-        when(friendRequestService.sendFriendRequest(1L, 2L)).thenReturn(fakeRequest);
-
-        mockMvc.perform(post("/friends/request")
-                .param("senderId", "1")
-                .param("receiverId", "2")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.status", is("PENDING")))
-                .andExpect(jsonPath("$.senderId", is(1)))
-                .andExpect(jsonPath("$.receiverId", is(2)));
-
+        assertThat(dto).isNotNull();
+        assertThat(dto.getId()).isEqualTo(1L);
         verify(friendRequestService).sendFriendRequest(1L, 2L);
     }
 
     @Test
-    public void testAcceptRequest() throws Exception {
-        UserProfile sender = new UserProfile();
-        sender.setId(1L);
-        sender.setPseudo("senderPseudo");
+    void acceptRequest_shouldReturnFriendRequestDTO() {
+        FriendRequest request = new FriendRequest();
+        request.setId(10L);
 
-        UserProfile receiver = new UserProfile();
-        receiver.setId(2L);
-        receiver.setPseudo("receiverPseudo");
+        when(friendRequestService.acceptFriendRequest(10L)).thenReturn(request);
 
-        FriendRequest acceptedRequest = new FriendRequest();
-        acceptedRequest.setId(10L);
-        acceptedRequest.setSender(sender);
-        acceptedRequest.setReceiver(receiver);
-        acceptedRequest.setStatus(FriendRequest.Status.ACCEPTED);
+        FriendRequestDTO dto = friendRequestController.acceptRequest(10L);
 
-        when(friendRequestService.acceptFriendRequest(10L)).thenReturn(acceptedRequest);
-
-        mockMvc.perform(post("/friends/10/accept"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(10)))
-                .andExpect(jsonPath("$.status", is("ACCEPTED")))
-                .andExpect(jsonPath("$.senderId", is(1)))
-                .andExpect(jsonPath("$.receiverId", is(2)));
-
+        assertThat(dto).isNotNull();
+        assertThat(dto.getId()).isEqualTo(10L);
         verify(friendRequestService).acceptFriendRequest(10L);
     }
 
     @Test
-    public void testRejectRequest() throws Exception {
-        UserProfile sender = new UserProfile();
-        sender.setId(1L);
-        sender.setPseudo("senderPseudo");
+    void rejectRequest_shouldReturnFriendRequestDTO() {
+        FriendRequest request = new FriendRequest();
+        request.setId(20L);
 
-        UserProfile receiver = new UserProfile();
-        receiver.setId(2L);
-        receiver.setPseudo("receiverPseudo");
+        when(friendRequestService.rejectFriendRequest(20L)).thenReturn(request);
 
-        FriendRequest rejectedRequest = new FriendRequest();
-        rejectedRequest.setId(10L);
-        rejectedRequest.setSender(sender);
-        rejectedRequest.setReceiver(receiver);
-        rejectedRequest.setStatus(FriendRequest.Status.REJECTED);
+        FriendRequestDTO dto = friendRequestController.rejectRequest(20L);
 
-        when(friendRequestService.rejectFriendRequest(10L)).thenReturn(rejectedRequest);
-
-        mockMvc.perform(post("/friends/10/reject"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(10)))
-                .andExpect(jsonPath("$.status", is("REJECTED")))
-                .andExpect(jsonPath("$.senderId", is(1)))
-                .andExpect(jsonPath("$.receiverId", is(2)));
-
-        verify(friendRequestService).rejectFriendRequest(10L);
+        assertThat(dto).isNotNull();
+        assertThat(dto.getId()).isEqualTo(20L);
+        verify(friendRequestService).rejectFriendRequest(20L);
     }
 
     @Test
-    public void testRemoveFriend() throws Exception {
-        doNothing().when(friendRequestService).removeFriend(1L, 2L);
-
-        mockMvc.perform(delete("/friends/2")
-                .param("userId", "1"))
-                .andExpect(status().isOk());
-
+    void removeFriend_shouldCallService() {
+        friendRequestController.removeFriend(1L, 2L);
         verify(friendRequestService).removeFriend(1L, 2L);
     }
 
     @Test
-    public void testListFriends() throws Exception {
-        UserProfile user1 = new UserProfile();
-        user1.setId(2L);
-        user1.setPseudo("friend1");
-        user1.setEmail("friend1@example.com");
+    void listFriends_shouldReturnFriendDTOList() {
+        UserProfile friend1 = new UserProfile();
+        friend1.setId(1L);
+        UserProfile friend2 = new UserProfile();
+        friend2.setId(2L);
 
-        List<UserProfile> friends = List.of(user1);
+        when(friendRequestService.listFriends(100L)).thenReturn(Arrays.asList(friend1, friend2));
 
-        when(friendRequestService.listFriends(1L)).thenReturn(friends);
+        List<FriendDTO> result = friendRequestController.listFriends(100L);
 
-        mockMvc.perform(get("/friends")
-                .param("userId", "1")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id", is(2)))
-                .andExpect(jsonPath("$[0].pseudo", is("friend1")))
-                .andExpect(jsonPath("$[0].email", is("friend1@example.com")));
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        assertThat(result.get(1).getId()).isEqualTo(2L);
+        verify(friendRequestService).listFriends(100L);
+    }
 
-        verify(friendRequestService).listFriends(1L);
+    @Test
+    void listReceivedRequests_shouldReturnFriendRequestDTOList() {
+        FriendRequest req1 = new FriendRequest();
+        req1.setId(1L);
+        FriendRequest req2 = new FriendRequest();
+        req2.setId(2L);
+
+        when(friendRequestService.listReceivedRequests(100L)).thenReturn(Arrays.asList(req1, req2));
+
+        List<FriendRequestDTO> result = friendRequestController.listReceivedRequests(100L);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        assertThat(result.get(1).getId()).isEqualTo(2L);
+        verify(friendRequestService).listReceivedRequests(100L);
+    }
+
+    @Test
+    void getFriendOuvrages_shouldReturnOuvrageDTOList_whenFriends() {
+        OuvrageDTO ouvrage = new OuvrageDTO();
+        ouvrage.setId(5L);
+
+        when(friendRequestService.areFriends(1L, 2L)).thenReturn(true);
+        when(friendRequestService.listFriendOuvrages(2L)).thenReturn(List.of(ouvrage));
+
+        List<OuvrageDTO> result = friendRequestController.getFriendOuvrages(2L, 1L);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getId()).isEqualTo(5L);
+        verify(friendRequestService).areFriends(1L, 2L);
+        verify(friendRequestService).listFriendOuvrages(2L);
+    }
+
+    @Test
+    void getFriendOuvrages_shouldThrowException_whenNotFriends() {
+        when(friendRequestService.areFriends(1L, 2L)).thenReturn(false);
+
+        assertThrows(ResponseStatusException.class,
+                () -> friendRequestController.getFriendOuvrages(2L, 1L));
+
+        verify(friendRequestService).areFriends(1L, 2L);
+        verify(friendRequestService, never()).listFriendOuvrages(anyLong());
     }
 }
- */

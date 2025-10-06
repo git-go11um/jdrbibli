@@ -1,4 +1,4 @@
-/* package com.jdrbibli.ouvrage_service.controller;
+package com.jdrbibli.ouvrage_service.controller;
 
 import com.jdrbibli.ouvrage_service.dto.GammeDTO;
 import com.jdrbibli.ouvrage_service.entity.Gamme;
@@ -6,225 +6,134 @@ import com.jdrbibli.ouvrage_service.mapper.GammeMapper;
 import com.jdrbibli.ouvrage_service.service.GammeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentMatchers;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 class GammeControllerTest {
 
-    @Mock
+    private MockMvc mockMvc;
     private GammeService gammeService;
-
-    @Mock
     private GammeMapper gammeMapper;
-
-    @InjectMocks
     private GammeController gammeController;
 
-    private MockMvc mockMvc;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
-
     @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
+    void setUp() {
+        gammeService = mock(GammeService.class);
+        gammeMapper = mock(GammeMapper.class);
+        gammeController = new GammeController(gammeService, gammeMapper);
         mockMvc = MockMvcBuilders.standaloneSetup(gammeController).build();
     }
 
     @Test
-    void testGetAll_success() throws Exception {
-        String ownerPseudo = "user1";
-        List<Gamme> gammes = List.of(new Gamme());
-        List<GammeDTO> gammesDTO = List.of(new GammeDTO());
-
-        when(gammeService.findByOwnerPseudo(ownerPseudo)).thenReturn(gammes);
-        when(gammeMapper.toDTO(any())).thenReturn(new GammeDTO());
-
-        mockMvc.perform(get("/api/ouvrage/gammes")
-                .header("X-User-Pseudo", ownerPseudo))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-
-        verify(gammeService).findByOwnerPseudo(ownerPseudo);
-    }
-
-    @Test
-    void testGetById_success() throws Exception {
-        Long id = 1L;
-        String ownerPseudo = "user1";
-
+    void getAll_shouldReturnListOfGammeDTO() throws Exception {
         Gamme gamme = new Gamme();
-        gamme.setOwnerPseudo(ownerPseudo);
-        GammeDTO dto = new GammeDTO();
+        gamme.setId(1L);
+        gamme.setNom("Gamme1");
+        gamme.setOwnerId(10L);
 
-        when(gammeService.findById(id)).thenReturn(Optional.of(gamme));
+        GammeDTO dto = new GammeDTO();
+        dto.setId(1L);
+        dto.setNom("Gamme1");
+        dto.setOwnerId(10L);
+
+        when(gammeService.findByOwnerId(10L)).thenReturn(List.of(gamme));
         when(gammeMapper.toDTO(gamme)).thenReturn(dto);
 
-        mockMvc.perform(get("/api/ouvrage/gammes/{id}", id)
-                .header("X-User-Pseudo", ownerPseudo))
+        mockMvc.perform(get("/api/ouvrage/gammes")
+                .header("X-User-Id", 10L))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].nom").value("Gamme1"))
+                .andExpect(jsonPath("$[0].ownerId").value(10L));
 
-        verify(gammeService).findById(id);
+        verify(gammeService).findByOwnerId(10L);
+        verify(gammeMapper).toDTO(gamme);
     }
 
     @Test
-    void testGetById_forbidden() throws Exception {
-        Long id = 1L;
-        String ownerPseudo = "user1";
-
+    void getById_shouldReturnGammeDTO_whenOwnerMatches() throws Exception {
         Gamme gamme = new Gamme();
-        gamme.setOwnerPseudo("otherUser");
+        gamme.setId(1L);
+        gamme.setNom("Gamme1");
+        gamme.setOwnerId(10L);
 
-        when(gammeService.findById(id)).thenReturn(Optional.of(gamme));
+        GammeDTO dto = new GammeDTO();
+        dto.setId(1L);
+        dto.setNom("Gamme1");
+        dto.setOwnerId(10L);
 
-        mockMvc.perform(get("/api/ouvrage/gammes/{id}", id)
-                .header("X-User-Pseudo", ownerPseudo))
+        when(gammeService.findById(1L)).thenReturn(Optional.of(gamme));
+        when(gammeMapper.toDTO(gamme)).thenReturn(dto);
+
+        mockMvc.perform(get("/api/ouvrage/gammes/1")
+                .header("X-User-Id", 10L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nom").value("Gamme1"))
+                .andExpect(jsonPath("$.ownerId").value(10L));
+    }
+
+    @Test
+    void getById_shouldReturnForbidden_whenOwnerMismatch() throws Exception {
+        Gamme gamme = new Gamme();
+        gamme.setId(1L);
+        gamme.setNom("Gamme1");
+        gamme.setOwnerId(20L);
+
+        when(gammeService.findById(1L)).thenReturn(Optional.of(gamme));
+
+        mockMvc.perform(get("/api/ouvrage/gammes/1")
+                .header("X-User-Id", 10L))
                 .andExpect(status().isForbidden());
-
-        verify(gammeService).findById(id);
     }
 
     @Test
-    void testGetById_notFound() throws Exception {
-        Long id = 1L;
-        String ownerPseudo = "user1";
+    void getById_shouldReturnNotFound_whenGammeMissing() throws Exception {
+        when(gammeService.findById(1L)).thenReturn(Optional.empty());
 
-        when(gammeService.findById(id)).thenReturn(Optional.empty());
-
-        mockMvc.perform(get("/api/ouvrage/gammes/{id}", id)
-                .header("X-User-Pseudo", ownerPseudo))
+        mockMvc.perform(get("/api/ouvrage/gammes/1")
+                .header("X-User-Id", 10L))
                 .andExpect(status().isNotFound());
-
-        verify(gammeService).findById(id);
     }
 
     @Test
-    void testCreate_success() throws Exception {
-        String ownerPseudo = "user1";
-        GammeDTO inputDTO = new GammeDTO(null, "Nom", "Desc", null);
-        Gamme gammeEntity = new Gamme();
-        Gamme savedEntity = new Gamme();
-        GammeDTO returnedDTO = new GammeDTO();
+    void create_shouldReturnCreatedGammeDTO() throws Exception {
+        GammeDTO inputDto = new GammeDTO();
+        inputDto.setNom("Nouvelle Gamme");
 
-        when(gammeMapper.toEntity(any(GammeDTO.class))).thenReturn(gammeEntity);
-        when(gammeService.save(gammeEntity)).thenReturn(savedEntity);
-        when(gammeMapper.toDTO(savedEntity)).thenReturn(returnedDTO);
+        Gamme entity = new Gamme();
+        entity.setId(1L);
+        entity.setNom("Nouvelle Gamme");
+        entity.setOwnerId(10L);
+
+        GammeDTO outputDto = new GammeDTO();
+        outputDto.setId(1L);
+        outputDto.setNom("Nouvelle Gamme");
+        outputDto.setOwnerId(10L);
+
+        when(gammeMapper.toEntity(ArgumentMatchers.any())).thenReturn(entity);
+        when(gammeService.save(entity)).thenReturn(entity);
+        when(gammeMapper.toDTO(entity)).thenReturn(outputDto);
 
         mockMvc.perform(post("/api/ouvrage/gammes")
-                .header("X-User-Pseudo", ownerPseudo)
+                .header("X-User-Id", 10L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputDTO)))
+                .content("{\"nom\":\"Nouvelle Gamme\"}"))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-
-        // Vérifie que ownerPseudo est forcé dans DTO avant mapping
-        ArgumentCaptor<GammeDTO> dtoCaptor = ArgumentCaptor.forClass(GammeDTO.class);
-        verify(gammeMapper).toEntity(dtoCaptor.capture());
-        assert (dtoCaptor.getValue().getOwnerPseudo().equals(ownerPseudo));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nom").value("Nouvelle Gamme"))
+                .andExpect(jsonPath("$.ownerId").value(10L));
     }
 
-    @Test
-    void testUpdate_success() throws Exception {
-        Long id = 1L;
-        String ownerPseudo = "user1";
-
-        Gamme existing = new Gamme();
-        existing.setOwnerPseudo(ownerPseudo);
-
-        GammeDTO updateDTO = new GammeDTO();
-        updateDTO.setNom("newNom");
-        updateDTO.setDescription("newDesc");
-
-        Gamme saved = new Gamme();
-
-        when(gammeService.findById(id)).thenReturn(Optional.of(existing));
-        when(gammeService.save(existing)).thenReturn(saved);
-
-        mockMvc.perform(put("/api/ouvrage/gammes/{id}", id)
-                .header("X-User-Pseudo", ownerPseudo)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateDTO)))
-                .andExpect(status().isOk());
-
-        verify(gammeService).save(existing);
-        // Vérifie que les champs ont bien été modifiés
-        assert (existing.getNom().equals("newNom"));
-        assert (existing.getDescription().equals("newDesc"));
-    }
-
-    @Test
-    void testUpdate_forbidden() throws Exception {
-        Long id = 1L;
-        String ownerPseudo = "user1";
-
-        Gamme existing = new Gamme();
-        existing.setOwnerPseudo("otherUser");
-
-        when(gammeService.findById(id)).thenReturn(Optional.of(existing));
-
-        GammeDTO updateDTO = new GammeDTO();
-
-        mockMvc.perform(put("/api/ouvrage/gammes/{id}", id)
-                .header("X-User-Pseudo", ownerPseudo)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateDTO)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void testDelete_success() throws Exception {
-        Long id = 1L;
-        String ownerPseudo = "user1";
-
-        Gamme existing = new Gamme();
-        existing.setOwnerPseudo(ownerPseudo);
-
-        when(gammeService.findById(id)).thenReturn(Optional.of(existing));
-        doNothing().when(gammeService).deleteById(id, false);
-
-        mockMvc.perform(delete("/api/ouvrage/gammes/{id}", id)
-                .header("X-User-Pseudo", ownerPseudo))
-                .andExpect(status().isNoContent());
-
-        verify(gammeService).deleteById(id, false);
-    }
-
-    @Test
-    void testDelete_forbidden() throws Exception {
-        Long id = 1L;
-        String ownerPseudo = "user1";
-
-        Gamme existing = new Gamme();
-        existing.setOwnerPseudo("otherUser");
-
-        when(gammeService.findById(id)).thenReturn(Optional.of(existing));
-
-        mockMvc.perform(delete("/api/ouvrage/gammes/{id}", id)
-                .header("X-User-Pseudo", ownerPseudo))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void testDelete_notFound() throws Exception {
-        Long id = 1L;
-        String ownerPseudo = "user1";
-
-        when(gammeService.findById(id)).thenReturn(Optional.empty());
-
-        mockMvc.perform(delete("/api/ouvrage/gammes/{id}", id)
-                .header("X-User-Pseudo", ownerPseudo))
-                .andExpect(status().isNotFound());
-    }
-
+    // D'autres tests pour update, delete et endpoints publics/amies peuvent être
+    // ajoutés de la même manière
 }
- */
