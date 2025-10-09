@@ -14,4 +14,5 @@ class AuthServiceApplicationTest {
         // Test minimal pour vérifier que le contexte démarre
     }
 }
+
  */

@@ -105,6 +105,7 @@
 
   <build>
     <plugins>
+      <!-- Jacoco  -->
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
@@ -124,7 +125,21 @@
           </execution>
         </executions>
       </plugin>
+  
+      <!--  Plugin nécessaire pour créer un jar exécutable -->
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+  
 
 </project>

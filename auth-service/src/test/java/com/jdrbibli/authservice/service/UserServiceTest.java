@@ -336,5 +336,19 @@ class UserServiceTest {
         assertEquals("Utilisateur non trouvé avec l'ID : " + userId, ex.getMessage());
     }
 
+    @Test
+void testDeleteUser() {
+    Long userId = 1L;
 
+    // Stubbing utilisé uniquement
+    when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+
+    // Appel de la méthode à tester
+    userService.deleteUserById(userId);
+
+    // Vérification
+    verify(userRepository).delete(testUser);
+}
+
+    
 }

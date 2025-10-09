@@ -1,4 +1,4 @@
-CREATE TABLE roles (
+/* CREATE TABLE roles (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
 );
@@ -20,3 +20,4 @@ CREATE TABLE users_roles (
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES roles(id)
 );
+ */

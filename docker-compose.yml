@@ -1,0 +1,110 @@
+version: "3.9"
+
+volumes:
+  jdrbibli_db_data:
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: jdrbibli-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: jdrbibli
+    ports:
+      - "3307:3306" # port externe pour ton host
+    volumes:
+      - jdrbibli_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -uroot -proot"]
+      interval: 5s
+      retries: 20
+      start_period: 15s
+
+  auth-service:
+    build:
+      context: ./auth-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 5s
+      retries: 20
+      start_period: 15s
+
+  user-service:
+    build:
+      context: ./user-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      mariadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 5s
+      retries: 20
+      start_period: 15s
+
+  ouvrage-service:
+    build:
+      context: ./ouvrage-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      mariadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 5s
+      retries: 20
+      start_period: 15s
+
+  audit-service:
+    build:
+      context: ./audit-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  gateway:
+    build:
+      context: ./gateway
+    ports:
+      - "8084:8084"
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+      ouvrage-service:
+        condition: service_healthy
+
+  jdrbibli-frontend:
+    build:
+      context: ./jdrbibli-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      gateway:
+        condition: service_started
+
+  jdrbibli-phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: jdrbibli-phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"
+    depends_on:
+      mariadb:
+        condition: service_healthy

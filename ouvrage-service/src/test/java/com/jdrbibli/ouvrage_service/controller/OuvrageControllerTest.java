@@ -8,11 +8,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class OuvrageControllerTest {
@@ -32,7 +36,7 @@ class OuvrageControllerTest {
     void getById_returnsOuvrageDTO_whenOwnerMatches() {
         Ouvrage ouvrage = new Ouvrage();
         ouvrage.setId(1L);
-        ouvrage.setTitre("Ouvrage1");  // <-- correction ici
+        ouvrage.setTitre("Ouvrage1"); // <-- correction ici
         ouvrage.setOwnerId(42L);
 
         OuvrageDTO dto = new OuvrageDTO();
@@ -78,5 +82,7 @@ class OuvrageControllerTest {
         verify(ouvrageService, times(1)).findById(1L);
         verifyNoInteractions(ouvrageMapper);
     }
+
+    
 
 }

@@ -8,6 +8,8 @@ import com.jdrbibli.authservice.service.UserService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.RestTemplate;
 
 import static org.mockito.Mockito.mock;
 
@@ -42,5 +44,17 @@ public class TestConfig {
     @Primary
     public EmailService emailService() {
         return mock(EmailService.class);
+    }
+
+    @Bean
+    @Primary
+    public PasswordEncoder passwordEncoder() {
+        return mock(PasswordEncoder.class);
+    }
+
+    @Bean
+    @Primary
+    public RestTemplate restTemplate() {
+        return mock(RestTemplate.class);
     }
 }
