@@ -24,14 +24,17 @@ import java.util.List;
  * 
  * Cette classe configure Spring Security pour gérer :
  * <ul>
- *   <li>L'authentification via JWT avec {@link JwtAuthenticationFilter} et {@link JwtTokenProvider}</li>
- *   <li>La gestion des utilisateurs avec {@link UserDetailsService}</li>
- *   <li>Le chiffrement des mots de passe avec {@link BCryptPasswordEncoder}</li>
- *   <li>La configuration CORS pour autoriser le front Angular sur localhost:4200</li>
- *   <li>La désactivation de CSRF pour les requêtes API REST</li>
+ * <li>L'authentification via JWT avec {@link JwtAuthenticationFilter} et
+ * {@link JwtTokenProvider}</li>
+ * <li>La gestion des utilisateurs avec {@link UserDetailsService}</li>
+ * <li>Le chiffrement des mots de passe avec {@link BCryptPasswordEncoder}</li>
+ * <li>La configuration CORS pour autoriser le front Angular sur
+ * localhost:4200</li>
+ * <li>La désactivation de CSRF pour les requêtes API REST</li>
  * </ul>
  * 
- * Les endpoints liés aux ouvrages et gammes sont actuellement ouverts à tous les accès.
+ * Les endpoints liés aux ouvrages et gammes sont actuellement ouverts à tous
+ * les accès.
  */
 @Configuration
 @EnableWebSecurity
@@ -43,18 +46,25 @@ public class SecurityConfig {
     /**
      * Constructeur de la configuration de sécurité.
      *
-     * @param jwtTokenProvider     fournisseur de tokens JWT pour l'authentification.
-     * @param userDetailsService   service Spring Security pour charger les informations des utilisateurs.
+     * @param jwtTokenProvider   fournisseur de tokens JWT pour l'authentification.
+     * @param userDetailsService service Spring Security pour charger les
+     *                           informations des utilisateurs.
      */
     public SecurityConfig(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
     }
 
+    // Constructeur supplémentaire pour tests unitaires
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = null; // ou Mockito.mock(UserDetailsService.class) si tu veux
+    }
+
     /**
      * Définit la chaîne de filtres de sécurité HTTP pour l'application.
      *
-     * @param http               configuration HttpSecurity.
+     * @param http                  configuration HttpSecurity.
      * @param authenticationManager gestionnaire d'authentification.
      * @return la chaîne de filtres de sécurité.
      * @throws Exception si la configuration échoue.
@@ -93,7 +103,8 @@ public class SecurityConfig {
     }
 
     /**
-     * Fournit un {@link PasswordEncoder} basé sur BCrypt pour sécuriser les mots de passe.
+     * Fournit un {@link PasswordEncoder} basé sur BCrypt pour sécuriser les mots de
+     * passe.
      *
      * @return le {@link BCryptPasswordEncoder}.
      */

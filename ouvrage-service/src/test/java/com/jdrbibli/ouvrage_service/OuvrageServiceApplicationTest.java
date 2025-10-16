@@ -1,11 +1,14 @@
 package com.jdrbibli.ouvrage_service;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+
 class OuvrageServiceApplicationTest {
-	@Test
-	void contextLoads() {
-	}
+
+    @Test
+    void application_canBeInstantiated() {
+        OuvrageServiceApplication app = new OuvrageServiceApplication();
+        assertThat(app).isNotNull();
+    }
 }

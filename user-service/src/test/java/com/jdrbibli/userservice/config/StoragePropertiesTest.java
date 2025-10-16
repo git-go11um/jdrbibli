@@ -2,7 +2,6 @@ package com.jdrbibli.userservice.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
@@ -10,12 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test unitaire pour {@link StorageProperties}.
- * 
- * Vérifie que les propriétés de configuration se chargent correctement
- * et que les accesseurs (getters/setters) fonctionnent comme prévu.
  */
-@SpringBootTest
-@EnableConfigurationProperties(StorageProperties.class)
+@SpringBootTest(classes = TestConfig.class)
 @TestPropertySource(properties = {
         "user.avatar.uploadDir=/tmp/uploads"
 })
@@ -25,8 +20,7 @@ class StoragePropertiesTest {
     private StorageProperties storageProperties;
 
     /**
-     * Vérifie que la propriété configurée est bien injectée depuis le fichier de
-     * configuration.
+     * Vérifie que la propriété configurée est bien injectée depuis la configuration de test.
      */
     @Test
     void shouldLoadUploadDirFromConfiguration() {
@@ -34,8 +28,7 @@ class StoragePropertiesTest {
     }
 
     /**
-     * Vérifie que les getters/setters fonctionnent correctement indépendamment de
-     * Spring.
+     * Vérifie que les getters/setters fonctionnent correctement indépendamment de Spring.
      */
     @Test
     void shouldSetAndGetUploadDirManually() {
