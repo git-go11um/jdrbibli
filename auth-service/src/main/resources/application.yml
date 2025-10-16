@@ -7,10 +7,16 @@ spring:
     username: root
     password: root
     driver-class-name: org.mariadb.jdbc.Driver
+    hikari:
+      connection-timeout: 30000   # 30s avant d'abandonner
+      maximum-pool-size: 10
+      minimum-idle: 1
+      validation-timeout: 5000    # 5s pour tester la connexion
+      initialization-fail-timeout: -1  # NE PAS échouer si la DB n'est pas prête au démarrage
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
