@@ -1,5 +1,4 @@
-# docker-compose.yml
-# Version non nécessaire (deprecated depuis Docker 20.10)
+version: "3.9"
 
 volumes:
   jdrbibli_db_data:
@@ -13,14 +12,17 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: jdrbibli
     ports:
-      - "3307:3306" # port externe sur l'hôte
+      - "3307:3306" # port externe pour accéder depuis l'hôte
     volumes:
-      - jdrbibli_db_data:/var/lib/mysql
       - ./docker/db-init:/docker-entrypoint-initdb.d
+      - jdrbibli_db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "mysqladmin ping -h127.0.0.1 -uroot -proot || exit 1"]
       interval: 10s
+      timeout: 5s
       retries: 10
+      start_period: 30s
+
 
   auth-service:
     build:
@@ -28,11 +30,12 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - mariadb  # plus besoin de condition: service_healthy
+      - mariadb
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-proot"]
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 10s
-      retries: 20
+      timeout: 5s
+      retries: 10
       start_period: 20s
 
   user-service:
@@ -46,7 +49,8 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
       interval: 10s
-      retries: 20
+      timeout: 5s
+      retries: 10
       start_period: 20s
 
   ouvrage-service:
@@ -60,7 +64,8 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
       interval: 10s
-      retries: 20
+      timeout: 5s
+      retries: 10
       start_period: 20s
 
   audit-service:
@@ -70,6 +75,12 @@ services:
       - "8085:8085"
     depends_on:
       - mariadb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   gateway:
     build:
@@ -80,6 +91,12 @@ services:
       - auth-service
       - user-service
       - ouvrage-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   jdrbibli-frontend:
     build:
