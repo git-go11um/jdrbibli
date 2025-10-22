@@ -4,11 +4,19 @@ server:
 spring:
   application:
     name: audit-service
-
   data:
     mongodb:
       uri: mongodb://jdrbibli-mongo:27017/auditdb
-      
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
 logging:
   level:
     root: INFO

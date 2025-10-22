@@ -57,7 +57,7 @@ spring:
           predicates:
             - Path=/api/ouvrage/**
           filters:
-            - RewritePath=/api/ouvrage/(?<remaining>.*)=/${remaining}
+            - RewritePath=/api/ouvrage/(?<remaining>.*), /${remaining}
 
         # -------------------------
         # Actuator (Gateway itself)

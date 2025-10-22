@@ -102,9 +102,9 @@ public class UserService implements IUserService {
         try {
             createUserProfile(savedUser.getId(), savedUser.getPseudo(), savedUser.getEmail());
         } catch (Exception e) {
-            System.err.println(
-                    "Échec création profil user-service pour pseudo=" + savedUser.getPseudo() + " : " + e.getMessage());
-            e.printStackTrace();
+            // Log uniquement, ne pas remonter l'exception
+            System.err.println("⚠️ Échec création profil user-service pour pseudo=" 
+                               + savedUser.getPseudo() + " : " + e.getMessage());
         }
 
         auditClient.logEvent("auth-service", "USER_CREATED",

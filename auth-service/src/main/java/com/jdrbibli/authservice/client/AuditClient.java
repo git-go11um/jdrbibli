@@ -13,12 +13,16 @@ import java.util.Map;
 /**
  * Client pour envoyer des événements d'audit vers le service Audit.
  * 
- * Cette classe utilise Spring {@link RestTemplate} pour faire des requêtes HTTP POST
- * vers l'URL configurée pour le service d'audit. Les événements envoyés contiennent 
+ * Cette classe utilise Spring {@link RestTemplate} pour faire des requêtes HTTP
+ * POST
+ * vers l'URL configurée pour le service d'audit. Les événements envoyés
+ * contiennent
  * le nom du service, l'action effectuée et des détails supplémentaires.
  * 
- * L'URL du service d'audit est configurable via la propriété `app.audit-url` dans `application.yml`.
- * Si elle n'est pas définie, la valeur par défaut est `http://localhost:8085/api/audit/logs`.
+ * L'URL du service d'audit est configurable via la propriété `app.audit-url`
+ * dans `application.yml`.
+ * Si elle n'est pas définie, la valeur par défaut est
+ * `http://localhost:8085/api/audit/logs`.
  * 
  */
 @Component
@@ -30,13 +34,14 @@ public class AuditClient {
      * URL du service Audit.
      * Configurable via la propriété `app.audit-url`.
      */
-    @Value("${app.audit-url:http://localhost:8085/api/audit/logs}")
+    @Value("${app.audit-url}")
     private String auditUrl;
 
     /**
      * Envoie un événement d'audit au service Audit.
      *
-     * @param serviceName le nom du service générant l'événement (ex: "auth-service")
+     * @param serviceName le nom du service générant l'événement (ex:
+     *                    "auth-service")
      * @param action      l'action effectuée (ex: "login", "password-reset")
      * @param details     des informations supplémentaires sur l'événement
      */

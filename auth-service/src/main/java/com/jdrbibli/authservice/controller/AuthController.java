@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 
 /**
@@ -23,17 +27,19 @@ import java.util.Map;
  * 
  * Cette classe expose les endpoints REST pour :
  * <ul>
- *     <li>Inscription et création de compte</li>
- *     <li>Authentification / login</li>
- *     <li>Gestion des tokens JWT (génération et refresh)</li>
- *     <li>Réinitialisation de mot de passe</li>
- *     <li>Mise à jour du profil utilisateur</li>
- *     <li>Suppression du compte utilisateur</li>
+ * <li>Inscription et création de compte</li>
+ * <li>Authentification / login</li>
+ * <li>Gestion des tokens JWT (génération et refresh)</li>
+ * <li>Réinitialisation de mot de passe</li>
+ * <li>Mise à jour du profil utilisateur</li>
+ * <li>Suppression du compte utilisateur</li>
  * </ul>
  * 
  * 
- * Elle communique avec {@link IUserService} pour la logique métier, {@link JwtService} pour les tokens JWT,
- * et utilise {@link WebClient} ou {@link RestTemplate} pour interagir avec d'autres microservices
+ * Elle communique avec {@link IUserService} pour la logique métier,
+ * {@link JwtService} pour les tokens JWT,
+ * et utilise {@link WebClient} ou {@link RestTemplate} pour interagir avec
+ * d'autres microservices
  * (ex. user-service pour la création de profil).
  * 
  */
@@ -47,15 +53,20 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final WebClient webClient;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+    @Value("${app.user-service-url}")
+    private String userServiceUrl;
+
     @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
     public AuthController(IUserService userService,
-                          AuthenticationManager authenticationManager,
-                          JwtService jwtService,
-                          PasswordEncoder passwordEncoder,
-                          WebClient webClient) {
+            AuthenticationManager authenticationManager,
+            JwtService jwtService,
+            PasswordEncoder passwordEncoder,
+            WebClient webClient) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
@@ -69,8 +80,10 @@ public class AuthController {
      * Crée l'utilisateur dans auth-service et le profil dans user-service,
      * puis retourne un token JWT et les informations de l'utilisateur.
      *
-     * @param request objet {@link InscriptionRequest} contenant pseudo, email et mot de passe
-     * @return {@link ResponseEntity} avec {@link AuthenticationResponse} ou message d'erreur
+     * @param request objet {@link InscriptionRequest} contenant pseudo, email et
+     *                mot de passe
+     * @return {@link ResponseEntity} avec {@link AuthenticationResponse} ou message
+     *         d'erreur
      */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody InscriptionRequest request) {
@@ -82,19 +95,19 @@ public class AuthController {
             profileDto.setPseudo(newUser.getPseudo());
             profileDto.setEmail(newUser.getEmail());
 
-            WebClient.create("http://localhost:8082")
+            WebClient.create(userServiceUrl)
                     .post()
-                    .uri("/api/users")
+                    .uri("/users")
                     .bodyValue(profileDto)
                     .retrieve()
-                    .bodyToMono(UserProfileDTO.class)
+                    .bodyToMono(Void.class)
                     .block();
 
             String token = jwtService.generateToken(newUser.getPseudo(), newUser.getId());
             return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(newUser)));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erreur lors de l'inscription", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erreur lors de l'inscription : " + e.getMessage()));
         }
@@ -104,7 +117,8 @@ public class AuthController {
      * Endpoint pour authentifier un utilisateur.
      *
      * @param request objet {@link LoginRequest} contenant pseudo et mot de passe
-     * @return {@link ResponseEntity} avec {@link AuthenticationResponse} ou message d'erreur
+     * @return {@link ResponseEntity} avec {@link AuthenticationResponse} ou message
+     *         d'erreur
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -157,7 +171,8 @@ public class AuthController {
      * Endpoint pour récupérer les informations de l'utilisateur connecté.
      *
      * @param authentication objet Spring Security Authentication
-     * @return {@link ResponseEntity} avec les données de l'utilisateur ou message d'erreur
+     * @return {@link ResponseEntity} avec les données de l'utilisateur ou message
+     *         d'erreur
      */
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
@@ -225,7 +240,8 @@ public class AuthController {
     /**
      * Endpoint pour réinitialiser le mot de passe après validation du code.
      *
-     * @param request objet {@link PasswordResetRequest} contenant pseudo, code et nouveau mot de passe
+     * @param request objet {@link PasswordResetRequest} contenant pseudo, code et
+     *                nouveau mot de passe
      * @return {@link ResponseEntity} avec message de succès ou erreur
      */
     @PutMapping("/reset-password")
@@ -268,13 +284,14 @@ public class AuthController {
     /**
      * Endpoint pour changer le mot de passe depuis le profil utilisateur.
      *
-     * @param request        objet {@link ChangePasswordProfileRequest} contenant l'ancien et le nouveau mot de passe
+     * @param request        objet {@link ChangePasswordProfileRequest} contenant
+     *                       l'ancien et le nouveau mot de passe
      * @param authentication objet Spring Security Authentication
      * @return {@link ResponseEntity} avec message et token mis à jour
      */
     @PutMapping("/profile/password")
     public ResponseEntity<?> changeProfilePassword(@RequestBody ChangePasswordProfileRequest request,
-                                                   Authentication authentication) {
+            Authentication authentication) {
         try {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             User user = userService.getUserByPseudo(userDetails.getUsername());

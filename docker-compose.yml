@@ -1,6 +1,7 @@
 volumes:
   jdrbibli_db_data:
   mongo_data:
+  #portainer_data:
 
 services:
   mariadb:
@@ -84,18 +85,22 @@ services:
   audit-service:
     build:
       context: ./audit-service
+    container_name: jdrbibli-audit
     ports:
       - "8085:8085"
     depends_on:
-    - mongodb
+      mongodb:
+        condition: service_healthy
     environment:
-    - SPRING_DATA_MONGODB_URI=mongodb://jdrbibli-mongo:27017/auditdb
+      SPRING_DATA_MONGODB_URI: mongodb://jdrbibli-mongo:27017/auditdb
+      SPRING_PROFILES_ACTIVE: docker
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
-      interval: 10s
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:8085/actuator/health || exit 0"]
+      interval: 20s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 90s
 
   gateway:
     build:
@@ -131,3 +136,14 @@ services:
       - "8080:80"
     depends_on:
       - mariadb
+
+  #portainer:
+   #image: portainer/portainer-ce:latest
+    #container_name: jdrbibli-portainer
+    #restart: always
+    #ports:
+      #- "9443:9443"
+      #- "9000:9000" # pour l’UI classique
+    #volumes:
+      #- /var/run/docker.sock:/var/run/docker.sock
+      #- portainer_data:/data
