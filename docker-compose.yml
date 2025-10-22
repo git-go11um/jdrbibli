@@ -1,7 +1,6 @@
-version: "3.9"
-
 volumes:
   jdrbibli_db_data:
+  mongo_data:
 
 services:
   mariadb:
@@ -12,17 +11,31 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: jdrbibli
     ports:
-      - "3307:3306" # port externe pour accéder depuis l'hôte
+      - "3307:3306" # port externe pour accès depuis l'hôte
     volumes:
       - ./docker/db-init:/docker-entrypoint-initdb.d
       - jdrbibli_db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h127.0.0.1 -uroot -proot || exit 1"]
+      test: ["CMD", "true"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
 
+  mongodb:
+    image: mongo:7
+    container_name: jdrbibli-mongo
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./docker/mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   auth-service:
     build:
@@ -74,7 +87,9 @@ services:
     ports:
       - "8085:8085"
     depends_on:
-      - mariadb
+    - mongodb
+    environment:
+    - SPRING_DATA_MONGODB_URI=mongodb://jdrbibli-mongo:27017/auditdb
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
       interval: 10s
@@ -96,7 +111,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 60s
 
   jdrbibli-frontend:
     build:

@@ -19,6 +19,11 @@
   </properties>
 
   <dependencies>
+    <!-- Monitoring et health checks -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
 
     <!-- Web Spring Boot -->
     <dependency>

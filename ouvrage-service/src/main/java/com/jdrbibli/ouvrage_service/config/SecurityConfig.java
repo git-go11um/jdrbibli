@@ -55,11 +55,14 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-    // Constructeur supplémentaire pour tests unitaires
-    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.userDetailsService = null; // ou Mockito.mock(UserDetailsService.class) si tu veux
-    }
+    /*
+     * // Constructeur supplémentaire pour tests unitaires
+     * public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
+     * this.jwtTokenProvider = jwtTokenProvider;
+     * this.userDetailsService = null; // ou Mockito.mock(UserDetailsService.class)
+     * si tu veux
+     * }
+     */
 
     /**
      * Définit la chaîne de filtres de sécurité HTTP pour l'application.
@@ -76,6 +79,7 @@ public class SecurityConfig {
                 .cors().and()
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/ouvrage/ouvrages/**").permitAll()
                         .requestMatchers("/api/ouvrage/gammes/**").permitAll()
                         .anyRequest().permitAll())

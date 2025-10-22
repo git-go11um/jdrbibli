@@ -16,10 +16,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * 
  * Cette classe configure Spring Security pour :
  * <ul>
- *     <li>Désactiver CSRF</li>
- *     <li>Utiliser une politique de session stateless</li>
- *     <li>Autoriser certaines routes publiques (test, création utilisateur, recherche, mise à jour)</li>
- *     <li>Appliquer un filtre JWT avant le filtre d'authentification standard</li>
+ * <li>Désactiver CSRF</li>
+ * <li>Utiliser une politique de session stateless</li>
+ * <li>Autoriser certaines routes publiques (test, création utilisateur,
+ * recherche, mise à jour)</li>
+ * <li>Appliquer un filtre JWT avant le filtre d'authentification standard</li>
  * </ul>
  */
 @Configuration
@@ -49,6 +50,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/test/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/search").permitAll()

@@ -26,6 +26,8 @@ public class WebClientConfig {
      */
     @Bean
     public WebClient webClient() {
-        return WebClient.builder().build();
+        return WebClient.builder()
+                .baseUrl("http://user-service:8082/api/users")
+                .build();
     }
 }

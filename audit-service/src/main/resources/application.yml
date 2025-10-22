@@ -7,8 +7,8 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/auditdb
-
+      uri: mongodb://jdrbibli-mongo:27017/auditdb
+      
 logging:
   level:
     root: INFO

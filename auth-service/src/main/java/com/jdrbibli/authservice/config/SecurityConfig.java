@@ -113,8 +113,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Endpoints publics
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers("/auth/login", "/auth/register", "/auth/password-reset/**", "/auth/refresh")
+                        .permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/password-reset/**").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
                         // Endpoints nécessitant authentification

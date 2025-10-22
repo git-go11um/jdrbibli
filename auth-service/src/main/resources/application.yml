@@ -1,18 +1,19 @@
 server:
   port: 8081
+  address: 0.0.0.0
 
 spring:
   datasource:
-    url: jdbc:mariadb://jdrbibli-db:3306/auth_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mariadb://mariadb:3306/auth_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: org.mariadb.jdbc.Driver
     hikari:
-      connection-timeout: 30000   # 30s avant d'abandonner
+      connection-timeout: 30000
       maximum-pool-size: 10
       minimum-idle: 1
-      validation-timeout: 5000    # 5s pour tester la connexion
-      initialization-fail-timeout: -1  # NE PAS échouer si la DB n'est pas prête au démarrage
+      validation-timeout: 5000
+      initialization-fail-timeout: -1
 
   jpa:
     hibernate:
@@ -50,12 +51,19 @@ mail:
 
 jwt:
   secret: Z2dKbnRHY0NvcnNDWUR0bFhHZ3R3NzIzbVRZT3o0Sk5GZjBWT2tVdzBrckxKVXphMnJKZThCb21BZzk1OU9sWkQ=
-
   expiration: 3600000
 
 app:
   frontend:
-    reset-password-url: "http://localhost:4200/reset-password?token="
+    reset-password-url: "http://jdrbibli-frontend:4200/reset-password?token="
   user-service-url: http://user-service:8082/api/users
   audit-url: http://audit-service:8085/api/audit/logs
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always

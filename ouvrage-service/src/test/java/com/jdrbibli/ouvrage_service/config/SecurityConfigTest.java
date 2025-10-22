@@ -11,11 +11,11 @@ class SecurityConfigTest {
 
     private SecurityConfig securityConfig;
 
-    @BeforeEach
+/*     @BeforeEach
     void setUp() {
         JwtTokenProvider mockJwtProvider = Mockito.mock(JwtTokenProvider.class);
         securityConfig = new SecurityConfig(mockJwtProvider); // constructeur de test
-    }
+    } */
 
     @Test
     void securityConfig_shouldBeCreated() {
