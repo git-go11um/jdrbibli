@@ -2,48 +2,48 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { environment } from '../environments/environment';  // Importer l'environnement
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiAuthUrl = 'http://localhost:8084/api/auth';
-  private apiUserUrl = 'http://localhost:8084/api/users';
+  private apiAuthUrl = `${environment.apiUrl}/auth`;  // Utilisation dynamique de l'URL
+  private apiUserUrl = `${environment.apiUrl}/users`;  // URL utilisateur dynamique
   private currentUser: any = null;
 
   constructor(private http: HttpClient) { }
 
+  // ---------------- CLEAR AUTH ----------------
   clearAuth(): void {
-    localStorage.removeItem('jwt');   // supprime le token
-    localStorage.removeItem('user');  // supprime les infos utilisateur
-    this.currentUser = null;          // réinitialise la variable interne
+    localStorage.removeItem('jwt');   // Supprime le token JWT
+    localStorage.removeItem('user');  // Supprime les infos utilisateur
+    this.currentUser = null;          // Réinitialise l'utilisateur courant
   }
 
-
+  // ---------------- SET USER & TOKEN ----------------
   setUserInfo(user: any) {
     this.currentUser = user;
     localStorage.setItem('user', JSON.stringify(user));
   }
 
   setToken(token: string) {
-    localStorage.setItem('jwt', token);  // <-- unifie sur "jwt"
+    localStorage.setItem('jwt', token);
   }
 
   // ---------------- LOGIN ----------------
   login(pseudo: string, password: string): Observable<{ token: string }> {
     return this.http.post<{ token: string }>(`${this.apiAuthUrl}/login`, { pseudo, password }).pipe(
-      tap(res => localStorage.setItem('jwt', res.token)),
+      tap(res => localStorage.setItem('jwt', res.token)),  // Enregistre le JWT dans le localStorage
       catchError(this.handleError)
     );
   }
 
+  // ---------------- GET USER INFO ----------------
   getUserInfo(): Observable<any> {
     const headers = this.authHeaders();
     return this.http.get<any>(`${this.apiUserUrl}/profile/me`, { headers }).pipe(catchError(this.handleError));
   }
 
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('jwt');
-  }
-
+  // ---------------- LOGOUT ----------------
   logout(): void {
     this.clearAuth();
   }
@@ -82,7 +82,7 @@ export class AuthService {
     return this.http.put<any>(`${this.apiAuthUrl}/profile`, body, { headers })
       .pipe(
         tap(res => {
-          if (res.token) localStorage.setItem('jwt', res.token);
+          if (res.token) localStorage.setItem('jwt', res.token);  // Met à jour le token si retourné
         }),
         catchError(this.handleError)
       );
@@ -99,13 +99,15 @@ export class AuthService {
     if (!userId) return throwError(() => new Error('ID utilisateur manquant'));
 
     const headers = this.authHeaders();
-    return this.http.delete<any>(`${this.apiAuthUrl}/${userId}`, { headers })
+    return this.http.delete<any>(`${this.apiAuthUrl}/profile/${userId}`, { headers })  // Correction : l'ID est dans l'URL de l'API
       .pipe(
-        tap(res => console.log('deleteUser response:', res)),
+        tap(res => {
+          console.log('User deleted:', res);
+          this.clearAuth();  // Logique supplémentaire pour effacer les informations après suppression
+        }),
         catchError(this.handleError)
       );
   }
-
 
   // ---------------- AVATAR ----------------
   uploadAvatar(fileData: FormData): Observable<string> {
@@ -122,6 +124,7 @@ export class AuthService {
     return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
   }
 
+  // Cette méthode est pour obtenir les headers d'authentification avec le token et l'ID utilisateur
   public getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('jwt');
     const userId = this.getUserIdFromToken();
@@ -131,8 +134,8 @@ export class AuthService {
     return headers;
   }
 
-
-  getUserIdFromToken(): number | null {
+  // ---------------- UTILITY FUNCTIONS ----------------
+  public getUserIdFromToken(): number | null {
     const token = localStorage.getItem('jwt');
     if (!token) {
       console.warn('[AuthService] Aucun token trouvé dans le localStorage.');
@@ -140,7 +143,6 @@ export class AuthService {
     }
     try {
       const payload = this.decodeJwt(token);
-      console.log('[AuthService] Payload décodé du JWT:', payload);
       return payload?.id ?? null;
     } catch (e) {
       console.error('[AuthService] Erreur décodage JWT pour id:', e);
@@ -148,7 +150,7 @@ export class AuthService {
     }
   }
 
-
+  // Extraction du pseudo de l'utilisateur depuis le JWT
   getUserPseudo(): string | null {
     const token = localStorage.getItem('jwt');
     if (!token) return null;
@@ -161,20 +163,22 @@ export class AuthService {
     }
   }
 
+  // Décode un JWT et retourne le payload
   private decodeJwt(token: string): any {
     const parts = token.split('.');
     if (parts.length !== 3) throw new Error('Token JWT invalide');
     return JSON.parse(atob(parts[1]));
   }
 
+  // ---------------- ERROR HANDLER ----------------
   private handleError(error: HttpErrorResponse) {
-    console.error('handleError triggered:', error);
     const msg = error.error instanceof ErrorEvent
       ? `Erreur: ${error.error.message}`
       : `Erreur serveur (${error.status}) - message: ${JSON.stringify(error.error)}`;
     return throwError(() => new Error(msg));
   }
 
+  // Retourne le token JWT actuel
   getToken(): string | null {
     return localStorage.getItem('jwt');
   }

@@ -59,18 +59,22 @@ public class UserService implements IUserService {
      * Constructeur injectant les dépendances essentielles.
      */
     @Autowired
-    public UserService(UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            JavaMailSender mailSender,
-            JwtTokenProvider jwtTokenProvider,
-            PasswordResetTokenRepository passwordResetTokenRepository) {
+    public UserService(RestTemplate restTemplate,
+                       @Value("${app.user-service-url}") String userServiceUrl,
+                       UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JavaMailSender mailSender,
+                       JwtTokenProvider jwtTokenProvider,
+                       PasswordResetTokenRepository passwordResetTokenRepository) {
+        this.restTemplate = restTemplate;
+        this.userServiceUrl = userServiceUrl;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailSender = mailSender;
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
-        this.restTemplate = new RestTemplate();
     }
+
 
     /**
      * Méthode exécutée après l’initialisation du bean Spring.
@@ -103,8 +107,8 @@ public class UserService implements IUserService {
             createUserProfile(savedUser.getId(), savedUser.getPseudo(), savedUser.getEmail());
         } catch (Exception e) {
             // Log uniquement, ne pas remonter l'exception
-            System.err.println("⚠️ Échec création profil user-service pour pseudo=" 
-                               + savedUser.getPseudo() + " : " + e.getMessage());
+            System.err.println("⚠️ Échec création profil user-service pour pseudo="
+                    + savedUser.getPseudo() + " : " + e.getMessage());
         }
 
         auditClient.logEvent("auth-service", "USER_CREATED",

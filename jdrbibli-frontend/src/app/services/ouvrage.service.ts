@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { GammeDTO } from '../models/gamme.model';
+import { environment } from '../environments/environment';
 
 export interface OuvrageDTO {
     id?: number;
@@ -34,7 +35,7 @@ export interface OuvrageDTO {
 })
 export class OuvrageService {
 
-    private apiUrl = 'http://localhost:8084/api/ouvrage/ouvrages';
+    private apiUrl = `${environment.apiUrl}/api/ouvrage/ouvrages`;
 
     constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -71,7 +72,7 @@ export class OuvrageService {
     uploadImage(file: File) {
         const formData = new FormData();
         formData.append('file', file);
-        return this.http.post('http://localhost:8083/api/ouvrage/ouvrages/upload-image', formData, { responseType: 'text' });
+        return this.http.post(`${environment.apiUrl}/api/ouvrage/ouvrages/upload-image`, formData, { responseType: 'text' });
     }
 
     // ---------------- Ludothèque d’un ami ----------------

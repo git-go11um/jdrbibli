@@ -1,17 +1,18 @@
+import { environment } from '../environments/environment';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     const excludedUrls = [
-        'http://localhost:8084/api/auth/login',
-        'http://localhost:8084/api/auth/register',
-        'http://localhost:8084/api/auth/password-reset/request',
-        'http://localhost:8084/api/auth/password-reset/verify-code',
-        'http://localhost:8084/api/auth/password-reset/confirm',
-        'http://localhost:8084/api/auth/validate-reset-code',
-        'http://localhost:8084/api/auth/password-reset/change',
-        'http://localhost:8084/api/auth/reset-password'
+        `${environment.apiUrl}/auth/login`,  // Utilisation de environment.apiUrl
+        `${environment.apiUrl}/auth/register`, 
+        `${environment.apiUrl}/auth/password-reset/request`,
+        `${environment.apiUrl}/auth/password-reset/verify-code`,
+        `${environment.apiUrl}/auth/password-reset/confirm`,
+        `${environment.apiUrl}/auth/validate-reset-code`,
+        `${environment.apiUrl}/auth/password-reset/change`,
+        `${environment.apiUrl}/auth/reset-password`
     ];
 
     const isExcluded = excludedUrls.some(url => req.url.includes(url));

@@ -32,7 +32,7 @@ class FriendRequestServiceTest {
         userRepository = mock(UserRepository.class);
         restTemplate = mock(RestTemplate.class);
         service = new FriendRequestService(friendRequestRepository, userRepository, restTemplate);
-        service.setOuvrageServiceUrl("http://localhost:8083/api/ouvrage");
+        service.setOuvrageServiceUrl("http://ouvrage-service:8083/api/ouvrage");
 
     }
 
@@ -116,7 +116,7 @@ class FriendRequestServiceTest {
         GammeDTO gamme = new GammeDTO();
         gamme.setOuvrages(List.of(ouvrage));
 
-        when(restTemplate.getForObject("http://localhost:8083/api/ouvrage/gammes/public/owner/2", GammeDTO[].class))
+        when(restTemplate.getForObject("http://ouvrage-service:8083/api/ouvrage/gammes/public/owner/2", GammeDTO[].class))
                 .thenReturn(new GammeDTO[]{gamme});
 
         List<OuvrageDTO> result = service.listFriendOuvrages(2L);

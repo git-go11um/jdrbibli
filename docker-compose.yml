@@ -1,7 +1,9 @@
+version: "3.7"
+
+# Définition des volumes pour persister les données
 volumes:
   jdrbibli_db_data:
   mongo_data:
-  #portainer_data:
 
 services:
   mariadb:
@@ -12,7 +14,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: jdrbibli
     ports:
-      - "3307:3306" # port externe pour accès depuis l'hôte
+      - "3307:3306" # Port externe pour accès depuis l'hôte
     volumes:
       - ./docker/db-init:/docker-entrypoint-initdb.d
       - jdrbibli_db_data:/var/lib/mysql
@@ -22,6 +24,8 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+    networks:
+      - jdrbibli-network
 
   mongodb:
     image: mongo:7
@@ -37,6 +41,8 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
+    networks:
+      - jdrbibli-network
 
   auth-service:
     build:
@@ -46,11 +52,13 @@ services:
     depends_on:
       - mariadb
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://auth-service:8081/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 20s
+    networks:
+      - jdrbibli-network
 
   user-service:
     build:
@@ -61,11 +69,13 @@ services:
       - auth-service
       - mariadb
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://user-service:8082/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 20s
+    networks:
+      - jdrbibli-network
 
   ouvrage-service:
     build:
@@ -76,11 +86,13 @@ services:
       - auth-service
       - mariadb
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://ouvrage-service:8083/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 20s
+    networks:
+      - jdrbibli-network
 
   audit-service:
     build:
@@ -96,11 +108,16 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     healthcheck:
       test:
-        ["CMD-SHELL", "curl -f http://localhost:8085/actuator/health || exit 0"]
+        [
+          "CMD-SHELL",
+          "curl -f http://audit-service:8085/actuator/health || exit 0",
+        ]
       interval: 20s
       timeout: 5s
       retries: 10
       start_period: 90s
+    networks:
+      - jdrbibli-network
 
   gateway:
     build:
@@ -112,11 +129,13 @@ services:
       - user-service
       - ouvrage-service
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://gateway:8084/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 60s
+    networks:
+      - jdrbibli-network
 
   jdrbibli-frontend:
     build:
@@ -125,6 +144,8 @@ services:
       - "4200:80"
     depends_on:
       - gateway
+    networks:
+      - jdrbibli-network
 
   jdrbibli-phpmyadmin:
     image: phpmyadmin:latest
@@ -136,14 +157,24 @@ services:
       - "8080:80"
     depends_on:
       - mariadb
+    networks:
+      - jdrbibli-network
 
-  #portainer:
-   #image: portainer/portainer-ce:latest
-    #container_name: jdrbibli-portainer
-    #restart: always
-    #ports:
-      #- "9443:9443"
-      #- "9000:9000" # pour l’UI classique
-    #volumes:
-      #- /var/run/docker.sock:/var/run/docker.sock
-      #- portainer_data:/data
+  # portainer (commenté pour l'instant, à décommenter si nécessaire)
+  # portainer:
+  #   image: portainer/portainer-ce:latest
+  #   container_name: jdrbibli-portainer
+  #   restart: always
+  #   ports:
+  #     - "9443:9443"
+  #     - "9000:9000"  # pour l'UI classique
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - portainer_data:/data
+  #   networks:
+  #     - jdrbibli-network
+
+# Définition du réseau Docker
+networks:
+  jdrbibli-network:
+    driver: bridge

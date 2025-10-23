@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { OuvrageService, OuvrageDTO } from '../../services/ouvrage.service';
+import { environment } from '../../environments/environment';
 
 @Component({
     selector: 'app-ouvrage-ami-detail-page',
@@ -18,6 +19,7 @@ export class OuvrageAmiDetailPage implements OnInit {
     ouvragesGamme: OuvrageDTO[] = [];
     loading = true;
     errorMessage = '';
+    environment = environment; // Accès à l'environnement
 
     constructor(
         private route: ActivatedRoute,

@@ -29,7 +29,7 @@ public class GatewayConfig {
         return builder.routes()
                 .route("auth-service", r -> r.path("/api/auth/**")
                         .filters(f -> f.stripPrefix(1))
-                        .uri("http://localhost:8081"))
+                        .uri("http://auth-service:8081"))
                 .build();
     }
 }

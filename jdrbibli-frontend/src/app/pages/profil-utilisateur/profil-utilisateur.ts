@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { FriendService } from '../../services/friend.service';
 import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment'; // Importer l'environnement
 
 @Component({
   selector: 'app-profil-utilisateur',
@@ -47,8 +48,8 @@ export class ProfilUtilisateur implements OnInit {
         this.pseudo = data.pseudo;
         this.email = data.email;
         this.avatarUrl = data.avatarUrl
-          ? `http://localhost:8084${data.avatarUrl}?t=${new Date().getTime()}`
-          : null;
+          ? `${environment.apiUrl}${data.avatarUrl}?t=${new Date().getTime()}`
+          : null;  // Utilisation de environment.apiUrl
       },
       error: (error: any) => {
         console.error('Erreur lors du chargement des informations utilisateur', error);
@@ -102,8 +103,8 @@ export class ProfilUtilisateur implements OnInit {
         // Génération des URL avatars amis
         this.friends.forEach(friend => {
           this.friendsAvatarUrls[friend.id] = friend.avatarUrl
-            ? `http://localhost:8084${friend.avatarUrl}?t=${new Date().getTime()}`
-            : '';
+            ? `${environment.apiUrl}${friend.avatarUrl}?t=${new Date().getTime()}`
+            : '';  // Utilisation de environment.apiUrl
         });
       },
       error: (err: any) => console.error('Erreur chargement amis', err)
@@ -155,14 +156,14 @@ export class ProfilUtilisateur implements OnInit {
     }
 
     this.http.get<any>(
-      `http://localhost:8084/api/users/search?pseudo=${this.searchPseudo}`,
+      `${environment.apiUrl}/api/users/search?pseudo=${this.searchPseudo}`,
       { headers: this.authService.getAuthHeaders() }
     ).subscribe({
       next: (user: any) => {
         this.searchedUser = user;
         this.searchedUserAvatarUrl = user.avatarUrl
-          ? `http://localhost:8084${user.avatarUrl}?t=${new Date().getTime()}`
-          : '';
+          ? `${environment.apiUrl}${user.avatarUrl}?t=${new Date().getTime()}`
+          : '';  // Utilisation de environment.apiUrl
         this.requestSent = false;
       },
       error: (err: any) => {

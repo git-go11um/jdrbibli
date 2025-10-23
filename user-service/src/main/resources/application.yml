@@ -36,9 +36,10 @@ user:
   avatar:
     upload-dir: uploads/avatars
 
+# Correction de l'URL pour la communication entre services Docker
 ouvrage:
   service:
-    url: http://localhost:8083/api/ouvrage
+    url: http://ouvrage-service:8083/api/ouvrage  # Utiliser le nom du service Docker pour communiquer
 
 # JWT secret (doit être exactement le même que dans auth-service)
 jwt:
@@ -53,5 +54,3 @@ management:
   endpoint:
     health:
       show-details: always
-
-

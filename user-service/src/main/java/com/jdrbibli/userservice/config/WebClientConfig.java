@@ -9,7 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient;
  * 
  * Ce bean configure un {@link WebClient} avec une URL de base pointant
  * vers le microservice Gateway (http://localhost:8084). Il peut être injecté
- * dans les services pour effectuer des requêtes HTTP vers d'autres microservices.
+ * dans les services pour effectuer des requêtes HTTP vers d'autres
+ * microservices.
  */
 @Configuration
 public class WebClientConfig {
@@ -22,7 +23,7 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient() {
         return WebClient.builder()
-                .baseUrl("http://localhost:8084")
+                .baseUrl("http://gateway:8084")
                 .build();
     }
 }

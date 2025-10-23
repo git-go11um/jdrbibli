@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { OuvrageService, OuvrageDTO } from '../../services/ouvrage.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-ouvrage-detail-page',
@@ -82,7 +83,7 @@ export class OuvrageDetailPage implements OnInit {
     // Vérification si l'URL est vide ou non valide
     if (!imageUrl) return 'assets/default-image.jpg';  // Par exemple, une image par défaut
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `http://localhost:8083${imageUrl}`;
+    return `${environment.apiUrl}${imageUrl}`;
   }
 
   /** Naviguer vers la page de la gamme */

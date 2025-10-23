@@ -22,17 +22,19 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Contrôleur REST pour gérer les {@link Ouvrage} dans le microservice {@code ouvrage-service}.
+ * Contrôleur REST pour gérer les {@link Ouvrage} dans le microservice
+ * {@code ouvrage-service}.
  * 
  * Fournit des endpoints pour :
  * <ul>
- *   <li>Récupérer tous les ouvrages d'un utilisateur</li>
- *   <li>Récupérer un ouvrage par son identifiant ou par sa gamme</li>
- *   <li>Créer, mettre à jour et supprimer un ouvrage</li>
- *   <li>Uploader une image pour un ouvrage</li>
- *   <li>Récupérer la bibliothèque d’un ami et ses ouvrages par gamme</li>
+ * <li>Récupérer tous les ouvrages d'un utilisateur</li>
+ * <li>Récupérer un ouvrage par son identifiant ou par sa gamme</li>
+ * <li>Créer, mettre à jour et supprimer un ouvrage</li>
+ * <li>Uploader une image pour un ouvrage</li>
+ * <li>Récupérer la bibliothèque d’un ami et ses ouvrages par gamme</li>
  * </ul>
- * Chaque requête sécurisée utilise l'en-tête {@code X-User-Id} pour identifier le propriétaire.
+ * Chaque requête sécurisée utilise l'en-tête {@code X-User-Id} pour identifier
+ * le propriétaire.
  */
 @RestController
 @RequestMapping("/api/ouvrage/ouvrages")
@@ -40,16 +42,19 @@ public class OuvrageController {
 
     private final OuvrageService ouvrageService;
     private final OuvrageMapper ouvrageMapper;
-/**
+
+    /**
      * Constructeur du contrôleur.
      *
      * @param ouvrageService service pour gérer les ouvrages.
-     * @param ouvrageMapper  mapper pour convertir entre {@link Ouvrage} et {@link OuvrageDTO}.
+     * @param ouvrageMapper  mapper pour convertir entre {@link Ouvrage} et
+     *                       {@link OuvrageDTO}.
      */
     public OuvrageController(OuvrageService ouvrageService, OuvrageMapper ouvrageMapper) {
         this.ouvrageService = ouvrageService;
         this.ouvrageMapper = ouvrageMapper;
     }
+
     /**
      * Récupère tous les ouvrages pour un utilisateur donné.
      *
@@ -85,6 +90,7 @@ public class OuvrageController {
 
         return ResponseEntity.ok(ouvrageMapper.toDTO(ouvrage));
     }
+
     /**
      * Récupère tous les ouvrages d'une gamme donnée.
      *
@@ -99,7 +105,8 @@ public class OuvrageController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
-/**
+
+    /**
      * Crée un nouvel ouvrage pour un utilisateur.
      *
      * @param dto     données de l'ouvrage
@@ -113,7 +120,8 @@ public class OuvrageController {
         Ouvrage created = ouvrageService.createFromDTO(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ouvrageMapper.toDTO(created));
     }
-/**
+
+    /**
      * Met à jour un ouvrage existant.
      *
      * @param id      identifiant de l'ouvrage.
@@ -137,7 +145,8 @@ public class OuvrageController {
         Ouvrage updated = ouvrageService.updateFromDTO(id, dto);
         return ResponseEntity.ok(ouvrageMapper.toDTO(updated));
     }
-/**
+
+    /**
      * Supprime un ouvrage.
      *
      * @param id      identifiant de l'ouvrage
@@ -158,7 +167,8 @@ public class OuvrageController {
         ouvrageService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-/**
+
+    /**
      * Récupère les ouvrages d'une gamme donnée en excluant un ouvrage spécifique.
      *
      * @param gammeId identifiant de la gamme
@@ -171,7 +181,8 @@ public class OuvrageController {
         List<OuvrageDTO> ouvrages = ouvrageService.getOuvragesByGamme(gammeId, id);
         return ResponseEntity.ok(ouvrages);
     }
-/**
+
+    /**
      * Upload d'une image pour un ouvrage.
      *
      * @param file fichier image
@@ -193,7 +204,6 @@ public class OuvrageController {
             Path filePath = uploadPath.resolve(filename);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-
             String imageUrl = "/uploads/images/" + filename;
             return ResponseEntity.ok(imageUrl);
 
@@ -201,7 +211,8 @@ public class OuvrageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur serveur");
         }
     }
-/**
+
+    /**
      * Récupère la bibliothèque d’un ami si les utilisateurs sont amis.
      *
      * @param friendId      identifiant de l'ami
@@ -220,7 +231,7 @@ public class OuvrageController {
         System.out.println("[DEBUG] Appel user-service : http://localhost:8082/api/users/are-friends?userId="
                 + currentUserId + "&friendId=" + friendId);
         try {
-            friends = WebClient.create("http://localhost:8082")
+            friends = WebClient.create("http://user-service:8082")
                     .get()
                     .uri("/api/users/are-friends?userId={userId}&friendId={friendId}", currentUserId, friendId)
                     .retrieve()
@@ -264,6 +275,7 @@ public class OuvrageController {
         System.out.println("[DEBUG] Renvoi " + dtos.size() + " DTOs");
         return ResponseEntity.ok(dtos);
     }
+
     /**
      * Récupère les ouvrages d'un ami pour une gamme spécifique.
      *
@@ -283,6 +295,7 @@ public class OuvrageController {
 
         return ResponseEntity.ok(ouvragesDTO);
     }
+
     /**
      * Récupère un ouvrage précis d'un ami.
      *

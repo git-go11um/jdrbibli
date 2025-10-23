@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-avatar-test',
@@ -44,7 +45,9 @@ export class AvatarTestComponent {
 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
-    this.http.put('http://localhost:8084/user/profile/avatar', formData, { headers })
+    const url = `${environment.apiUrl}/user/profile/avatar`;
+
+    this.http.put(url, formData, { headers })
       .subscribe({
         next: (res) => {
           this.message = 'Upload réussi !';

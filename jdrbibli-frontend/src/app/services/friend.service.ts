@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class FriendService {
-    private apiUrl = 'http://localhost:8084/api/friends';
+    private apiUrl = `${environment.apiUrl}/friends`;
 
     constructor(private http: HttpClient) { }
 

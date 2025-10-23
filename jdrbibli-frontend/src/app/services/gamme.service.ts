@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 export interface GammeDTO {
     id?: number;
@@ -12,7 +13,7 @@ export interface GammeDTO {
     providedIn: 'root'
 })
 export class GammeService {
-    private readonly baseUrl = 'http://localhost:8084/api/ouvrage/gammes';
+    private readonly baseUrl = `${environment.apiUrl}/ouvrage/gammes`;
 
     constructor(private http: HttpClient) { }
 
