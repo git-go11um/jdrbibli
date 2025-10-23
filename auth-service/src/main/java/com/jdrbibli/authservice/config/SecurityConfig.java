@@ -25,8 +25,8 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService,
-                          JwtAuthenticationFilter jwtAuthenticationFilter,
-                          PasswordEncoder passwordEncoder) {
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.passwordEncoder = passwordEncoder;
@@ -48,27 +48,26 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors().and()
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                // OPTIONS pour CORS
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Actuator
-                .requestMatchers("/actuator/**").permitAll()
-                // Endpoints publics
-                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/password-reset/**").permitAll()
-                .requestMatchers("/auth/refresh").permitAll()
-                // Endpoints nécessitant authentification
-                .requestMatchers("/auth/me").authenticated()
-                .requestMatchers("/auth/profile/**").authenticated()
-                // Tout le reste sous /auth/** sécurisé
-                .requestMatchers("/auth/**").authenticated()
-            )
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .cors().and()
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // OPTIONS pour CORS
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Actuator
+                        .requestMatchers("/actuator/**").permitAll()
+                        // Endpoints publics
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/password-reset/**").permitAll()
+                        .requestMatchers("/auth/refresh").permitAll()
+                        // Endpoints nécessitant authentification
+                        .requestMatchers("/auth/me").authenticated()
+                        .requestMatchers("/auth/profile/**").authenticated()
+                        // Tout le reste sécurisé
+                        .anyRequest().authenticated())
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

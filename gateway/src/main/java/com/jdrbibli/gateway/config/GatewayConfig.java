@@ -1,9 +1,9 @@
-package com.jdrbibli.gateway.config;
+/* package com.jdrbibli.gateway.config;
 
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Configuration; */
 
 /**
  * Configuration des routes pour le gateway-service.
@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
  * vers le microservice {@code auth-service} sur {@code http://localhost:8081}, 
  * en supprimant le préfixe {@code /api}.
  */
-@Configuration
-public class GatewayConfig {
+/* @Configuration
+public class GatewayConfig { */
 
     /**
      * Crée un {@link RouteLocator} personnalisé avec les règles de routage.
@@ -24,7 +24,7 @@ public class GatewayConfig {
      * @param builder le {@link RouteLocatorBuilder} fourni par Spring Cloud Gateway.
      * @return un {@link RouteLocator} configuré pour le routage des microservices.
      */
-    @Bean
+    /* @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("auth-service", r -> r.path("/api/auth/**")
@@ -32,4 +32,4 @@ public class GatewayConfig {
                         .uri("http://auth-service:8081"))
                 .build();
     }
-}
+} */

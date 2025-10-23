@@ -182,4 +182,10 @@ export class AuthService {
   getToken(): string | null {
     return localStorage.getItem('jwt');
   }
+
+  // ---------------- CHECK IF USER IS LOGGED IN ----------------
+  isLoggedIn(): boolean {
+    const token = this.getToken();  // Récupère le token JWT du localStorage
+    return !!token;  // Retourne true si un token est présent, sinon false
+  }
 }

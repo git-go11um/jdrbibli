@@ -17,8 +17,8 @@
       </div>
 
       <!-- Image de l'ouvrage -->
-      <div *ngIf="ouvrage.imageUrl" class="ouvrage-image">
-        <img [src]="environment.imageUrl + ouvrage.imageUrl" alt="{{ ouvrage.titre || 'Ouvrage' }}" />
+      <div *ngIf="ouvrage.imageUrl || 'default-image.jpg'" class="ouvrage-image">
+        <img [src]="environment.imageUrl + (ouvrage.imageUrl || 'default-image.jpg')" alt="{{ ouvrage.titre || 'Ouvrage' }}" />
       </div>
 
       <h2>{{ ouvrage.titre }}</h2>

@@ -88,13 +88,22 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody InscriptionRequest request) {
         try {
-            User newUser = userService.inscrireNewUser(request.getPseudo(), request.getEmail(), request.getPassword());
+            // Log de la tentative d'inscription
+            logger.info("Tentative d'enregistrement pour pseudo: {}, email: {}", request.getPseudo(),
+                    request.getEmail());
 
+            // Inscription de l'utilisateur via le service
+            User newUser = userService.inscrireNewUser(request.getPseudo(), request.getEmail(), request.getPassword());
+            logger.info("Utilisateur créé avec succès : {}", newUser.getPseudo());
+
+            // Création du profil utilisateur
             UserProfileDTO profileDto = new UserProfileDTO();
             profileDto.setId(newUser.getId());
             profileDto.setPseudo(newUser.getPseudo());
             profileDto.setEmail(newUser.getEmail());
 
+            // Tentative de création du profil utilisateur dans le service user-service
+            logger.info("Envoi du profil utilisateur au user-service pour le pseudo : {}", newUser.getPseudo());
             WebClient.create(userServiceUrl)
                     .post()
                     .uri("/users")
@@ -102,12 +111,18 @@ public class AuthController {
                     .retrieve()
                     .bodyToMono(Void.class)
                     .block();
+            logger.info("Profil utilisateur créé avec succès dans le user-service");
 
+            // Génération du token JWT
             String token = jwtService.generateToken(newUser.getPseudo(), newUser.getId());
+            logger.info("Token JWT généré pour le pseudo : {}", newUser.getPseudo());
+
+            // Retour du token et des informations utilisateur
             return ResponseEntity.ok(new AuthenticationResponse(token, userService.toDTO(newUser)));
 
         } catch (Exception e) {
-            logger.error("Erreur lors de l'inscription", e);
+            // Log de l'erreur en cas d'échec
+            logger.error("Erreur lors de l'inscription : ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erreur lors de l'inscription : " + e.getMessage()));
         }

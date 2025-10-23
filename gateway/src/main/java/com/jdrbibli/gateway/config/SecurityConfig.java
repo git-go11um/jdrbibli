@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .pathMatchers("/api/auth/login").permitAll()
                         .pathMatchers("/api/auth/register").permitAll()
                         .pathMatchers("/api/auth/password-reset/**").permitAll()
+                        .pathMatchers("/actuator/**").permitAll()
                         .anyExchange().permitAll() // ✅ le gateway ne valide plus rien
                 )
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)

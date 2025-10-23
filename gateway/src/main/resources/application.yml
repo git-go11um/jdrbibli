@@ -16,8 +16,14 @@ spring:
   cloud:
     gateway:
       default-filters:
-        # Filtre global pour gérer le CORS
-        - DedupeResponseHeader=Access-Control-Allow-Credentials, Access-Control-Allow-Origin
+        - name: DedupeResponseHeader
+          args:
+            name: Access-Control-Allow-Origin
+            strategy: RETAIN_FIRST
+        - name: DedupeResponseHeader
+          args:
+            name: Access-Control-Allow-Credentials
+            strategy: RETAIN_FIRST
       routes:
         # -------------------------
         # Auth Service
@@ -37,7 +43,7 @@ spring:
           predicates:
             - Path=/api/users/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
 
         # -------------------------
         # Friends (User) Service
@@ -47,7 +53,7 @@ spring:
           predicates:
             - Path=/api/friends/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
 
         # -------------------------
         # Ouvrage Service
@@ -55,9 +61,19 @@ spring:
         - id: ouvrage-service
           uri: http://ouvrage-service:8083
           predicates:
-            - Path=/api/ouvrage/**
+            - Path=/api/ouvrages/**
           filters:
-            - RewritePath=/api/ouvrage/(?<remaining>.*), /${remaining}
+            - StripPrefix=1
+
+        # -------------------------
+        # Audit Service
+        # -------------------------
+        - id: audit-service
+          uri: http://audit-service:8085
+          predicates:
+            - Path=/api/audit/**
+          filters:
+            - StripPrefix=1
 
         # -------------------------
         # Actuator (Gateway itself)
@@ -71,13 +87,15 @@ jwt:
   secret: Z2dKbnRHY0NvcnNDWUR0bFhHZ3R3NzIzbVRZT3o0Sk5GZjBWT2tVdzBrckxKVXphMnJKZThCb21BZzk1OU9sWkQ=
 
 management:
+  endpoint:
+    gateway:
+      enabled: true     # <--- Active explicitement l’endpoint
+    health:
+      show-details: always
   endpoints:
     web:
       exposure:
-        include: health, info
-  endpoint:
-    health:
-      show-details: always
+        include: health, info, gateway
 
 logging:
   level:
