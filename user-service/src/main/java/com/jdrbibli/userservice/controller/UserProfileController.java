@@ -5,6 +5,7 @@ import com.jdrbibli.userservice.dto.UserProfileDTO;
 import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.service.UserProfileService;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +30,18 @@ import java.util.List;
  * gérer les avatars, rechercher par pseudo, et vérifier les relations d'amitié.
  */
 @RestController
-@RequestMapping({ "/api/users", "/user" })
+@RequestMapping({ "/users", "/user" })
 public class UserProfileController {
+
+    @PostConstruct
+    public void init() {
+        log.info("✅ UserProfileController initialisé et prêt à gérer /users/**");
+    }
 
     private static final Logger log = LoggerFactory.getLogger(UserProfileController.class);
 
     private final UserProfileService userProfileService;
+
     /**
      * Constructeur du contrôleur.
      *
@@ -43,6 +50,7 @@ public class UserProfileController {
     public UserProfileController(UserProfileService userProfileService) {
         this.userProfileService = userProfileService;
     }
+
     /**
      * Récupère tous les utilisateurs.
      *
@@ -52,6 +60,7 @@ public class UserProfileController {
     public List<UserProfile> getAllUsers() {
         return userProfileService.getAllUsers();
     }
+
     /**
      * Récupère un utilisateur par son ID.
      *
@@ -64,6 +73,7 @@ public class UserProfileController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
     /**
      * Supprime un utilisateur par son pseudo.
      *
@@ -75,6 +85,7 @@ public class UserProfileController {
         userProfileService.deleteUserByPseudo(pseudo);
         return ResponseEntity.noContent().build();
     }
+
     /**
      * Met à jour un utilisateur à partir d'un DTO.
      *
@@ -91,6 +102,7 @@ public class UserProfileController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
     /**
      * Recherche un utilisateur par pseudo.
      *
@@ -106,8 +118,7 @@ public class UserProfileController {
                         user.getEmail(),
                         (user.getAvatarPath() != null && !user.getAvatarPath().isBlank())
                                 ? "/api/users/profile/avatar/" + user.getId()
-                                : ""
-                ))
+                                : ""))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -123,6 +134,7 @@ public class UserProfileController {
         List<FriendDTO> friends = userProfileService.getFriends(pseudo);
         return ResponseEntity.ok(friends);
     }
+
     /**
      * Upload ou remplacement de l'avatar de l'utilisateur authentifié.
      *
@@ -169,6 +181,7 @@ public class UserProfileController {
                     .body("Erreur upload avatar: " + e.getMessage());
         }
     }
+
     /**
      * Récupère l'avatar d'un utilisateur par son ID.
      *
@@ -199,6 +212,7 @@ public class UserProfileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     /**
      * Crée un nouvel utilisateur.
      *
@@ -210,6 +224,7 @@ public class UserProfileController {
         UserProfileDTO created = userProfileService.createUser(dto);
         return ResponseEntity.ok(created);
     }
+
     /**
      * Récupère le profil de l'utilisateur authentifié.
      *
@@ -219,6 +234,7 @@ public class UserProfileController {
     @GetMapping("/profile/me")
     public ResponseEntity<UserProfileDTO> getMyProfile(Authentication authentication) {
         if (authentication == null || authentication.getPrincipal() == null) {
+            log.warn("❌ Aucun utilisateur authentifié (authentication ou principal null)");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -229,21 +245,32 @@ public class UserProfileController {
         } else if (principal instanceof UserDetails) {
             pseudo = ((UserDetails) principal).getUsername();
         } else {
+            log.error("⚠️ Type de principal inattendu : {}", principal.getClass());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
-        UserProfile profile = userProfileService.findByPseudo(pseudo)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+        log.info("🎯 Auth principal reçu: {}", pseudo);
 
-        UserProfileDTO dto = new UserProfileDTO(
-                profile.getPseudo(),
-                profile.getEmail(),
-                (profile.getAvatarPath() != null && !profile.getAvatarPath().isBlank())
-                        ? "/api/users/profile/avatar/" + profile.getId()
-                        : "");
+        try {
+            UserProfile profile = userProfileService.findByPseudo(pseudo)
+                    .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
-        return ResponseEntity.ok(dto);
+            UserProfileDTO dto = new UserProfileDTO(
+                    profile.getPseudo(),
+                    profile.getEmail(),
+                    (profile.getAvatarPath() != null && !profile.getAvatarPath().isBlank())
+                            ? "/api/users/profile/avatar/" + profile.getId()
+                            : "");
+
+            log.info("✅ Profil retourné pour {} (email={})", dto.getPseudo(), dto.getEmail());
+            return ResponseEntity.ok(dto);
+
+        } catch (Exception e) {
+            log.error("❌ Erreur lors de la récupération du profil pour '{}': {}", pseudo, e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
+
     /**
      * Supprime un utilisateur par son ID.
      *
@@ -259,6 +286,7 @@ public class UserProfileController {
             return ResponseEntity.notFound().build();
         }
     }
+
     /**
      * Supprime un utilisateur par son ID avec cascade sur ses gammes et ludothèque.
      *
@@ -274,6 +302,7 @@ public class UserProfileController {
             return ResponseEntity.notFound().build();
         }
     }
+
     /**
      * Endpoint test pour la suppression en cascade.
      *
@@ -284,6 +313,7 @@ public class UserProfileController {
     public ResponseEntity<String> testCascade(@PathVariable Long id) {
         return ResponseEntity.ok("OK cascade " + id);
     }
+
     /**
      * Vérifie si deux utilisateurs sont amis.
      *

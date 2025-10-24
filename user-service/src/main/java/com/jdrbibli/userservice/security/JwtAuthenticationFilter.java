@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -14,83 +16,64 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Filtre Spring Security qui intercepte chaque requête HTTP et valide
- * le JWT présent dans l'en-tête Authorization.
- * 
- * 
- * Si le token est valide, il place une authentification dans le contexte
- * de sécurité Spring afin que l'utilisateur soit reconnu pour cette requête.
- * 
- * 
- * 
- * Les requêtes de création d'utilisateur (/api/users POST) sont exclues
- * du filtrage JWT afin de permettre l'inscription sans authentification.
- * 
+ * Filtre JWT qui intercepte chaque requête HTTP et valide le token dans
+ * l'en-tête Authorization.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     private final JwtService jwtService;
 
-    /**
-     * Crée un filtre d'authentification JWT avec le service JWT fourni.
-     *
-     * @param jwtService le service utilisé pour valider et extraire les informations du token
-     */
     public JwtAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
-    /**
-     * Filtre la requête HTTP pour extraire et valider le JWT.
-     * Si le token est valide, configure l'authentification dans le contexte Spring Security.
-     *
-     * @param request     la requête HTTP entrante
-     * @param response    la réponse HTTP
-     * @param filterChain la chaîne de filtres à continuer
-     * @throws ServletException en cas d'erreur de servlet
-     * @throws IOException      en cas d'erreur d'entrée/sortie
-     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
+        log.info("🚦 JwtAuthenticationFilter intercepts {}", request.getRequestURI());
 
         String path = request.getRequestURI();
-        if (path.equals("/api/users") && request.getMethod().equals("POST")) {
+
+        // 🔹 Autoriser certaines routes publiques
+        if ("/api/users".equals(path) && "POST".equals(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
         }
 
         final String authHeader = request.getHeader("Authorization");
-        final String token;
-        final String pseudo;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.debug("Aucun header Authorization valide pour {}", path);
             filterChain.doFilter(request, response);
             return;
         }
 
-        token = authHeader.substring(7);
+        final String token = authHeader.substring(7);
+        String pseudo = null;
+
         try {
             pseudo = jwtService.extractPseudo(token);
-        } catch (Exception e) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+            log.info("🔐 Token reçu pour pseudo: {}", pseudo);
 
-        if (pseudo != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (pseudo != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (jwtService.isTokenValid(token, pseudo)) {
+                if (jwtService.isTokenValid(token, pseudo)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(pseudo,
+                            null, null);
 
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(pseudo, null,
-                        null);
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    log.info("✅ Authentification configurée pour {}", pseudo);
+                } else {
+                    log.warn("❌ Token invalide pour {}", pseudo);
+                }
             }
+        } catch (Exception e) {
+            log.error("Erreur dans JwtAuthenticationFilter : {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
