@@ -106,7 +106,7 @@ public class AuthController {
             logger.info("Envoi du profil utilisateur au user-service pour le pseudo : {}", newUser.getPseudo());
             WebClient.create(userServiceUrl)
                     .post()
-                    .uri("/users")
+                    .uri("/api/users")
                     .bodyValue(profileDto)
                     .retrieve()
                     .bodyToMono(Void.class)

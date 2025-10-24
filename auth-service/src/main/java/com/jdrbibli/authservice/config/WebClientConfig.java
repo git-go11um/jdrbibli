@@ -24,10 +24,17 @@ public class WebClientConfig {
      *
      * @return un {@link WebClient} singleton pour l'application
      */
+    /*
+     * @Bean
+     * public WebClient webClient() {
+     * return WebClient.builder()
+     * .baseUrl("http://user-service:8082/api/users")
+     * .build();
+     * }
+     */
+
     @Bean
     public WebClient webClient() {
-        return WebClient.builder()
-                .baseUrl("http://user-service:8082/api/users")
-                .build();
+        return WebClient.builder().build();
     }
 }
