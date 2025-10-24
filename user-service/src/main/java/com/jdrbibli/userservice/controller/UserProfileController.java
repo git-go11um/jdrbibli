@@ -30,7 +30,7 @@ import java.util.List;
  * gérer les avatars, rechercher par pseudo, et vérifier les relations d'amitié.
  */
 @RestController
-@RequestMapping({ "/users", "/user" })
+@RequestMapping({ "/users", "/user", "/api/users" })
 public class UserProfileController {
 
     @PostConstruct

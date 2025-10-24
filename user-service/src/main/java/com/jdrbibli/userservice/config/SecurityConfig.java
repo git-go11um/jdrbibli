@@ -29,12 +29,16 @@ public class SecurityConfig {
                         // Routes publiques
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/test/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users", "/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/search", "/users/search").permitAll()
-                        // Autorise la liste complète des utilisateurs (utile pour debug)
-                        .requestMatchers(HttpMethod.GET, "/api/users", "/users").permitAll()
-                        // Le reste doit être authentifié
-                        .anyRequest().authenticated())
+
+                        // 🔥 Autorise tous les POST venant d'auth-service (création utilisateur)
+                        .requestMatchers(HttpMethod.POST, "/api/users/**", "/users/**").permitAll()
+
+                        // 🔥 Autorise les recherches et affichages utilisateurs
+                        .requestMatchers(HttpMethod.GET, "/api/users/**", "/users/**").permitAll()
+
+                        // Tout le reste nécessite un token JWT
+                        .anyRequest().authenticated()
+                )
                 // Important : le filtre JWT doit passer avant le filtre UsernamePassword
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
