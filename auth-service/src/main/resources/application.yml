@@ -39,7 +39,7 @@ logging:
     org.springframework.web.servlet.DispatcherServlet: TRACE
 
 mail:
-  host: localhost
+  host: host.docker.internal
   port: 25
   username: ""
   password: ""
