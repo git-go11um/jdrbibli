@@ -23,22 +23,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/auth/**",
-                                "/api/users",
-                                "/users",
-                                "/friends/**",
-                                "/api/friends/**",
-                                "/actuator/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
-                // ✅ Ajoute ton filtre JWT AVANT UsernamePasswordAuthenticationFilter
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                // --- Routes publiques ---
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/auth/**",
+                    "/actuator/**"
+                ).permitAll()
+
+                // --- Routes utilisateurs accessibles par Auth-Service ---
+                .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/users/**").permitAll()   // ✅ permet les updates du auth-service
+                .requestMatchers(HttpMethod.DELETE, "/api/users/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
+
+                // --- Routes friends publiques (si besoin) ---
+                .requestMatchers("/friends/**", "/api/friends/**").permitAll()
+
+                // --- Tout le reste doit être authentifié ---
+                .anyRequest().authenticated()
+            )
+            // ✅ On ajoute le filtre JWT
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

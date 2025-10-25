@@ -54,10 +54,10 @@ jwt:
   expiration: 3600000
 
 app:
-  frontend:
-    reset-password-url: "http://jdrbibli-frontend:4200/reset-password?token="
   user-service-url: http://user-service:8082
   audit-url: http://audit-service:8085/api/audit/logs
+  frontend:
+    reset-password-url: "http://jdrbibli-frontend:4200/reset-password?token="
 
 management:
   endpoints:

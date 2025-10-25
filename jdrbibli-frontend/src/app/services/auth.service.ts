@@ -74,19 +74,22 @@ export class AuthService {
   }
 
   // ---------------- PROFILE ----------------
-  updateProfile(pseudo: string, email: string, newPassword?: string): Observable<any> {
-    const headers = this.authHeaders();
-    const body: any = { pseudo, email };
-    if (newPassword) body.password = newPassword;
+  updateProfile(pseudo: string, email: string): Observable<any> {
+    const headers = this.authHeaders(); // <- pas besoin de X-User-Id ici
+    const body = { pseudo, email };
 
     return this.http.put<any>(`${this.apiAuthUrl}/profile`, body, { headers })
       .pipe(
         tap(res => {
-          if (res.token) localStorage.setItem('jwt', res.token);  // Met à jour le token si retourné
+          if (res.token) {
+            localStorage.setItem('jwt', res.token);
+          }
         }),
         catchError(this.handleError)
       );
   }
+
+
 
   changeProfilePassword(data: { currentPassword: string; newPassword: string; confirmNewPassword: string }): Observable<any> {
     const headers = this.authHeaders();
