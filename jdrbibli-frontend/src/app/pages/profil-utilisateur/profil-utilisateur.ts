@@ -156,7 +156,7 @@ export class ProfilUtilisateur implements OnInit {
     }
 
     this.http.get<any>(
-      `${environment.apiUrl}/api/users/search?pseudo=${this.searchPseudo}`,
+      `${environment.apiUrl}/users/search?pseudo=${this.searchPseudo}`,
       { headers: this.authService.getAuthHeaders() }
     ).subscribe({
       next: (user: any) => {
