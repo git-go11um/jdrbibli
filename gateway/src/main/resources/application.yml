@@ -7,7 +7,7 @@ spring:
 
   webflux:
     cors:
-      allowed-origins: "http://localhost:4200"  # Frontend Angular local
+      allowed-origins: "http://localhost:4200" # Frontend Angular local
       allowed-methods: "*"
       allowed-headers: "*"
       exposed-headers: "Authorization"
@@ -16,6 +16,7 @@ spring:
   cloud:
     gateway:
       default-filters:
+        # Évite la duplication des headers CORS
         - name: DedupeResponseHeader
           args:
             name: Access-Control-Allow-Origin
@@ -24,10 +25,21 @@ spring:
           args:
             name: Access-Control-Allow-Credentials
             strategy: RETAIN_FIRST
+
+      # ⚙️ IMPORTANT : ne retire aucun header sensible (dont Authorization)
+      sensitive-headers: []
+
+      # Préserve les en-têtes de contexte (Forwarded / X-Forwarded)
+      forwarded:
+        enabled: true
+      x-forwarded:
+        enabled: true
+
+      # -------------------------
+      # Routes
+      # -------------------------
       routes:
-        # -------------------------
         # Auth Service
-        # -------------------------
         - id: auth-service
           uri: http://auth-service:8081
           predicates:
@@ -35,9 +47,7 @@ spring:
           filters:
             - StripPrefix=1
 
-        # -------------------------
         # User Service
-        # -------------------------
         - id: user-service
           uri: http://user-service:8082
           predicates:
@@ -45,9 +55,7 @@ spring:
           filters:
             - StripPrefix=1
 
-        # -------------------------
         # Friends (User) Service
-        # -------------------------
         - id: user-service-friends
           uri: http://user-service:8082
           predicates:
@@ -55,9 +63,7 @@ spring:
           filters:
             - StripPrefix=1
 
-        # -------------------------
         # Ouvrage Service
-        # -------------------------
         - id: ouvrage-service
           uri: http://ouvrage-service:8083
           predicates:
@@ -65,9 +71,7 @@ spring:
           filters:
             - StripPrefix=1
 
-        # -------------------------
         # Audit Service
-        # -------------------------
         - id: audit-service
           uri: http://audit-service:8085
           predicates:
@@ -75,9 +79,7 @@ spring:
           filters:
             - StripPrefix=1
 
-        # -------------------------
         # Actuator (Gateway itself)
-        # -------------------------
         - id: actuator
           uri: http://gateway:8084
           predicates:
@@ -89,7 +91,7 @@ jwt:
 management:
   endpoint:
     gateway:
-      enabled: true     # <--- Active explicitement l’endpoint
+      enabled: true
     health:
       show-details: always
   endpoints:
@@ -100,5 +102,7 @@ management:
 logging:
   level:
     root: INFO
-    org.springframework: DEBUG
-    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security.web.server: TRACE
+    org.springframework.security.web.server.authorization: TRACE
+    org.springframework.security.web.server.authorization.AuthorizationWebFilter: TRACE
+    org.springframework.security.web.server.util.matcher: TRACE

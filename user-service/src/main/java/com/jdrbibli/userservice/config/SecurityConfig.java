@@ -26,20 +26,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Routes publiques
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/test/**").permitAll()
-
-                        // 🔥 Autorise tous les POST venant d'auth-service (création utilisateur)
-                        .requestMatchers(HttpMethod.POST, "/api/users/**", "/users/**").permitAll()
-
-                        // 🔥 Autorise les recherches et affichages utilisateurs
-                        .requestMatchers(HttpMethod.GET, "/api/users/**", "/users/**").permitAll()
-
-                        // Tout le reste nécessite un token JWT
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/auth/**",
+                                "/api/users",
+                                "/users",
+                                "/friends/**",
+                                "/api/friends/**",
+                                "/actuator/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
-                // Important : le filtre JWT doit passer avant le filtre UsernamePassword
+                // ✅ Ajoute ton filtre JWT AVANT UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * supprimer des amis, lister les amis et accéder aux ouvrages d'un ami.
  */
 @RestController
-@RequestMapping("/api/friends")
+@RequestMapping("/friends")
 public class FriendRequestController {
 
     private final FriendRequestService friendRequestService;

@@ -14,7 +14,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Filtre JWT qui intercepte chaque requête HTTP et valide le token dans l'en-tête Authorization.
+ * Filtre JWT qui intercepte chaque requête HTTP et valide le token dans
+ * l'en-tête Authorization.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -28,20 +29,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                   HttpServletResponse response,
-                                   FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
+
+        log.info("PATH_RECU_JWT_FILTER: {} [{}]", request.getRequestURI(), request.getMethod());
+        log.info("🆕 JwtAuthenticationFilter version REBUILT active !");
 
         String path = request.getRequestURI();
         log.debug("🚦 JwtAuthenticationFilter intercepts {}", path);
 
         // ✅ Bypass uniquement pour les routes réellement publiques
-        if (("/api/auth".equals(path) || path.startsWith("/api/auth/"))
-                || ("/auth".equals(path) || path.startsWith("/auth/"))
-                || ("/api/users".equals(path) && "POST".equals(request.getMethod()))
-                || ("/users".equals(path) && "POST".equals(request.getMethod()))
+        if (path.startsWith("/auth")
+                || path.startsWith("/api/auth")
                 || path.startsWith("/actuator")
-                || path.startsWith("/test")) {
+                || path.startsWith("/test")
+                || (path.equals("/users") && "POST".equals(request.getMethod()))
+                || (path.equals("/api/users") && "POST".equals(request.getMethod()))) {
             log.info("PUBLIC_ROUTE: accès public détecté pour {}", path);
             filterChain.doFilter(request, response);
             return;
@@ -64,8 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (pseudo != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 if (jwtService.isTokenValid(token, pseudo)) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(pseudo, null, null);
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(pseudo,
+                            null, null);
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);

@@ -6,7 +6,7 @@ import { throwError } from 'rxjs';
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     const excludedUrls = [
         `${environment.apiUrl}/auth/login`,  // Utilisation de environment.apiUrl
-        `${environment.apiUrl}/auth/register`, 
+        `${environment.apiUrl}/auth/register`,
         `${environment.apiUrl}/auth/password-reset/request`,
         `${environment.apiUrl}/auth/password-reset/verify-code`,
         `${environment.apiUrl}/auth/password-reset/confirm`,
@@ -22,6 +22,10 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
         // JWT
         const token = localStorage.getItem('jwt');
+
+        console.log('🔍 Interceptor - URL interceptée:', req.url);
+        console.log('🔍 Interceptor - Token actuel:', token);
+
         if (token) {
             headers = headers.set('Authorization', `Bearer ${token}`);
         }
