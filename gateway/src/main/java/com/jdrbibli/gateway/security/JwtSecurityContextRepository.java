@@ -5,6 +5,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
  * ⚠️ Actuellement, le gateway ne valide plus les JWT, mais cette classe est prête
  * pour la réactivation de l'authentification basée sur JWT.
  */
+@Component
 public class JwtSecurityContextRepository implements ServerSecurityContextRepository {
 
     private final JwtAuthenticationManager authenticationManager;

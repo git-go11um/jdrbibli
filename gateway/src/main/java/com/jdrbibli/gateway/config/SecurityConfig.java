@@ -1,5 +1,7 @@
 package com.jdrbibli.gateway.config;
 
+import com.jdrbibli.gateway.security.JwtAuthenticationManager;
+import com.jdrbibli.gateway.security.JwtSecurityContextRepository;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,26 +14,36 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
+    private final JwtAuthenticationManager jwtAuthenticationManager;
+    private final JwtSecurityContextRepository jwtSecurityContextRepository;
+
+    public SecurityConfig(JwtAuthenticationManager jwtAuthenticationManager,
+            JwtSecurityContextRepository jwtSecurityContextRepository) {
+        this.jwtAuthenticationManager = jwtAuthenticationManager;
+        this.jwtSecurityContextRepository = jwtSecurityContextRepository;
+    }
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        http
-                // Désactivation CSRF (API REST)
+
+        return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                // Configuration CORS autorisant Angular
                 .cors(cors -> cors.configurationSource(request -> {
-                    var config = new org.springframework.web.cors.CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:4200"));
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    config.setAllowedHeaders(List.of("*"));
-                    config.setAllowCredentials(true);
-                    return config;
+                    var c = new org.springframework.web.cors.CorsConfiguration();
+                    c.setAllowedOrigins(List.of("http://localhost:4200"));
+                    c.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    c.setAllowedHeaders(List.of("*"));
+                    c.setExposedHeaders(List.of("Authorization"));
+                    c.setAllowCredentials(true);
+                    return c;
                 }))
-                // Définition des autorisations
+                .securityContextRepository(jwtSecurityContextRepository)
+                .authenticationManager(jwtAuthenticationManager)
                 .authorizeExchange(exchanges -> exchanges
-                        // Autorise les requêtes CORS preflight
+                        // Préflight CORS
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Auth-service (inscription, login, reset)
+                        // Auth-service (login, register, reset)
                         .pathMatchers(
                                 "/api/auth/login",
                                 "/api/auth/register",
@@ -41,18 +53,10 @@ public class SecurityConfig {
                         // Actuator
                         .pathMatchers("/actuator/**").permitAll()
 
-                        // Friends publics (liste accessible sans token)
-                        .pathMatchers(HttpMethod.GET, "/api/friends/**").permitAll()
-
-                        // Users (si tu veux garder /me protégé)
-                        .pathMatchers("/api/users/**").authenticated()
-
-                        // Tout le reste nécessite authentification (ex: /api/users/**, /me, etc.)
+                        // Tout le reste = sécurisé
                         .anyExchange().authenticated())
-                // Pas de form login ni HTTP Basic
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-                .formLogin(ServerHttpSecurity.FormLoginSpec::disable);
-
-        return http.build();
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+                .build();
     }
 }
