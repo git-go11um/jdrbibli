@@ -113,14 +113,33 @@ export class ProfilUtilisateur implements OnInit {
   loadFriends(): void {
     const userId = this.authService.getUserIdFromToken();
     if (!userId) return;
+
     this.friendService.listFriends(userId).subscribe({
-      next: (data: any) => {
+      next: (data: any[]) => {
         this.friends = data;
-        // Génération des URL avatars amis
+        this.friendsAvatarUrls = {}; // reset avant de recharger
+
         this.friends.forEach(friend => {
-          this.friendsAvatarUrls[friend.id] = friend.avatarUrl
-            ? `${environment.apiUrl}${friend.avatarUrl.replace(/^\/api/, '')}?t=${new Date().getTime()}`
-            : '';  // Utilisation de environment.apiUrl
+          if (friend.avatarUrl) {
+            const endpoint = `${environment.apiUrl}${friend.avatarUrl.replace(/^\/api/, '')}`;
+
+            // 🔒 requête sécurisée pour récupérer le blob avec token JWT
+            this.http.get(endpoint, {
+              headers: this.authService.getAuthHeaders(),
+              responseType: 'blob'
+            }).subscribe({
+              next: blob => {
+                this.friendsAvatarUrls[friend.id] = URL.createObjectURL(blob);
+                console.log(`✅ Avatar ami ${friend.pseudo} chargé`);
+              },
+              error: err => {
+                console.error(`Erreur chargement avatar ami ${friend.pseudo}`, err);
+                this.friendsAvatarUrls[friend.id] = '';
+              }
+            });
+          } else {
+            this.friendsAvatarUrls[friend.id] = '';
+          }
         });
       },
       error: (err: any) => console.error('Erreur chargement amis', err)
