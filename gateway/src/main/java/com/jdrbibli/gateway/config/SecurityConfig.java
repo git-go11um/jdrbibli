@@ -50,8 +50,8 @@ public class SecurityConfig {
                                 "/api/auth/password-reset/**")
                         .permitAll()
 
-                        // Actuator
-                        .pathMatchers("/actuator/**").permitAll()
+                        // ✅ On autorise l'accès public aux images et à l'actuator
+                        .pathMatchers("/uploads/**", "/actuator/**").permitAll()
 
                         // Tout le reste = sécurisé
                         .anyExchange().authenticated())

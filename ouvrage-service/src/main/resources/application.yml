@@ -7,6 +7,10 @@ spring:
     username: root
     password: root
     driver-class-name: org.mariadb.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   jpa:
     hibernate:
@@ -21,14 +25,12 @@ spring:
     enabled: false
     locations: classpath:db/migration
 
-
-
-
 logging:
   level:
     org.springframework.web: DEBUG
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
     org.flywaydb: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
 
 management:
   endpoints:
@@ -38,4 +40,3 @@ management:
   endpoint:
     health:
       show-details: always
-

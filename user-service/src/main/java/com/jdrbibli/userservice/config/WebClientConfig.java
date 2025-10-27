@@ -4,26 +4,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
-/**
- * Configuration de {@link WebClient} pour les appels HTTP réactifs.
- * 
- * Ce bean configure un {@link WebClient} avec une URL de base pointant
- * vers le microservice Gateway (http://localhost:8084). Il peut être injecté
- * dans les services pour effectuer des requêtes HTTP vers d'autres
- * microservices.
- */
 @Configuration
 public class WebClientConfig {
 
-    /**
-     * Crée et configure le {@link WebClient} utilisé pour les appels HTTP.
-     *
-     * @return une instance de {@link WebClient} avec l'URL de base configurée
-     */
     @Bean
     public WebClient webClient() {
+        // Utilisé pour les appels internes au gateway ou à d'autres services
         return WebClient.builder()
                 .baseUrl("http://gateway:8084")
+                .build();
+    }
+
+    @Bean(name = "authWebClient")
+    public WebClient authWebClient() {
+        // Utilisé pour appeler directement auth-service (Docker)
+        return WebClient.builder()
+                .baseUrl("http://auth-service:8081")
                 .build();
     }
 }

@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * le propriétaire.
  */
 @RestController
-@RequestMapping("/api/ouvrage/ouvrages")
+@RequestMapping("/ouvrages")
 public class OuvrageController {
 
     private final OuvrageService ouvrageService;
@@ -97,8 +97,8 @@ public class OuvrageController {
      * @param gammeId identifiant de la gamme
      * @return liste de {@link OuvrageDTO}.
      */
-    @GetMapping("/gammes/{gammeId}")
-    public ResponseEntity<List<OuvrageDTO>> getByGamme(@PathVariable Long gammeId) {
+    @GetMapping("/by-gamme/{gammeId}")
+    public ResponseEntity<List<OuvrageDTO>> getByGammeId(@PathVariable Long gammeId) {
         List<Ouvrage> ouvrages = ouvrageService.findByGammeId(gammeId);
         List<OuvrageDTO> dtos = ouvrages.stream()
                 .map(ouvrageMapper::toDTO)

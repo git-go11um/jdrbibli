@@ -14,19 +14,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Contrôleur REST pour gérer les {@link Gamme} dans le microservice {@code ouvrage-service}.
+ * Contrôleur REST pour gérer les {@link Gamme} dans le microservice
+ * {@code ouvrage-service}.
  * 
  * Fournit des endpoints pour :
  * <ul>
- *   <li>Récupérer toutes les gammes d'un utilisateur</li>
- *   <li>Récupérer une gamme par son identifiant</li>
- *   <li>Créer, mettre à jour et supprimer une gamme</li>
- *   <li>Récupérer les gammes publiques ou celles d'un ami</li>
+ * <li>Récupérer toutes les gammes d'un utilisateur</li>
+ * <li>Récupérer une gamme par son identifiant</li>
+ * <li>Créer, mettre à jour et supprimer une gamme</li>
+ * <li>Récupérer les gammes publiques ou celles d'un ami</li>
  * </ul>
- * Chaque requête sécurisée utilise l'en-tête {@code X-User-Id} pour identifier le propriétaire.
+ * Chaque requête sécurisée utilise l'en-tête {@code X-User-Id} pour identifier
+ * le propriétaire.
  */
 @RestController
-@RequestMapping("/api/ouvrage/gammes")
+@RequestMapping("/ouvrages/gammes")
 public class GammeController {
 
     private final GammeService gammeService;
@@ -36,7 +38,8 @@ public class GammeController {
      * Constructeur du contrôleur.
      *
      * @param gammeService service pour gérer les gammes.
-     * @param gammeMapper  mapper pour convertir entre {@link Gamme} et {@link GammeDTO}.
+     * @param gammeMapper  mapper pour convertir entre {@link Gamme} et
+     *                     {@link GammeDTO}.
      */
     public GammeController(GammeService gammeService, GammeMapper gammeMapper) {
         this.gammeService = gammeService;

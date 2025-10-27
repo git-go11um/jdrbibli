@@ -57,7 +57,7 @@ export class OuvrageDetailPage implements OnInit {
     });
   }
 
-  /** Récupérer les autres ouvrages de la même gamme en excluant celui qu’on consulte */
+  /** 🔁 Récupérer les autres ouvrages de la même gamme (en excluant celui consulté) */
   loadOtherOuvragesInGamme(gammeId: number, excludeId: number): void {
     this.ouvrageService.getOtherOuvragesInGamme(gammeId, excludeId).subscribe({
       next: (data) => {
@@ -70,24 +70,28 @@ export class OuvrageDetailPage implements OnInit {
     });
   }
 
-  /** Naviguer vers un autre ouvrage */
+  /** 📘 Naviguer vers un autre ouvrage */
   ouvrirPageOuvrage(id: number): void {
     this.router.navigate(['/ouvrage-detail', id]);
   }
 
+  /** 📗 Naviguer vers la page de la gamme */
+  ouvrirPageGamme(gammeId: number): void {
+    this.router.navigate(['/gamme', gammeId]);
+  }
+
+  /** 📅 Formater la date d'affichage */
   formatDate(date: string): string {
     return new Date(date).toLocaleDateString('fr-FR');
   }
 
+  /** 🖼️ Générer le chemin complet de l’image */
   getImageFullPath(imageUrl: string): string {
-    // Vérification si l'URL est vide ou non valide
-    if (!imageUrl) return 'assets/default-image.jpg';  // Par exemple, une image par défaut
+    if (!imageUrl) return 'assets/default-image.jpg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    return `${environment.apiUrl}${imageUrl}`;
-  }
 
-  /** Naviguer vers la page de la gamme */
-  ouvrirPageGamme(gammeId: number): void {
-    this.router.navigate(['/gamme', gammeId]);
+    // ✅ Retire le "/api" car les images sont servies directement via le gateway
+    const baseUrl = environment.apiUrl.replace('/api', '');
+    return `${baseUrl}${imageUrl}`;
   }
 }

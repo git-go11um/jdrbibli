@@ -39,6 +39,19 @@ spring:
       # Routes
       # -------------------------
       routes:
+        # ✅ 1. Static uploads (images) - doit être avant tout le reste
+        - id: ouvrage-service-uploads
+          uri: http://ouvrage-service:8083
+          predicates:
+            - Path=/uploads/images/**
+          filters:
+            - StripPrefix=0
+          metadata:
+            cors:
+              allowedOrigins: "*"
+              allowedMethods: "*"
+              allowedHeaders: "*"
+
         # Auth Service
         - id: auth-service
           uri: http://auth-service:8081

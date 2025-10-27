@@ -8,6 +8,7 @@ import com.jdrbibli.userservice.entity.UserProfile;
 import com.jdrbibli.userservice.mapper.FriendMapper;
 import com.jdrbibli.userservice.repository.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,19 +35,24 @@ import java.util.stream.Collectors;
 public class UserProfileService {
 
     private final WebClient webClient;
+    private final WebClient authWebClient;
     private final StorageProperties storageProperties;
     private final FriendRequestService friendRequestService;
     private final UserProfileRepository userProfileRepository;
     private static final Logger log = LoggerFactory.getLogger(UserProfileService.class);
 
     @Autowired
-    public UserProfileService(UserProfileRepository userProfileRepository,
-                              FriendRequestService friendRequestService,
-                              WebClient webClient,
-                              StorageProperties storageProperties) {
+    public UserProfileService(
+            UserProfileRepository userProfileRepository,
+            FriendRequestService friendRequestService,
+            WebClient webClient,
+            @Qualifier("authWebClient") WebClient authWebClient,
+            StorageProperties storageProperties) {
+
         this.userProfileRepository = userProfileRepository;
         this.friendRequestService = friendRequestService;
         this.webClient = webClient;
+        this.authWebClient = authWebClient;
         this.storageProperties = storageProperties;
     }
 
@@ -262,14 +268,25 @@ public class UserProfileService {
         UserProfile profile = optionalProfile.get();
 
         try {
+            // 🗑️ 1. Suppression locale (user_db)
             userProfileRepository.delete(profile);
-            log.info("Profil utilisateur {} et ses gammes supprimés avec succès.", id);
+            log.info("✅ Profil utilisateur {} supprimé de user_db.", id);
+
+            // 🌐 2. Suppression dans auth-service via WebClient Docker
+            log.info("➡️ Appel auth-service pour supprimer user {}", id);
+            authWebClient.delete()
+                    .uri("/users/" + id + "/cascade")
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block();
+
+            log.info("✅ Utilisateur {} supprimé dans auth-service.", id);
+            return true;
+
         } catch (Exception e) {
-            log.error("Erreur lors de la suppression du profil utilisateur {}", id, e);
+            log.error("❌ Erreur lors de la suppression de l'utilisateur {}", id, e);
             return false;
         }
-
-        return true;
     }
 
     /**

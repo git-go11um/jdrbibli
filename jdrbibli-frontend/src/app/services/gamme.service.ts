@@ -13,7 +13,7 @@ export interface GammeDTO {
     providedIn: 'root'
 })
 export class GammeService {
-    private readonly baseUrl = `${environment.apiUrl}/ouvrage/gammes`;
+    private readonly baseUrl = `${environment.apiUrl}/ouvrages/gammes`;
 
     constructor(private http: HttpClient) { }
 

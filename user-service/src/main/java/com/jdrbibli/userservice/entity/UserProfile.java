@@ -53,7 +53,7 @@ public class UserProfile {
     private List<UserProfile> friends;
 
     /** Ensemble des gammes créées par l'utilisateur. */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Gamme> gammes = new HashSet<>();
 
     /** Retourne l'identifiant de l'utilisateur. */

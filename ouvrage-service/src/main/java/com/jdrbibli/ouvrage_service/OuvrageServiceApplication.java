@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 
  * Cette classe démarre l'application Spring Boot et initialise le contexte.
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.jdrbibli.ouvrage_service")
 public class OuvrageServiceApplication {
 
     /**

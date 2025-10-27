@@ -66,8 +66,8 @@ services:
   user-service:
     container_name: jdrbibli-user-service
     build:
-      context: .                      # ⚠️ le contexte devient la racine du projet !
-      dockerfile: user-service/Dockerfile  # on indique le chemin vers le Dockerfile
+      context: . # ⚠️ le contexte devient la racine du projet !
+      dockerfile: user-service/Dockerfile # on indique le chemin vers le Dockerfile
     ports:
       - "8082:8082"
     depends_on:
@@ -81,7 +81,6 @@ services:
       start_period: 20s
     networks:
       - jdrbibli-network
-
 
   ouvrage-service:
     container_name: jdrbibli-ouvrage-service
@@ -100,6 +99,8 @@ services:
       start_period: 20s
     networks:
       - jdrbibli-network
+    volumes:
+      - ./uploads/images:/app/uploads/images
 
   audit-service:
     container_name: jdrbibli-audit-service

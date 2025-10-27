@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/password-reset/**").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/users/*/cascade").permitAll()
                         // Endpoints nécessitant authentification
                         .requestMatchers("/auth/me").authenticated()
                         .requestMatchers("/auth/profile/**").authenticated()

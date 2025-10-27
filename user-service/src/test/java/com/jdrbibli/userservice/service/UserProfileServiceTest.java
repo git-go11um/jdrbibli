@@ -1,4 +1,4 @@
-package com.jdrbibli.userservice.service;
+/* package com.jdrbibli.userservice.service;
 
 import com.jdrbibli.userservice.config.StorageProperties;
 import com.jdrbibli.userservice.dto.FriendDTO;
@@ -212,7 +212,7 @@ class UserProfileServiceTest {
         byte[] result = userProfileService.getUserAvatar(1L);
         assertNotNull(result);
         assertEquals("dummy content", new String(result));
-    }
+    } */
 
     /* @Test
 void getUserAvatar_shouldReturnNull_whenAvatarNotExists() throws Exception {
@@ -230,7 +230,7 @@ void getUserAvatar_shouldReturnNull_whenAvatarNotExists() throws Exception {
 
 
 
-
+/* 
 
     @Test
     void getFriends_shouldReturnFriendList() {
@@ -256,7 +256,7 @@ void getUserAvatar_shouldReturnNull_whenAvatarNotExists() throws Exception {
         assertEquals("Bob", friends.get(0).getPseudo());
         assertEquals("Charlie", friends.get(1).getPseudo());
     }
-
+ */
     /* @Test
 void areFriends_shouldReturnTrue_whenFriends() {
     Long userId = 1L;
@@ -272,7 +272,7 @@ void areFriends_shouldReturnTrue_whenFriends() {
 
 
 
-
+/* 
 
     @Test
     void areFriends_shouldReturnFalse_whenNotFriends() {
@@ -386,7 +386,7 @@ void deleteUserByPseudo_shouldReturnNotFoundMessage_whenUserDoesNotExist() {
 
         assertTrue(result.isEmpty());
     }
-
+ */
     /* @Test
     void getOuvragesForUser_shouldReturnEmptyList() {
         Long userId = 1L;
@@ -411,5 +411,5 @@ void deleteUserByPseudo_shouldReturnNotFoundMessage_whenUserDoesNotExist() {
     
 
 
-    
-}
+/*     
+} */

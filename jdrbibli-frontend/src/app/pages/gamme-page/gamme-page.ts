@@ -104,6 +104,10 @@ export class GammePage implements OnInit {
 
   // Soumet le formulaire (ajout ou modification)
   submitFormulaire() {
+    if (!this.gamme?.id) {
+      console.error("Impossible d'ajouter : gamme non chargée.");
+      return;
+    }
     const dto: OuvrageDTO = {
       id: this.currentOuvrage.id,
       titre: this.currentOuvrage.titre.trim(),

@@ -35,7 +35,7 @@ export interface OuvrageDTO {
 })
 export class OuvrageService {
 
-    private apiUrl = `${environment.apiUrl}/api/ouvrage/ouvrages`;
+    private apiUrl = `${environment.apiUrl}/ouvrages`;
 
     constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -49,7 +49,7 @@ export class OuvrageService {
     }
 
     getByGammeId(gammeId: number): Observable<OuvrageDTO[]> {
-        return this.http.get<OuvrageDTO[]>(`${this.apiUrl}/gammes/${gammeId}`);
+        return this.http.get<OuvrageDTO[]>(`${this.apiUrl}/by-gamme/${gammeId}`);
     }
 
     create(ouvrage: OuvrageDTO): Observable<OuvrageDTO> {
@@ -72,7 +72,7 @@ export class OuvrageService {
     uploadImage(file: File) {
         const formData = new FormData();
         formData.append('file', file);
-        return this.http.post(`${environment.apiUrl}/api/ouvrage/ouvrages/upload-image`, formData, { responseType: 'text' });
+        return this.http.post(`${environment.apiUrl}/ouvrages/upload-image`, formData, { responseType: 'text' });
     }
 
     // ---------------- Ludothèque d’un ami ----------------
