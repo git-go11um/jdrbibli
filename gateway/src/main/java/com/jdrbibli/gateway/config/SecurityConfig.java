@@ -52,6 +52,7 @@ public class SecurityConfig {
 
                         // ✅ On autorise l'accès public aux images et à l'actuator
                         .pathMatchers("/uploads/**", "/actuator/**").permitAll()
+                        .pathMatchers("/api/users/profile/avatar/**").permitAll()
 
                         // Tout le reste = sécurisé
                         .anyExchange().authenticated())

@@ -47,25 +47,25 @@ export class ProfilUtilisateur implements OnInit {
       next: (data: any) => {
         this.pseudo = data.pseudo;
         this.email = data.email;
-        this.avatarUrl = data.avatarUrl
-          ? `${environment.apiUrl}${data.avatarUrl}?t=${new Date().getTime()}`
-          : null;  // Utilisation de environment.apiUrl
-      },
-      error: (error: any) => {
-        console.error('Erreur lors du chargement des informations utilisateur', error);
-      }
-    });
-  }
+        console.log('🧠 Données utilisateur reçues:', data);
 
-  deleteUser(): void {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;
-
-    this.authService.deleteUser().subscribe({
-      next: () => {
-        this.authService.logout();
-        this.router.navigate(['/home-public']);
+        if (data.avatarUrl) {
+          const endpoint = `${environment.apiUrl}${data.avatarUrl.replace(/^\/api/, '')}`;
+          this.http.get(endpoint, {
+            headers: this.authService.getAuthHeaders(),
+            responseType: 'blob'
+          }).subscribe({
+            next: blob => {
+              console.log('✅ Blob reçu pour avatar:', blob);
+              this.avatarUrl = URL.createObjectURL(blob);
+            },
+            error: err => console.error('Erreur chargement avatar sécurisé', err)
+          });
+        } else {
+          this.avatarUrl = null;
+        }
       },
-      error: (err: any) => alert('Une erreur est survenue lors de la suppression du compte.')
+      error: err => console.error('Erreur infos utilisateur', err)
     });
   }
 
@@ -89,6 +89,22 @@ export class ProfilUtilisateur implements OnInit {
     });
   }
 
+  deleteUser(): void {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;
+
+    this.authService.deleteUser().subscribe({
+      next: () => {
+        alert('Votre compte a bien été supprimé.');
+        this.authService.logout();
+        this.router.navigate(['/home-public']);
+      },
+      error: (err: any) => {
+        console.error('Erreur lors de la suppression du compte:', err);
+        alert('Une erreur est survenue lors de la suppression du compte.');
+      }
+    });
+  }
+
   goToResetPassword(): void {
     this.router.navigate(['/reset-profil-password']);
   }
@@ -103,7 +119,7 @@ export class ProfilUtilisateur implements OnInit {
         // Génération des URL avatars amis
         this.friends.forEach(friend => {
           this.friendsAvatarUrls[friend.id] = friend.avatarUrl
-            ? `${environment.apiUrl}${friend.avatarUrl}?t=${new Date().getTime()}`
+            ? `${environment.apiUrl}${friend.avatarUrl.replace(/^\/api/, '')}?t=${new Date().getTime()}`
             : '';  // Utilisation de environment.apiUrl
         });
       },
@@ -162,7 +178,7 @@ export class ProfilUtilisateur implements OnInit {
       next: (user: any) => {
         this.searchedUser = user;
         this.searchedUserAvatarUrl = user.avatarUrl
-          ? `${environment.apiUrl}${user.avatarUrl}?t=${new Date().getTime()}`
+          ? `${environment.apiUrl}${user.avatarUrl.replace(/^\/api/, '')}?t=${new Date().getTime()}`
           : '';  // Utilisation de environment.apiUrl
         this.requestSent = false;
       },
