@@ -50,11 +50,16 @@ public class SecurityConfig {
                                 "/api/auth/password-reset/**")
                         .permitAll()
 
-                        // ✅ On autorise l'accès public aux images et à l'actuator
-                        .pathMatchers("/uploads/**", "/actuator/**").permitAll()
+                        // ✅ Images d’ouvrages
+                        .pathMatchers("/api/uploads/**", "/uploads/**").permitAll()
+
+                        // ✅ Avatars utilisateur
                         .pathMatchers("/api/users/profile/avatar/**").permitAll()
 
-                        // Tout le reste = sécurisé
+                        // ✅ Actuator
+                        .pathMatchers("/actuator/**").permitAll()
+
+                        // Tout le reste = authentifié
                         .anyExchange().authenticated())
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)

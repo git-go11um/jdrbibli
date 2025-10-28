@@ -19,7 +19,8 @@ public class PublicFileController {
 
     @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> getImage(@PathVariable String filename) {
-        File file = new File("/app/uploads/images/" + filename);
+        // ✅ Corrigé : chemin relatif (et non absolu)
+        File file = new File("uploads/images/" + filename);
 
         if (!file.exists() || !file.isFile()) {
             return ResponseEntity.notFound().build();

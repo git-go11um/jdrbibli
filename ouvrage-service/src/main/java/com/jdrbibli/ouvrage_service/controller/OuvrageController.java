@@ -21,6 +21,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
+
 /**
  * Contrôleur REST pour gérer les {@link Ouvrage} dans le microservice
  * {@code ouvrage-service}.
@@ -315,6 +319,48 @@ public class OuvrageController {
 
         Ouvrage ouvrage = ouvrageOpt.get();
         return ResponseEntity.ok(ouvrageMapper.toDTO(ouvrage));
+    }
+
+    /**
+     * Récupère l'image associée à un ouvrage.
+     *
+     * @param id identifiant de l'ouvrage
+     * @return le fichier image ou 404 si non trouvé
+     */
+    @GetMapping("/{id}/image")
+    public ResponseEntity<Resource> getOuvrageImage(@PathVariable Long id) {
+        try {
+            Optional<Ouvrage> ouvrageOpt = ouvrageService.findById(id);
+            if (ouvrageOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            Ouvrage ouvrage = ouvrageOpt.get();
+            String imageUrl = ouvrage.getImageUrl();
+
+            if (imageUrl == null || imageUrl.isBlank()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            Path imagePath = Paths.get("uploads/images").resolve(Paths.get(imageUrl).getFileName()).normalize();
+            if (!Files.exists(imagePath)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            Resource resource = new UrlResource(imagePath.toUri());
+            String contentType = Files.probeContentType(imagePath);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

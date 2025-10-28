@@ -43,9 +43,9 @@ spring:
         - id: ouvrage-service-uploads
           uri: http://ouvrage-service:8083
           predicates:
-            - Path=/uploads/images/**
+            - Path=/uploads/images/**, /api/uploads/images/**, /api/uploads/**
           filters:
-            - StripPrefix=0
+            - StripPrefix=1
           metadata:
             cors:
               allowedOrigins: "*"

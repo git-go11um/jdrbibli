@@ -102,4 +102,16 @@ export class OuvrageService {
         return this.http.get<OuvrageDTO>(`${this.apiUrl}/friend/${friendId}/${ouvrageId}`, { headers });
     }
 
+    getOuvrageImage(imageUrl: string): Observable<Blob> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        });
+
+        // imageUrl correspond à "/uploads/images/xxx.jpg"
+        return this.http.get(`http://localhost:8084/api${imageUrl}`, {
+            headers,
+            responseType: 'blob'
+        });
+    }
+
 }

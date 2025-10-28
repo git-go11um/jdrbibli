@@ -196,14 +196,34 @@ export class ProfilUtilisateur implements OnInit {
     ).subscribe({
       next: (user: any) => {
         this.searchedUser = user;
-        this.searchedUserAvatarUrl = user.avatarUrl
-          ? `${environment.apiUrl}${user.avatarUrl.replace(/^\/api/, '')}?t=${new Date().getTime()}`
-          : '';  // Utilisation de environment.apiUrl
         this.requestSent = false;
+
+        if (user.avatarUrl) {
+          const endpoint = `${environment.apiUrl}${user.avatarUrl.replace(/^\/api/, '')}`;
+          console.log('🧩 Chargement avatar utilisateur recherché:', endpoint);
+
+          // 🔒 Récupération sécurisée du blob avec token JWT
+          this.http.get(endpoint, {
+            headers: this.authService.getAuthHeaders(),
+            responseType: 'blob'
+          }).subscribe({
+            next: blob => {
+              this.searchedUserAvatarUrl = URL.createObjectURL(blob);
+              console.log('✅ Avatar utilisateur recherché chargé (blob)');
+            },
+            error: err => {
+              console.error('Erreur chargement avatar utilisateur recherché', err);
+              this.searchedUserAvatarUrl = '';
+            }
+          });
+        } else {
+          this.searchedUserAvatarUrl = '';
+        }
       },
       error: (err: any) => {
         console.error('Utilisateur non trouvé', err);
         this.searchedUser = null;
+        this.searchedUserAvatarUrl = '';
         alert('Pseudo inconnu');
       }
     });
