@@ -92,6 +92,13 @@ export class ProfilUtilisateur implements OnInit {
   deleteUser(): void {
     if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return;
 
+    // ✅ Bloque le double clic
+    if ((this as any)._isDeleting) return;
+    (this as any)._isDeleting = true;
+
+    const btn = document.activeElement as HTMLButtonElement;
+    if (btn) btn.disabled = true;
+
     this.authService.deleteUser().subscribe({
       next: () => {
         alert('Votre compte a bien été supprimé.');
@@ -101,9 +108,17 @@ export class ProfilUtilisateur implements OnInit {
       error: (err: any) => {
         console.error('Erreur lors de la suppression du compte:', err);
         alert('Une erreur est survenue lors de la suppression du compte.');
+      },
+      complete: () => {
+        (this as any)._isDeleting = false;
+        if (btn) btn.disabled = false;
       }
     });
   }
+
+
+
+
 
   goToResetPassword(): void {
     this.router.navigate(['/reset-profil-password']);

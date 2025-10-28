@@ -19,11 +19,13 @@ public class FriendRequest {
     /** Utilisateur qui envoie la demande */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private UserProfile sender;
 
     /** Utilisateur qui reçoit la demande */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "receiver_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private UserProfile receiver;
 
     /** Statut de la demande */
@@ -73,25 +75,61 @@ public class FriendRequest {
     }
 
     // --- Getters / Setters ---
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public UserProfile getSender() { return sender; }
-    public void setSender(UserProfile sender) { this.sender = sender; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public UserProfile getReceiver() { return receiver; }
-    public void setReceiver(UserProfile receiver) { this.receiver = receiver; }
+    public UserProfile getSender() {
+        return sender;
+    }
 
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
+    public void setSender(UserProfile sender) {
+        this.sender = sender;
+    }
 
-    public boolean isPending() { return status == Status.PENDING; }
-    public boolean isAccepted() { return status == Status.ACCEPTED; }
-    public boolean isRejected() { return status == Status.REJECTED; }
+    public UserProfile getReceiver() {
+        return receiver;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getRespondedAt() { return respondedAt; }
-    public void setRespondedAt(LocalDateTime respondedAt) { this.respondedAt = respondedAt; }
+    public void setReceiver(UserProfile receiver) {
+        this.receiver = receiver;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public boolean isPending() {
+        return status == Status.PENDING;
+    }
+
+    public boolean isAccepted() {
+        return status == Status.ACCEPTED;
+    }
+
+    public boolean isRejected() {
+        return status == Status.REJECTED;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getRespondedAt() {
+        return respondedAt;
+    }
+
+    public void setRespondedAt(LocalDateTime respondedAt) {
+        this.respondedAt = respondedAt;
+    }
 
     @Override
     public String toString() {
@@ -108,5 +146,4 @@ public class FriendRequest {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-    
 }

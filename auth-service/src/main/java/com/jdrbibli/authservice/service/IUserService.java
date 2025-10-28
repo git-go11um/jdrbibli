@@ -9,7 +9,8 @@ import jakarta.mail.MessagingException;
 
 /**
  * Interface définissant les services liés aux utilisateurs.
- * Contient l'inscription, la connexion, la gestion des mots de passe, et la modification de profil.
+ * Contient l'inscription, la connexion, la gestion des mots de passe, et la
+ * modification de profil.
  */
 public interface IUserService {
 
@@ -24,7 +25,8 @@ public interface IUserService {
     User login(String email, String password);
 
     /**
-     * Convertit un objet User en DTO pour exposer uniquement les informations nécessaires.
+     * Convertit un objet User en DTO pour exposer uniquement les informations
+     * nécessaires.
      */
     UserResponseDTO toDTO(User user);
 
@@ -36,7 +38,7 @@ public interface IUserService {
     /**
      * Récupère un utilisateur à partir de son ID.
      */
-    User getUserById(Long id); 
+    User getUserById(Long id);
 
     /**
      * Change le mot de passe d'un utilisateur via son email.
@@ -54,7 +56,8 @@ public interface IUserService {
     void requestPasswordReset(String pseudo) throws MessagingException;
 
     /**
-     * Réinitialise le mot de passe d'un utilisateur en utilisant le code reçu par email.
+     * Réinitialise le mot de passe d'un utilisateur en utilisant le code reçu par
+     * email.
      */
     void resetPassword(String pseudo, String resetCode, String newPassword);
 
@@ -64,12 +67,16 @@ public interface IUserService {
     void deleteUserById(Long userId);
 
     /**
-     * Met à jour le profil d'un utilisateur (pseudo et email) et retourne la réponse incluant un nouveau token si nécessaire.
+     * Met à jour le profil d'un utilisateur (pseudo et email) et retourne la
+     * réponse incluant un nouveau token si nécessaire.
      */
     ReponseProfileChange updateUserProfile(Long userId, String newPseudo, String newEmail);
 
     /**
-     * Change le mot de passe d'un utilisateur connecté à partir de son pseudo et de la requête de changement.
+     * Change le mot de passe d'un utilisateur connecté à partir de son pseudo et de
+     * la requête de changement.
      */
     void changeProfilePassword(String userPseudo, ChangePasswordProfileRequest request);
+
+    boolean deleteUserWithCascade(Long userId);
 }

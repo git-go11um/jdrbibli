@@ -57,14 +57,12 @@ public class SecurityConfig {
                         // Actuator
                         .requestMatchers("/actuator/**").permitAll()
                         // Endpoints publics
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/password-reset/**").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/users/*/cascade").permitAll()
-                        // Endpoints nécessitant authentification
-                        .requestMatchers("/auth/me").authenticated()
-                        .requestMatchers("/auth/profile/**").authenticated()
+                        // ✅ Autoriser via API Gateway
+                        .requestMatchers("/api/auth/**").authenticated()
                         // Tout le reste sécurisé
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())

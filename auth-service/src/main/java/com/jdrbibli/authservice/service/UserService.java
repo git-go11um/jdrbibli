@@ -107,26 +107,50 @@ public class UserService implements IUserService {
     @Transactional
     public boolean deleteUserWithCascade(Long userId) {
         String url = userServiceUrl + "/api/users/" + userId + "/cascade";
+        boolean userServiceDeleted = false;
+        boolean authServiceDeleted = false;
+
+        // --- Suppression dans user-service ---
         try {
-            restTemplate.delete(url);
-            System.out.println("✅ Suppression cascade réussie dans user-service pour id=" + userId);
+            ResponseEntity<Void> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Void.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                System.out.println("✅ Suppression cascade réussie dans user-service pour id=" + userId);
+                userServiceDeleted = true;
+            } else {
+                System.err.println(
+                        "⚠️ Réponse inattendue du user-service (" + response.getStatusCode() + ") pour id=" + userId);
+            }
         } catch (HttpClientErrorException.NotFound e) {
-            System.err.println("Profil utilisateur " + userId + " inexistant côté user-service.");
+            System.out.println("ℹ️ Profil utilisateur " + userId + " inexistant côté user-service (déjà supprimé).");
+        } catch (HttpClientErrorException.Forbidden e) {
+            System.err.println("❌ Accès refusé au user-service lors de la suppression du profil " + userId);
         } catch (Exception e) {
-            System.err
-                    .println("Erreur lors de la suppression dans user-service (id=" + userId + ") : " + e.getMessage());
-            return false;
+            System.err.println(
+                    "⚠️ Erreur lors de la suppression dans user-service pour id=" + userId + " : " + e.getMessage());
         }
 
-        if (userRepository.existsById(userId)) {
-            userRepository.deleteById(userId);
-            System.out.println("✅ Compte utilisateur " + userId + " supprimé côté auth-service.");
+        // --- Suppression dans auth-service ---
+        try {
+            if (userRepository.existsById(userId)) {
+                userRepository.deleteById(userId);
+                System.out.println("✅ Compte utilisateur " + userId + " supprimé côté auth-service.");
+                authServiceDeleted = true;
+            } else {
+                System.out.println("⚠️ Compte utilisateur " + userId + " déjà supprimé côté auth-service.");
+            }
+        } catch (Exception e) {
+            System.err.println(
+                    "⚠️ Erreur lors de la suppression dans auth-service pour id=" + userId + " : " + e.getMessage());
+        }
+
+        // --- Résultat final ---
+        if (userServiceDeleted || authServiceDeleted) {
             auditClient.logEvent("auth-service", "USER_DELETED", "Utilisateur supprimé avec id: " + userId);
             return true;
-        } else {
-            System.err.println("Compte utilisateur " + userId + " déjà supprimé côté auth-service.");
-            return false;
         }
+
+        System.err.println("⚠️ Suppression incomplète pour l'utilisateur " + userId);
+        return false;
     }
 
     @Override
@@ -144,6 +168,7 @@ public class UserService implements IUserService {
         } catch (Exception e) {
             System.err.println(
                     "⚠️ Erreur lors de la suppression dans user-service (id=" + userId + ") : " + e.getMessage());
+            e.printStackTrace(); // 👈 ajoute ceci
         }
 
         auditClient.logEvent("auth-service", "USER_DELETED", "Utilisateur supprimé avec id: " + userId);

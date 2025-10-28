@@ -102,14 +102,15 @@ export class AuthService {
     if (!userId) return throwError(() => new Error('ID utilisateur manquant'));
 
     const headers = this.authHeaders();
-    return this.http.delete<any>(`${this.apiAuthUrl}/profile/${userId}`, { headers })  // Correction : l'ID est dans l'URL de l'API
-      .pipe(
-        tap(res => {
-          console.log('User deleted:', res);
-          this.clearAuth();  // Logique supplémentaire pour effacer les informations après suppression
-        }),
-        catchError(this.handleError)
-      );
+    return this.http.delete<any>(`${this.apiAuthUrl}/profile/${userId}`, { headers }).pipe(
+      tap(res => {
+        console.log('✅ Compte supprimé:', res?.message || res);
+        this.clearAuth(); // efface le token et les infos utilisateur
+        alert('Votre compte a été supprimé avec succès.');
+        window.location.href = '/'; // ✅ redirection vers la page publique
+      }),
+      catchError(this.handleError)
+    );
   }
 
   // ---------------- AVATAR ----------------

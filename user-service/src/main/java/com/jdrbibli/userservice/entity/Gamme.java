@@ -22,6 +22,7 @@ public class Gamme {
     /** Propriétaire de la gamme */
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private UserProfile user;
 
     /** Ouvrages appartenant à cette gamme */
@@ -29,18 +30,44 @@ public class Gamme {
     private Set<Ouvrage> ouvrages = new HashSet<>();
 
     // --- Getters / Setters ---
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getTitle() {
+        return title;
+    }
 
-    public UserProfile getUser() { return user; }
-    public void setUser(UserProfile user) { this.user = user; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public Set<Ouvrage> getOuvrages() { return ouvrages; }
-    public void setOuvrages(Set<Ouvrage> ouvrages) { this.ouvrages = ouvrages; }
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public UserProfile getUser() {
+        return user;
+    }
+
+    public void setUser(UserProfile user) {
+        this.user = user;
+    }
+
+    public Set<Ouvrage> getOuvrages() {
+        return ouvrages;
+    }
+
+    public void setOuvrages(Set<Ouvrage> ouvrages) {
+        this.ouvrages = ouvrages;
+    }
+
 }

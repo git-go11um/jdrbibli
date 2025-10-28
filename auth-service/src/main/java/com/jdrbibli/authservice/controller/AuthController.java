@@ -2,6 +2,7 @@ package com.jdrbibli.authservice.controller;
 
 import com.jdrbibli.authservice.dto.*;
 import com.jdrbibli.authservice.entity.User;
+import com.jdrbibli.authservice.exception.UserNotFoundException;
 import com.jdrbibli.authservice.security.JwtService;
 import com.jdrbibli.authservice.service.IUserService;
 import jakarta.mail.MessagingException;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,7 +47,7 @@ import java.util.Map;
  * 
  */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping({"/auth", "/api/auth"})
 public class AuthController {
 
     private final IUserService userService;
@@ -374,5 +377,38 @@ public class AuthController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", token);
         return headers;
+    }
+
+    /**
+     * Suppression de compte (orchestrée) appelée par le front :
+     * /api/auth/profile/{id}
+     */
+    @DeleteMapping("/profile/{id}")
+    public ResponseEntity<Map<String, Object>> deleteMyAccount(@PathVariable Long id, Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            boolean deleted = userService.deleteUserWithCascade(id);
+
+            if (deleted) {
+                response.put("message", "Compte supprimé avec succès");
+                return ResponseEntity.ok(response); // ✅ 200 OK
+            } else {
+                response.put("message", "Utilisateur non trouvé ou déjà supprimé");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response); // ✅ 404 cohérent
+            }
+
+        } catch (UserNotFoundException e) {
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la suppression du compte utilisateur " + id + " : " + e.getMessage());
+            response.put("message", "Erreur interne du serveur");
+            response.put("timestamp", new Date());
+            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); // ✅ 500 uniquement si
+                                                                                           // imprévu
+        }
     }
 }
