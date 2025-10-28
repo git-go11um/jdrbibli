@@ -2,6 +2,7 @@
 volumes:
   jdrbibli_db_data:
   mongo_data:
+  jenkins_home:
 
 services:
   mariadb:
@@ -167,6 +168,24 @@ services:
       - "8080:80"
     depends_on:
       - mariadb
+    networks:
+      - jdrbibli-network
+
+  jdrbibli-jenkins:
+    container_name: jdrbibli-jenkins
+    image: jenkins/jenkins:lts-jdk21
+    user: root
+    ports:
+      - "8090:8080"    # UI Jenkins : http://localhost:8090
+      - "50000:50000"  # (agents distants)
+    environment:
+      - TZ=Europe/Paris
+      - JAVA_OPTS=-Duser.timezone=Europe/Paris
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - gateway
     networks:
       - jdrbibli-network
 
