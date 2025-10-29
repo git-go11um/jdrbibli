@@ -1,57 +1,80 @@
 package com.jdrbibli.ouvrage_service.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.security.Key;
-import java.util.Date;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
+class JwtAuthenticationFilterTest {
 
-import java.security.Key;
-import java.util.Date;
+    private JwtTokenProvider jwtTokenProvider;
+    private AuthenticationManager authenticationManager;
+    private JwtAuthenticationFilter filter;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+    private FilterChain filterChain;
 
-@Component
-public class JwtTokenProviderTest {
+    @BeforeEach
+    void setUp() {
+        jwtTokenProvider = mock(JwtTokenProvider.class);
+        authenticationManager = mock(AuthenticationManager.class);
+        filter = new JwtAuthenticationFilter(jwtTokenProvider, authenticationManager);
 
-    // Génération d'une clé HS512 sécurisée
-    private static final Key JWT_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        request = mock(HttpServletRequest.class);
+        response = mock(HttpServletResponse.class);
+        filterChain = mock(FilterChain.class);
 
-    private static final long JWT_EXPIRATION = 86400000; // 24h en ms
+        // ✅ Empêche NullPointerException lors des tests unitaires
+        when(request.getRequestURI()).thenReturn("/api/test");
 
-    public String generateToken(String username) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
-
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(JWT_KEY)
-                .compact();
+        SecurityContextHolder.clearContext();
     }
 
-    public Claims getClaimsFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(JWT_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    @Test
+    void doFilterInternal_shouldAuthenticate_whenTokenIsValid() throws Exception {
+        String token = "validToken";
+        Claims claims = mock(Claims.class);
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(jwtTokenProvider.validateToken(token)).thenReturn(true);
+        when(jwtTokenProvider.getClaimsFromToken(token)).thenReturn(claims);
+        when(claims.getSubject()).thenReturn("admin");
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
+        assertEquals("admin", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+
+        verify(filterChain).doFilter(request, response);
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Claims claims = getClaimsFromToken(token);
-            return claims.getExpiration().after(new Date());
-        } catch (Exception e) {
-            return false;
-        }
+    @Test
+    void doFilterInternal_shouldNotAuthenticate_whenNoToken() throws Exception {
+        when(request.getHeader("Authorization")).thenReturn(null);
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    void doFilterInternal_shouldNotAuthenticate_whenTokenInvalid() throws Exception {
+        String token = "invalidToken";
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(jwtTokenProvider.validateToken(token)).thenReturn(false);
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        verify(filterChain).doFilter(request, response);
     }
 }
