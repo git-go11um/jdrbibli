@@ -31,7 +31,7 @@ class JwtAuthenticationFilterTest {
         response = mock(HttpServletResponse.class);
         filterChain = mock(FilterChain.class);
 
-        // ✅ Empêche NullPointerException dans doFilterInternal()
+        // ✅ Empêche NullPointerException dans doFilterInternal() 
         when(request.getRequestURI()).thenReturn("/api/test");
 
         SecurityContextHolder.clearContext();
