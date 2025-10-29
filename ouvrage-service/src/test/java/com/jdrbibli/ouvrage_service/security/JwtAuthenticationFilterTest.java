@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -32,7 +31,8 @@ class JwtAuthenticationFilterTest {
         response = mock(HttpServletResponse.class);
         filterChain = mock(FilterChain.class);
 
-        when(request.getServletPath()).thenReturn("/api/test"); // ✅ empêche NPE
+        // ✅ Évite les NPE sur request.getServletPath()
+        when(request.getServletPath()).thenReturn("/api/test");
 
         SecurityContextHolder.clearContext();
     }
@@ -51,7 +51,6 @@ class JwtAuthenticationFilterTest {
 
         assertNotNull(SecurityContextHolder.getContext().getAuthentication());
         assertEquals("admin", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-
         verify(filterChain).doFilter(request, response);
     }
 

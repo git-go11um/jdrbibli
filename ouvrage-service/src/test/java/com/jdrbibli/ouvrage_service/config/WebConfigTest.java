@@ -21,7 +21,7 @@ class WebConfigTest {
         webConfig.addResourceHandlers(registry);
 
         verify(registry).addResourceHandler("/uploads/images/**");
-        // ✅ on rend le test compatible avec tous les chemins commençant par "file:"
+        // ✅ Compatible Docker : le chemin peut être relatif ou absolu
         verify(registration).addResourceLocations(startsWith("file:"));
     }
 }
