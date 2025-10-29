@@ -2,29 +2,31 @@ pipeline {
     agent any
 
     environment {
-    PROJECT_NAME = 'JdrBibli'
-    MAVEN_HOME = tool 'maven-3.9.9'
-}
+        PROJECT_NAME = 'JdrBibli'
+        MAVEN_HOME = tool 'maven-3.9.9'
+    }
 
     stages {
-
         stage('Checkout') {
             steps {
-                echo "🔄 Clonage du dépôt GitHub..."
+                echo '🔄 Clonage du dépôt GitHub...'
                 checkout scm
             }
         }
 
         stage('Build & Test (Maven)') {
             steps {
-                echo "🏗️ Compilation et exécution des tests unitaires..."
-                sh "mvn -B clean install -DskipTests=false"
+                echo '🏗️ Compilation et exécution des tests unitaires...'
+                script {
+                    def mvnHome = tool 'maven-3.9.9'
+                    sh "${mvnHome}/bin/mvn -B clean install -DskipTests=false"
+                }
             }
         }
 
         stage('Docker Build') {
             steps {
-                echo "🐳 Construction des images Docker..."
+                echo '🐳 Construction des images Docker...'
                 script {
                     def services = ['auth-service', 'user-service', 'ouvrage-service', 'audit-service', 'gateway']
                     for (svc in services) {
@@ -36,8 +38,8 @@ pipeline {
 
         stage('Docker Compose Up') {
             steps {
-                echo "🚀 Lancement des conteneurs (docker-compose up)..."
-                sh "docker compose up -d"
+                echo '🚀 Lancement des conteneurs (docker-compose up)...'
+                sh 'docker compose up -d'
             }
         }
     }
@@ -47,7 +49,7 @@ pipeline {
             echo "✅ Build et déploiement réussis pour ${PROJECT_NAME}"
         }
         failure {
-            echo "❌ Erreur durant le pipeline, vérifie les logs Jenkins."
+            echo '❌ Erreur durant le pipeline, vérifie les logs Jenkins.'
         }
     }
 }
