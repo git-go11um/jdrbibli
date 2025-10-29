@@ -2,13 +2,9 @@ pipeline {
     agent any
 
     environment {
-        // Nom du projet
-        PROJECT_NAME = 'JdrBibli'
-        // Version Maven à utiliser
-        MAVEN_HOME = tool 'maven-3.9.9'
-        // Variables Docker
-        DOCKERHUB_USER = credentials('dockerhub-user') // optionnel pour push
-    }
+    PROJECT_NAME = 'JdrBibli'
+    MAVEN_HOME = tool 'maven-3.9.9'
+}
 
     stages {
 
