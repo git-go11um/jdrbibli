@@ -31,8 +31,8 @@ class JwtAuthenticationFilterTest {
         response = mock(HttpServletResponse.class);
         filterChain = mock(FilterChain.class);
 
-        // ✅ Évite les NPE sur request.getServletPath()
-        when(request.getServletPath()).thenReturn("/api/test");
+        // ✅ Empêche NullPointerException dans doFilterInternal()
+        when(request.getRequestURI()).thenReturn("/api/test");
 
         SecurityContextHolder.clearContext();
     }
